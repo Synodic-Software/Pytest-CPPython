@@ -4,9 +4,8 @@ Test the integrations related to the internal generator implementation and the '
 
 import pytest
 
-from cppython.data import default_pyproject
-from cppython.plugins.generator.cmake import CMakeData, CMakeGenerator
-from cppython.plugins.test.pytest import GeneratorIntegrationTests
+from pytest_cppython.plugin import GeneratorIntegrationTests
+from tests.data import TestGenerator
 
 
 class TestCMakeGenerator(GeneratorIntegrationTests):
@@ -15,12 +14,11 @@ class TestCMakeGenerator(GeneratorIntegrationTests):
     """
 
     @pytest.fixture(name="generator")
-    def fixture_generator(self):
+    def fixture_generator(self) -> TestGenerator:
         """
         Override of the plugin provided generator fixture.
 
         Returns:
             CMakeGenerator -- The Generator object to use for the CPPython defined tests
         """
-        cmake_data = CMakeData()
-        return CMakeGenerator(default_pyproject, cmake_data)
+        return TestGenerator()

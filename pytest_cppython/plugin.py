@@ -6,9 +6,7 @@ from abc import ABC
 from importlib.metadata import entry_points
 
 import pytest
-from cppython.data import default_pyproject
-from cppython.project import Project
-from cppython.schema import Generator, Interface
+from cppython_core.schema import Generator, Interface
 
 
 class GeneratorTests(ABC):
@@ -81,12 +79,6 @@ class InterfaceIntegrationTests(InterfaceTests):
     """
     Base class for all interface integration tests that test plugin agnostic behavior
     """
-
-    def test_project(self, interface: Interface):
-        """
-        Test that the project can be constructed from the given interface
-        """
-        Project(interface, default_pyproject)
 
 
 class InterfaceUnitTests(InterfaceTests):
