@@ -3,9 +3,10 @@ Test the functions related to the internal generator implementation and the 'Gen
 """
 
 import pytest
+from cppython_core.schema import GeneratorData
 
 from pytest_cppython.plugin import GeneratorUnitTests
-from tests.data import TestGenerator
+from tests.data import TestGenerator, test_pyproject
 
 
 class TestCMakeGenerator(GeneratorUnitTests):
@@ -21,4 +22,6 @@ class TestCMakeGenerator(GeneratorUnitTests):
         Returns:
             CMakeGenerator -- The Generator object to use for the CPPython defined tests
         """
-        return TestGenerator()
+
+        data = GeneratorData()
+        return TestGenerator(test_pyproject, data)
