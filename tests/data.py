@@ -3,6 +3,7 @@ TODO
 """
 
 
+from pathlib import Path
 from typing import Type
 
 from cppython_core.schema import (
@@ -16,7 +17,7 @@ from cppython_core.schema import (
     ToolData,
 )
 
-test_cppython = CPPythonData()
+test_cppython = CPPythonData(**{"generator":"test_generator", "target":"executable", "install-path": Path()})
 test_tool = ToolData(cppython=test_cppython)
 test_pep621 = PEP621(name="test-project", version="1.0.0", description="This is a test project")
 test_pyproject = PyProject(project=test_pep621, tool=test_tool)
