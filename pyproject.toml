@@ -23,7 +23,7 @@ paths = ["LICENSE.md"]
 
 [project.urls]
 homepage = "https://github.com/Synodic-Software/Pytest-CPPython"
-repository = "https://github.com/Synodic-Software/Pytest-CPPython-PDM"
+repository = "https://github.com/Synodic-Software/Pytest-CPPython"
 
 [tool.pdm]
 version = {use_scm = true}
