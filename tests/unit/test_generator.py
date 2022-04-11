@@ -24,4 +24,4 @@ class TestCMakeGenerator(GeneratorUnitTests):
         """
 
         data = GeneratorData()
-        return TestGenerator(test_pyproject, data)
+        return TestGenerator(test_pyproject)

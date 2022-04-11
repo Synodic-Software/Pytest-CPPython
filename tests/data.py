@@ -17,7 +17,7 @@ from cppython_core.schema import (
     ToolData,
 )
 
-test_cppython = CPPythonData(**{"generator":"test_generator", "target":"executable", "install-path": Path()})
+test_cppython = CPPythonData(**{"generator": "test_generator", "target": "executable", "install-path": Path()})
 test_tool = ToolData(cppython=test_cppython)
 test_pep621 = PEP621(name="test-project", version="1.0.0", description="This is a test project")
 test_pyproject = PyProject(project=test_pep621, tool=test_tool)
@@ -50,8 +50,8 @@ class TestGenerator(Generator):
     TODO
     """
 
-    def __init__(self, pyproject: PyProject, generator_data: GeneratorData) -> None:
-        super().__init__(pyproject, generator_data)
+    def __init__(self, pyproject: PyProject) -> None:
+        super().__init__(pyproject)
 
     @staticmethod
     def name() -> str:
