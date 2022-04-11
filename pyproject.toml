@@ -15,7 +15,7 @@ dynamic = ["version"]
 requires-python = ">=3.10"
 
 dependencies = [
-  "cppython-core>=0.1.0",
+  "cppython-core>=0.1.4",
 ]
 
 [project.license-files]
@@ -23,15 +23,15 @@ paths = ["LICENSE.md"]
 
 [project.urls]
 homepage = "https://github.com/Synodic-Software/Pytest-CPPython"
-repository = "https://github.com/Synodic-Software/Pytest-CPPython-PDM"
+repository = "https://github.com/Synodic-Software/Pytest-CPPython"
 
 [tool.pdm]
 version = {use_scm = true}
 
 [tool.pdm.dev-dependencies]
 lint = [
-  "black>=22.1.0",
-  "pylint>=2.12.2",
+  "black>=22.3.0",
+  "pylint>=2.13.5",
   "isort>=5.10.1",
 ]
 test = [
