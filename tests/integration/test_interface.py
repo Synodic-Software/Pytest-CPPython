@@ -4,7 +4,7 @@ TODO
 import pytest
 
 from pytest_cppython.plugin import InterfaceIntegrationTests
-from tests.data import TestInterface
+from tests.data import MockInterface
 
 
 class TestCPPythonInterface(InterfaceIntegrationTests):
@@ -13,11 +13,11 @@ class TestCPPythonInterface(InterfaceIntegrationTests):
     """
 
     @pytest.fixture(name="interface")
-    def fixture_interface(self) -> TestInterface:
+    def fixture_interface(self) -> MockInterface:
         """
         Override of the plugin provided interface fixture.
 
         Returns:
             ConsoleInterface -- The Interface object to use for the CPPython defined tests
         """
-        return TestInterface()
+        return MockInterface()

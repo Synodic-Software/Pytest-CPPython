@@ -3,9 +3,10 @@ Test the integrations related to the internal generator implementation and the '
 """
 
 import pytest
+from cppython_core.schema import Generator
 
 from pytest_cppython.plugin import GeneratorIntegrationTests
-from tests.data import TestGenerator, test_pyproject
+from tests.data import MockGenerator, test_pyproject
 
 
 class TestCMakeGenerator(GeneratorIntegrationTests):
@@ -14,7 +15,7 @@ class TestCMakeGenerator(GeneratorIntegrationTests):
     """
 
     @pytest.fixture(name="generator")
-    def fixture_generator(self) -> TestGenerator:
+    def fixture_generator(self) -> MockGenerator:
         """
         Override of the plugin provided generator fixture.
 
@@ -22,4 +23,4 @@ class TestCMakeGenerator(GeneratorIntegrationTests):
             CMakeGenerator -- The Generator object to use for the CPPython defined tests
         """
 
-        return TestGenerator(test_pyproject)
+        return MockGenerator(test_pyproject)
