@@ -35,6 +35,17 @@ class GeneratorIntegrationTests(GeneratorTests):
         plugin_entries = entry_points(group=f"cppython.{generator.plugin_group()}")
         assert len(plugin_entries) > 0
 
+    def test_is_downloaded(self, generator: Generator):
+        """
+        TODO
+        """
+
+        assert not generator.generator_downloaded()
+
+        generator.download_generator()
+
+        assert generator.generator_downloaded()
+
 
 class GeneratorUnitTests(GeneratorTests):
     """

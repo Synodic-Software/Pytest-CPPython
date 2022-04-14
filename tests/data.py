@@ -23,7 +23,7 @@ test_pep621 = PEP621(name="test-project", version="1.0.0", description="This is 
 test_pyproject = PyProject(project=test_pep621, tool=test_tool)
 
 
-class TestInterface(Interface):
+class MockInterface(Interface):
     """
     TODO
     """
@@ -45,13 +45,15 @@ class TestInterface(Interface):
         """
 
 
-class TestGenerator(Generator):
+class MockGenerator(Generator):
     """
     TODO
     """
 
     def __init__(self, pyproject: PyProject) -> None:
         super().__init__(pyproject)
+
+        self.downloaded = False
 
     @staticmethod
     def name() -> str:
@@ -62,10 +64,10 @@ class TestGenerator(Generator):
         return GeneratorData
 
     def generator_downloaded(self) -> bool:
-        return True
+        return self.downloaded
 
     def download_generator(self) -> None:
-        pass
+        self.downloaded = True
 
     def update_generator(self) -> None:
         pass

@@ -16,6 +16,7 @@ requires-python = ">=3.10"
 
 dependencies = [
   "cppython-core>=0.1.4",
+  "pydantic>=1.9.0",
 ]
 
 [project.license-files]
@@ -57,6 +58,7 @@ profile = "black"
 
 [tool.pylint.messages_control]
 disable = "C0330, C0326"
+extension-pkg-whitelist = "pydantic"
 
 [tool.pylint.format]
 max-line-length = "120"

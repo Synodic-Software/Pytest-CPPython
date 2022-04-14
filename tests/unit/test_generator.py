@@ -5,7 +5,7 @@ Test the functions related to the internal generator implementation and the 'Gen
 import pytest
 
 from pytest_cppython.plugin import GeneratorUnitTests
-from tests.data import TestGenerator, test_pyproject
+from tests.data import MockGenerator, test_pyproject
 
 
 class TestCMakeGenerator(GeneratorUnitTests):
@@ -14,7 +14,7 @@ class TestCMakeGenerator(GeneratorUnitTests):
     """
 
     @pytest.fixture(name="generator")
-    def fixture_generator(self) -> TestGenerator:
+    def fixture_generator(self) -> MockGenerator:
         """
         Override of the plugin provided generator fixture.
 
@@ -22,4 +22,4 @@ class TestCMakeGenerator(GeneratorUnitTests):
             CMakeGenerator -- The Generator object to use for the CPPython defined tests
         """
 
-        return TestGenerator(test_pyproject)
+        return MockGenerator(test_pyproject)
