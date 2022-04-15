@@ -63,13 +63,13 @@ class MockGenerator(Generator):
     def data_type() -> Type[GeneratorData]:
         return GeneratorData
 
-    def generator_downloaded(self) -> bool:
+    def generator_downloaded(self, path: Path) -> bool:
         return self.downloaded
 
-    def download_generator(self) -> None:
+    def download_generator(self, path: Path) -> None:
         self.downloaded = True
 
-    def update_generator(self) -> None:
+    def update_generator(self, path: Path) -> None:
         pass
 
     def install(self) -> None:
