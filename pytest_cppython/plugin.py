@@ -4,6 +4,7 @@ TODO: Should by a pytest plugin, removing the need for this module in production
 """
 from abc import ABC
 from importlib.metadata import entry_points
+from pathlib import Path
 
 import pytest
 from cppython_core.schema import Generator, Interface
@@ -35,16 +36,16 @@ class GeneratorIntegrationTests(GeneratorTests):
         plugin_entries = entry_points(group=f"cppython.{generator.plugin_group()}")
         assert len(plugin_entries) > 0
 
-    def test_is_downloaded(self, generator: Generator):
+    def test_is_downloaded(self, generator: Generator, tmp_path: Path):
         """
         TODO
         """
 
-        assert not generator.generator_downloaded()
+        assert not generator.generator_downloaded(tmp_path)
 
-        generator.download_generator()
+        generator.download_generator(tmp_path)
 
-        assert generator.generator_downloaded()
+        assert generator.generator_downloaded(tmp_path)
 
 
 class GeneratorUnitTests(GeneratorTests):
