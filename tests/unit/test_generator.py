@@ -5,7 +5,7 @@ Test the functions related to the internal generator implementation and the 'Gen
 import pytest
 
 from pytest_cppython.plugin import GeneratorUnitTests
-from tests.data import MockGenerator, test_pyproject
+from tests.data import MockGenerator, test_configuration, test_pyproject
 
 
 class TestCMakeGenerator(GeneratorUnitTests):
@@ -21,5 +21,4 @@ class TestCMakeGenerator(GeneratorUnitTests):
         Returns:
             CMakeGenerator -- The Generator object to use for the CPPython defined tests
         """
-
-        return MockGenerator(test_pyproject)
+        return MockGenerator(test_configuration, test_pyproject)

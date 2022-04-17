@@ -3,6 +3,7 @@ TODO
 """
 
 
+import logging
 from pathlib import Path
 from typing import Type
 
@@ -10,6 +11,7 @@ from cppython_core.schema import (
     PEP621,
     CPPythonData,
     Generator,
+    GeneratorConfiguration,
     GeneratorData,
     GeneratorDataType,
     Interface,
@@ -23,17 +25,19 @@ test_tool = ToolData(cppython=test_cppython)
 test_pep621 = PEP621(name="test-project", version="1.0.0", description="This is a test project")
 test_pyproject = PyProject(project=test_pep621, tool=test_tool)
 
+test_logger = logging.getLogger(__name__)
+test_configuration = GeneratorConfiguration(test_logger)
+
 
 class MockInterface(Interface):
     """
     TODO
     """
 
-    def print(self, string: str) -> None:
+    def register_logger(self, logger: logging.Logger) -> None:
         """
         TODO
         """
-        print(string)
 
     def read_generator_data(self, generator_data_type: Type[GeneratorDataType]) -> GeneratorDataType:
         """
@@ -52,8 +56,8 @@ class MockGenerator(Generator):
     TODO
     """
 
-    def __init__(self, pyproject: PyProject) -> None:
-        super().__init__(pyproject)
+    def __init__(self, configuration: GeneratorConfiguration, pyproject: PyProject) -> None:
+        super().__init__(configuration, pyproject)
 
         self.downloaded = False
 

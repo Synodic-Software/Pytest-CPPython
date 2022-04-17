@@ -3,10 +3,9 @@ Test the integrations related to the internal generator implementation and the '
 """
 
 import pytest
-from cppython_core.schema import Generator
 
 from pytest_cppython.plugin import GeneratorIntegrationTests
-from tests.data import MockGenerator, test_pyproject
+from tests.data import MockGenerator, test_configuration, test_pyproject
 
 
 class TestCMakeGenerator(GeneratorIntegrationTests):
@@ -22,5 +21,4 @@ class TestCMakeGenerator(GeneratorIntegrationTests):
         Returns:
             CMakeGenerator -- The Generator object to use for the CPPython defined tests
         """
-
-        return MockGenerator(test_pyproject)
+        return MockGenerator(test_configuration, test_pyproject)
