@@ -68,10 +68,11 @@ dependencies = [
 
 [[package]]
 name = "cppython-core"
-version = "0.2.1"
+version = "0.3.2"
 requires_python = ">=3.10"
 summary = "Data definitions for CPPython"
 dependencies = [
+    "packaging>=21.3",
     "pydantic>=1.9",
 ]
 
@@ -232,7 +233,7 @@ summary = "Module for decorators, wrappers and monkey patching."
 
 [metadata]
 lock_version = "3.1"
-content_hash = "sha256:3cef1a0cd82a8204a9b049710913423a469419148053481392bca0b74e5180a2"
+content_hash = "sha256:672b3eb5f16caff4515553416a3daf9293689e58353b422a3be59657865ee832"
 
 [metadata.files]
 "astroid 2.11.2" = [
@@ -323,9 +324,9 @@ content_hash = "sha256:3cef1a0cd82a8204a9b049710913423a469419148053481392bca0b74
     {file = "coverage-6.3.2-pp36.pp37.pp38-none-any.whl", hash = "sha256:18d520c6860515a771708937d2f78f63cc47ab3b80cb78e86573b0a760161faf"},
     {file = "coverage-6.3.2.tar.gz", hash = "sha256:03e2a7826086b91ef345ff18742ee9fc47a6839ccd517061ef8fa1976e652ce9"},
 ]
-"cppython-core 0.2.1" = [
-    {file = "cppython_core-0.2.1-py3-none-any.whl", hash = "sha256:d5f7be4815b89c53bfd7bbc7653e1fc66e1cde022edebe78afc86f5b0d6a1de4"},
-    {file = "cppython-core-0.2.1.tar.gz", hash = "sha256:001fb049a1d62c584eb1a2bcc8c4e4acad461ff583e875bb44ab5df9249b37b7"},
+"cppython-core 0.3.2" = [
+    {file = "cppython_core-0.3.2-py3-none-any.whl", hash = "sha256:bd7ee3988fe73206476c7d3979392279f203ed696e2920e00075163b00a5aea9"},
+    {file = "cppython-core-0.3.2.tar.gz", hash = "sha256:65da9e2cac0db22c8e061978bd910137560ad1bbb0c28f240797e0b8a7b5d6fa"},
 ]
 "dill 0.3.4" = [
     {file = "dill-0.3.4-py2.py3-none-any.whl", hash = "sha256:7e40e4a70304fd9ceab3535d36e58791d9c4a776b38ec7f7ec9afc8d3dca4d4f"},
