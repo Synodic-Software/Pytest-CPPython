@@ -8,9 +8,9 @@ from pytest_cppython.plugin import GeneratorIntegrationTests
 from tests.data import MockGenerator, test_configuration, test_pyproject
 
 
-class TestCMakeGenerator(GeneratorIntegrationTests):
+class TestMockGenerator(GeneratorIntegrationTests):
     """
-    The tests for our CMake generator
+    The tests for our Mock generator
     """
 
     @pytest.fixture(name="generator")
@@ -19,6 +19,11 @@ class TestCMakeGenerator(GeneratorIntegrationTests):
         Override of the plugin provided generator fixture.
 
         Returns:
-            CMakeGenerator -- The Generator object to use for the CPPython defined tests
+            MockGenerator -- The Generator object to use for the CPPython defined tests
         """
         return MockGenerator(test_configuration, test_pyproject)
+
+    def test_plugin_registration(self, generator: MockGenerator):
+        """
+        Override the base class preventing a registration check for the Mock
+        """
