@@ -15,7 +15,7 @@ dynamic = ["version"]
 requires-python = ">=3.10"
 
 dependencies = [
-  "cppython-core>=0.3.2",
+  "cppython-core>=0.3.3.dev0",
   "pydantic>=1.9.0",
 ]
 
@@ -32,11 +32,11 @@ version = {use_scm = true}
 [tool.pdm.dev-dependencies]
 lint = [
   "black>=22.3.0",
-  "pylint>=2.13.5",
+  "pylint>=2.13.7",
   "isort>=5.10.1",
 ]
 test = [
-  "pytest >=7.1.0",
+  "pytest >=7.1.2",
   "pytest-cov>=3.0.0",
   "pytest-mock>=3.7.0",
 ]
