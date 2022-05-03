@@ -3,6 +3,7 @@ TODO
 """
 
 import pytest
+from cppython_core.schema import InterfaceConfiguration
 
 from pytest_cppython.plugin import InterfaceUnitTests
 from tests.data import MockInterface
@@ -21,4 +22,5 @@ class TestCPPythonInterface(InterfaceUnitTests):
         Returns:
             ConsoleInterface -- The Interface object to use for the CPPython defined tests
         """
-        return MockInterface()
+        configuration = InterfaceConfiguration()
+        return MockInterface(configuration)

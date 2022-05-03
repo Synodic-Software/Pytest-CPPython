@@ -15,6 +15,7 @@ from cppython_core.schema import (
     GeneratorData,
     GeneratorDataT,
     Interface,
+    InterfaceConfiguration,
     PyProject,
     TargetEnum,
     ToolData,
@@ -34,10 +35,12 @@ class MockInterface(Interface):
     TODO
     """
 
-    def register_logger(self, logger: logging.Logger) -> None:
-        """
-        TODO
-        """
+    def __init__(self, configuration: InterfaceConfiguration) -> None:
+        super().__init__(configuration)
+
+    @staticmethod
+    def name() -> str:
+        return "mock"
 
     def read_generator_data(self, generator_data_type: Type[GeneratorDataT]) -> GeneratorDataT:
         """
@@ -63,7 +66,7 @@ class MockGenerator(Generator):
 
     @staticmethod
     def name() -> str:
-        return "test"
+        return "mock"
 
     @staticmethod
     def data_type() -> Type[GeneratorData]:
