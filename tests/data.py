@@ -13,7 +13,7 @@ from cppython_core.schema import (
     Generator,
     GeneratorConfiguration,
     GeneratorData,
-    GeneratorDataType,
+    GeneratorDataT,
     Interface,
     PyProject,
     TargetEnum,
@@ -26,7 +26,7 @@ test_pep621 = PEP621(name="test-project", version="1.0.0", description="This is 
 test_pyproject = PyProject(project=test_pep621, tool=test_tool)
 
 test_logger = logging.getLogger(__name__)
-test_configuration = GeneratorConfiguration(test_logger)
+test_configuration = GeneratorConfiguration()
 
 
 class MockInterface(Interface):
@@ -39,7 +39,7 @@ class MockInterface(Interface):
         TODO
         """
 
-    def read_generator_data(self, generator_data_type: Type[GeneratorDataType]) -> GeneratorDataType:
+    def read_generator_data(self, generator_data_type: Type[GeneratorDataT]) -> GeneratorDataT:
         """
         TODO
         """
