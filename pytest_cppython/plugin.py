@@ -98,3 +98,12 @@ class InterfaceUnitTests(InterfaceTests):
     Custom implementations of the Interface class should inherit from this class for its tests.
     Base class for all interface unit tests that test plugin agnostic behavior
     """
+
+    def test_name(self, interface: Interface):
+        """
+        Test name restrictions
+        TODO: This should be a pydantic schema
+        """
+        name = interface.name()
+
+        assert name != ""
