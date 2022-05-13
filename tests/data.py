@@ -59,8 +59,8 @@ class MockGenerator(Generator):
     TODO
     """
 
-    def __init__(self, configuration: GeneratorConfiguration, pyproject: PyProject) -> None:
-        super().__init__(configuration, pyproject)
+    def __init__(self, configuration: GeneratorConfiguration, project: PEP621, cppython: CPPythonData) -> None:
+        super().__init__(configuration, project, cppython)
 
         self.downloaded = False
 
