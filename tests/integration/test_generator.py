@@ -5,7 +5,13 @@ Test the integrations related to the internal generator implementation and the '
 import pytest
 
 from pytest_cppython.plugin import GeneratorIntegrationTests
-from tests.data import MockGenerator, test_configuration, test_cppython, test_pep621
+from tests.data import (
+    MockGenerator,
+    test_configuration,
+    test_cppython,
+    test_generator,
+    test_pep621,
+)
 
 
 class TestMockGenerator(GeneratorIntegrationTests):
@@ -21,7 +27,7 @@ class TestMockGenerator(GeneratorIntegrationTests):
         Returns:
             MockGenerator -- The Generator object to use for the CPPython defined tests
         """
-        return MockGenerator(test_configuration, test_pep621, test_cppython)
+        return MockGenerator(test_configuration, test_pep621, test_cppython, test_generator)
 
     def test_plugin_registration(self, generator: MockGenerator):
         """
