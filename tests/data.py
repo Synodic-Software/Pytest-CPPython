@@ -28,7 +28,7 @@ test_pep621 = PEP621(name="test-project", version="1.0.0", description="This is 
 test_pyproject = PyProject(project=test_pep621, tool=test_tool)
 
 test_logger = logging.getLogger(__name__)
-test_configuration = GeneratorConfiguration()
+test_configuration = GeneratorConfiguration(root_path=Path())
 
 
 class MockInterface(Interface):
