@@ -72,6 +72,12 @@ class GeneratorUnitTests(GeneratorTests):
 
         assert data_type != ""
 
+    def test_preset_generation(self, generator: Generator):
+        """
+        Tests the generation of the cmake configuration preset
+        """
+        generator.generate_cmake_config()
+
 
 class InterfaceTests(ABC):
     """

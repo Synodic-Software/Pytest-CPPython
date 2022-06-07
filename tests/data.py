@@ -9,6 +9,7 @@ from typing import Type
 
 from cppython_core.schema import (
     PEP621,
+    ConfigurePreset,
     CPPythonData,
     Generator,
     GeneratorConfiguration,
@@ -92,3 +93,6 @@ class MockGenerator(Generator):
 
     def build(self) -> None:
         pass
+
+    def generate_cmake_config(self) -> ConfigurePreset:
+        return ConfigurePreset(name="mock-config")
