@@ -22,7 +22,6 @@ from cppython_core.schema import (
     ToolData,
 )
 
-test_generator = GeneratorData()
 test_cppython = CPPythonData(**{"target": TargetEnum.EXE})
 test_tool = ToolData(cppython=test_cppython)
 test_pep621 = PEP621(name="test-project", version="1.0.0", description="This is a test project")
@@ -56,13 +55,26 @@ class MockInterface(Interface):
         """
 
 
-class MockGenerator(Generator):
+class MockGeneratorData(GeneratorData):
+    """
+    TODO
+    """
+
+
+test_generator = MockGeneratorData()
+
+
+class MockGenerator(Generator[MockGeneratorData]):
     """
     TODO
     """
 
     def __init__(
-        self, configuration: GeneratorConfiguration, project: PEP621, cppython: CPPythonData, generator: GeneratorData
+        self,
+        configuration: GeneratorConfiguration,
+        project: PEP621,
+        cppython: CPPythonData,
+        generator: MockGeneratorData,
     ) -> None:
         super().__init__(configuration, project, cppython, generator)
 
@@ -73,8 +85,8 @@ class MockGenerator(Generator):
         return "mock"
 
     @staticmethod
-    def data_type() -> Type[GeneratorData]:
-        return GeneratorData
+    def data_type() -> Type[MockGeneratorData]:
+        return MockGeneratorData
 
     def generator_downloaded(self, path: Path) -> bool:
         return self.downloaded

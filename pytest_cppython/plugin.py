@@ -1,22 +1,22 @@
 """
 Helper fixtures and plugin definitions for pytest
-TODO: Should by a pytest plugin, removing the need for this module in production code.
 """
 from abc import ABC
 from importlib.metadata import entry_points
 from pathlib import Path
+from typing import Generic
 
 import pytest
-from cppython_core.schema import Generator, Interface
+from cppython_core.schema import GeneratorT, InterfaceT
 
 
-class GeneratorTests(ABC):
+class GeneratorTests(ABC, Generic[GeneratorT]):
     """
     Shared functionality between the different Generator testing categories
     """
 
     @pytest.fixture(name="generator")
-    def fixture_generator(self) -> Generator:
+    def fixture_generator(self) -> GeneratorT:
         """
         A hook allowing implementations to override the fixture with a parameterization
             @pytest.mark.parametrize("generator", [CustomGenerator])
@@ -24,19 +24,19 @@ class GeneratorTests(ABC):
         raise NotImplementedError
 
 
-class GeneratorIntegrationTests(GeneratorTests):
+class GeneratorIntegrationTests(GeneratorTests[GeneratorT]):
     """
     Base class for all generator integration tests that test plugin agnostic behavior
     """
 
-    def test_plugin_registration(self, generator: Generator):
+    def test_plugin_registration(self, generator: GeneratorT):
         """
         Test the registration with setuptools entry_points
         """
         plugin_entries = entry_points(group=f"cppython.{generator.group()}")
         assert len(plugin_entries) > 0
 
-    def test_is_downloaded(self, generator: Generator, tmp_path: Path):
+    def test_is_downloaded(self, generator: GeneratorT, tmp_path: Path):
         """
         TODO
         """
@@ -48,13 +48,13 @@ class GeneratorIntegrationTests(GeneratorTests):
         assert generator.generator_downloaded(tmp_path)
 
 
-class GeneratorUnitTests(GeneratorTests):
+class GeneratorUnitTests(GeneratorTests[GeneratorT]):
     """
     Custom implementations of the Generator class should inherit from this class for its tests.
     Base class for all generator unit tests that test plugin agnostic behavior
     """
 
-    def test_name(self, generator: Generator):
+    def test_name(self, generator: GeneratorT):
         """
         Test name restrictions
         TODO: This should be a pydantic schema
@@ -63,7 +63,7 @@ class GeneratorUnitTests(GeneratorTests):
 
         assert name != ""
 
-    def test_data_type(self, generator: Generator):
+    def test_data_type(self, generator: GeneratorT):
         """
         Test data_type restrictions
         TODO: This should be a pydantic schema
@@ -72,20 +72,20 @@ class GeneratorUnitTests(GeneratorTests):
 
         assert data_type != ""
 
-    def test_preset_generation(self, generator: Generator):
+    def test_preset_generation(self, generator: GeneratorT):
         """
         Tests the generation of the cmake configuration preset
         """
         generator.generate_cmake_config()
 
 
-class InterfaceTests(ABC):
+class InterfaceTests(ABC, Generic[InterfaceT]):
     """
     Shared functionality between the different Interface testing categories
     """
 
     @pytest.fixture(name="interface")
-    def fixture_interface(self) -> Interface:
+    def fixture_interface(self) -> InterfaceT:
         """
         A hook allowing implementations to override the fixture with a parameterization
             @pytest.mark.parametrize("interface", [CustomInterface])
@@ -93,19 +93,19 @@ class InterfaceTests(ABC):
         raise NotImplementedError
 
 
-class InterfaceIntegrationTests(InterfaceTests):
+class InterfaceIntegrationTests(InterfaceTests[InterfaceT]):
     """
     Base class for all interface integration tests that test plugin agnostic behavior
     """
 
 
-class InterfaceUnitTests(InterfaceTests):
+class InterfaceUnitTests(InterfaceTests[InterfaceT]):
     """
     Custom implementations of the Interface class should inherit from this class for its tests.
     Base class for all interface unit tests that test plugin agnostic behavior
     """
 
-    def test_name(self, interface: Interface):
+    def test_name(self, interface: InterfaceT):
         """
         Test name restrictions
         TODO: This should be a pydantic schema
