@@ -9,7 +9,7 @@ from pytest_cppython.plugin import InterfaceUnitTests
 from tests.data import MockInterface
 
 
-class TestCPPythonInterface(InterfaceUnitTests):
+class TestCPPythonInterface(InterfaceUnitTests[MockInterface]):
     """
     The tests for the PDM interface
     """

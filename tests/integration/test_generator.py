@@ -14,7 +14,7 @@ from tests.data import (
 )
 
 
-class TestMockGenerator(GeneratorIntegrationTests):
+class TestMockGenerator(GeneratorIntegrationTests[MockGenerator]):
     """
     The tests for our Mock generator
     """
@@ -31,5 +31,5 @@ class TestMockGenerator(GeneratorIntegrationTests):
 
     def test_plugin_registration(self, generator: MockGenerator):
         """
-        Override the base class preventing a registration check for the Mock
+        Override the base class 'GeneratorIntegrationTests' preventing a registration check for the Mock
         """

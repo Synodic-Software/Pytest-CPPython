@@ -14,7 +14,7 @@ from tests.data import (
 )
 
 
-class TestMockGenerator(GeneratorUnitTests):
+class TestMockGenerator(GeneratorUnitTests[MockGenerator]):
     """
     The tests for our Mock generator
     """
