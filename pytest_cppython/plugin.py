@@ -4,27 +4,58 @@ Helper fixtures and plugin definitions for pytest
 from abc import ABC
 from importlib.metadata import entry_points
 from pathlib import Path
-from typing import Generic
+from typing import Generic, Type
 
 import pytest
-from cppython_core.schema import GeneratorT, InterfaceT
+from cppython_core.schema import (
+    PEP621,
+    CPPythonData,
+    GeneratorConfiguration,
+    GeneratorDataT,
+    GeneratorT,
+    InterfaceConfiguration,
+    InterfaceT,
+)
+
+from pytest_cppython.fixtures import CPPythonFixtures
 
 
-class GeneratorTests(ABC, Generic[GeneratorT]):
+class GeneratorTests(ABC, CPPythonFixtures, Generic[GeneratorT, GeneratorDataT]):
     """
     Shared functionality between the different Generator testing categories
     """
 
+    @pytest.fixture(name="generator_data")
+    def fixture_generator_data(self) -> GeneratorDataT:
+        """
+        A required testing hook that allows GeneratorData generation
+        """
+        raise NotImplementedError("Subclasses should override this fixture")
+
+    @pytest.fixture(name="generator_type")
+    def fixture_generator_type(self) -> Type[GeneratorT]:
+        """
+        A required testing hook that allows type generation
+        """
+        raise NotImplementedError("Subclasses should override this fixture")
+
     @pytest.fixture(name="generator")
-    def fixture_generator(self) -> GeneratorT:
+    def fixture_generator(
+        self,
+        generator_type: Type[GeneratorT],
+        generator_configuration: GeneratorConfiguration,
+        pep621: PEP621,
+        cppython: CPPythonData,
+        generator_data: GeneratorDataT,
+    ) -> GeneratorT:
         """
         A hook allowing implementations to override the fixture with a parameterization
             @pytest.mark.parametrize("generator", [CustomGenerator])
         """
-        raise NotImplementedError
+        return generator_type(generator_configuration, pep621, cppython, generator_data)
 
 
-class GeneratorIntegrationTests(GeneratorTests[GeneratorT]):
+class GeneratorIntegrationTests(GeneratorTests[GeneratorT, GeneratorDataT]):
     """
     Base class for all generator integration tests that test plugin agnostic behavior
     """
@@ -47,8 +78,13 @@ class GeneratorIntegrationTests(GeneratorTests[GeneratorT]):
 
         assert generator.generator_downloaded(tmp_path)
 
+    def test_install(self):
+        """
+        TODO
+        """
 
-class GeneratorUnitTests(GeneratorTests[GeneratorT]):
+
+class GeneratorUnitTests(GeneratorTests[GeneratorT, GeneratorDataT]):
     """
     Custom implementations of the Generator class should inherit from this class for its tests.
     Base class for all generator unit tests that test plugin agnostic behavior
@@ -79,18 +115,27 @@ class GeneratorUnitTests(GeneratorTests[GeneratorT]):
         generator.generate_cmake_config()
 
 
-class InterfaceTests(ABC, Generic[InterfaceT]):
+class InterfaceTests(ABC, CPPythonFixtures, Generic[InterfaceT]):
     """
     Shared functionality between the different Interface testing categories
     """
 
+    @pytest.fixture(name="interface_type")
+    def fixture_generator_type(self) -> Type[InterfaceT]:
+        """
+        A required testing hook that allows type generation
+        """
+        raise NotImplementedError("Subclasses should override this fixture")
+
     @pytest.fixture(name="interface")
-    def fixture_interface(self) -> InterfaceT:
+    def fixture_interface(
+        self, interface_type: Type[InterfaceT], interface_configuration: InterfaceConfiguration
+    ) -> InterfaceT:
         """
         A hook allowing implementations to override the fixture with a parameterization
             @pytest.mark.parametrize("interface", [CustomInterface])
         """
-        raise NotImplementedError
+        return interface_type(interface_configuration)
 
 
 class InterfaceIntegrationTests(InterfaceTests[InterfaceT]):

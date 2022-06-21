@@ -2,32 +2,32 @@
 Test the integrations related to the internal generator implementation and the 'Generator' interface itself
 """
 
+from typing import Type
+
 import pytest
 
 from pytest_cppython.plugin import GeneratorIntegrationTests
-from tests.data import (
-    MockGenerator,
-    test_configuration,
-    test_cppython,
-    test_generator,
-    test_pep621,
-)
+from tests.data import MockGenerator, MockGeneratorData
 
 
-class TestMockGenerator(GeneratorIntegrationTests[MockGenerator]):
+class TestMockGenerator(GeneratorIntegrationTests[MockGenerator, MockGeneratorData]):
     """
     The tests for our Mock generator
     """
 
-    @pytest.fixture(name="generator")
-    def fixture_generator(self) -> MockGenerator:
+    @pytest.fixture(name="generator_data")
+    def fixture_generator_data(self) -> MockGeneratorData:
         """
-        Override of the plugin provided generator fixture.
+        A required testing hook that allows GeneratorData generation
+        """
+        return MockGeneratorData()
 
-        Returns:
-            MockGenerator -- The Generator object to use for the CPPython defined tests
+    @pytest.fixture(name="generator_type")
+    def fixture_generator_type(self) -> Type[MockGenerator]:
         """
-        return MockGenerator(test_configuration, test_pep621, test_cppython, test_generator)
+        A required testing hook that allows type generation
+        """
+        return MockGenerator
 
     def test_plugin_registration(self, generator: MockGenerator):
         """
