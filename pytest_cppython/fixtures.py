@@ -6,6 +6,7 @@ from typing import cast
 
 import pytest
 from cppython_core.schema import (
+    PEP508,
     PEP621,
     CPPythonData,
     GeneratorConfiguration,
@@ -34,7 +35,7 @@ class CPPythonFixtures:
         dynamic, version = cast(tuple[list[str], str | None], request.param)
         return PEP621(name="test-project", dynamic=dynamic, version=version, description="This is a test description")
 
-    _generator_configuration_parameters: list[Path] = [Path(), Path()]
+    _generator_configuration_parameters: list[Path] = [Path("/"), Path("/..")]
 
     @pytest.fixture(
         name="generator_configuration",
@@ -48,14 +49,11 @@ class CPPythonFixtures:
         root_path = cast(Path, request.param)
         return GeneratorConfiguration(root_path=root_path)
 
-    _interface_configuration_parameters = []
-
     @pytest.fixture(
         name="interface_configuration",
         scope="session",
-        params=_interface_configuration_parameters,
     )
-    def fixture_interface_configuration(self, request: pytest.FixtureRequest) -> InterfaceConfiguration:
+    def fixture_interface_configuration(self) -> InterfaceConfiguration:
         """
         Fixture defining all testable variations of Pep621
         """
@@ -71,20 +69,74 @@ class CPPythonFixtures:
     )
     def fixture_target(self, request: pytest.FixtureRequest) -> TargetEnum:
         """
-        Fixture defining all testable variations of CPPythonData
+        TODO
         """
         return cast(TargetEnum, request.param)
 
-    _cppython_parameters = []
+    _dependency_parameters = [[], [PEP508("poco")]]
 
     @pytest.fixture(
-        name="cppython",
+        name="dependencies",
         scope="session",
-        params=_cppython_parameters,
+        params=_dependency_parameters,
     )
-    def fixture_cppython(self, request: pytest.FixtureRequest, target: TargetEnum) -> CPPythonData:
+    def fixture_dependencies(self, request: pytest.FixtureRequest) -> list[PEP508]:
+        """
+        TODO
+        """
+        return cast(list[PEP508], request.param)
+
+    _install_path_parameters = []
+
+    @pytest.fixture(
+        name="install_path",
+        scope="session",
+        params=_install_path_parameters,
+    )
+    def fixture_install_path(self, request: pytest.FixtureRequest) -> Path:
+        """
+        TODO
+        """
+        return cast(Path, request.param)
+
+    _tool_path_parameters = []
+
+    @pytest.fixture(
+        name="tool_path",
+        scope="session",
+        params=_tool_path_parameters,
+    )
+    def fixture_tool_path(self, request: pytest.FixtureRequest) -> Path:
+        """
+        TODO
+        """
+        return cast(Path, request.param)
+
+    _build_path_parameters = []
+
+    @pytest.fixture(
+        name="build_path",
+        scope="session",
+        params=_build_path_parameters,
+    )
+    def fixture_build_path(self, request: pytest.FixtureRequest) -> Path:
+        """
+        TODO
+        """
+        return cast(Path, request.param)
+
+    @pytest.fixture(name="cppython", scope="session")
+    def fixture_cppython(
+        self, target: TargetEnum, dependencies: list[PEP508], install_path: Path, tool_path: Path, build_path: Path
+    ) -> CPPythonData:
         """
         Fixture defining all testable variations of CPPythonData
         """
 
-        return CPPythonData(target=target)
+        return CPPythonData(
+            target=target,
+            dependencies=dependencies,
+            install_path=install_path,
+            tool_path=tool_path,
+            build_path=build_path,
+        )
