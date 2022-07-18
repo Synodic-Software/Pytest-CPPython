@@ -1,5 +1,5 @@
 """
-TODO
+Defines variations of PEP621 for testing
 """
 
 from cppython_core.schema import PEP621

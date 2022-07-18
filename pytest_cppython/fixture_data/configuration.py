@@ -1,5 +1,5 @@
 """
-TODO
+Defines variations of Interface/Generator data
 """
 
 from pathlib import Path

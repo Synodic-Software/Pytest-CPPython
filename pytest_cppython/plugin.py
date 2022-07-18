@@ -69,7 +69,7 @@ class GeneratorIntegrationTests(GeneratorTests[GeneratorT, GeneratorDataT]):
 
     def test_is_downloaded(self, generator: GeneratorT, tmp_path: Path):
         """
-        TODO
+        Tests the generators ability to download external tooling and report the state of its download
         """
 
         assert not generator.generator_downloaded(tmp_path)
@@ -78,7 +78,7 @@ class GeneratorIntegrationTests(GeneratorTests[GeneratorT, GeneratorDataT]):
 
         assert generator.generator_downloaded(tmp_path)
 
-    def test_install(self):
+    def test_install(self, generator: GeneratorT, tmp_path: Path):
         """
         TODO
         """
@@ -89,24 +89,6 @@ class GeneratorUnitTests(GeneratorTests[GeneratorT, GeneratorDataT]):
     Custom implementations of the Generator class should inherit from this class for its tests.
     Base class for all generator unit tests that test plugin agnostic behavior
     """
-
-    def test_name(self, generator: GeneratorT):
-        """
-        Test name restrictions
-        TODO: This should be a pydantic schema
-        """
-        name = generator.name()
-
-        assert name != ""
-
-    def test_data_type(self, generator: GeneratorT):
-        """
-        Test data_type restrictions
-        TODO: This should be a pydantic schema
-        """
-        data_type = generator.data_type()
-
-        assert data_type != ""
 
     def test_preset_generation(self, generator: GeneratorT):
         """
@@ -149,12 +131,3 @@ class InterfaceUnitTests(InterfaceTests[InterfaceT]):
     Custom implementations of the Interface class should inherit from this class for its tests.
     Base class for all interface unit tests that test plugin agnostic behavior
     """
-
-    def test_name(self, interface: InterfaceT):
-        """
-        Test name restrictions
-        TODO: This should be a pydantic schema
-        """
-        name = interface.name()
-
-        assert name != ""

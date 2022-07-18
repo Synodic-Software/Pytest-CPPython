@@ -1,5 +1,6 @@
 """
-TODO
+Shared definitions for testing.
+TODO: Replace with conftest.py
 """
 
 
@@ -25,7 +26,7 @@ test_configuration = GeneratorConfiguration(root_path=Path())
 
 class MockInterface(Interface):
     """
-    TODO
+    A mock interface class for behavior testing
     """
 
     def __init__(self, configuration: InterfaceConfiguration) -> None:
@@ -37,19 +38,19 @@ class MockInterface(Interface):
 
     def read_generator_data(self, generator_data_type: Type[GeneratorDataT]) -> GeneratorDataT:
         """
-        TODO
+        Implementation of Interface function
         """
         return generator_data_type()
 
     def write_pyproject(self) -> None:
         """
-        TODO
+        Implementation of Interface function
         """
 
 
 class MockGeneratorData(GeneratorData):
     """
-    TODO
+    Mock generator data class
     """
 
 
@@ -58,7 +59,7 @@ test_generator = MockGeneratorData()
 
 class MockGenerator(Generator[MockGeneratorData]):
     """
-    TODO
+    A mock generator class for behavior testing
     """
 
     def __init__(

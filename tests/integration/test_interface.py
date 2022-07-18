@@ -1,6 +1,7 @@
 """
-TODO
+Tests the integration test plugin
 """
+
 from typing import Type
 
 import pytest
