@@ -121,7 +121,7 @@ class InterfaceTests(ABC, CPPythonFixtures, Generic[InterfaceT]):
     """
 
     @pytest.fixture(name="interface_type")
-    def fixture_generator_type(self) -> Type[InterfaceT]:
+    def fixture_interface_type(self) -> Type[InterfaceT]:
         """
         A required testing hook that allows type generation
         """

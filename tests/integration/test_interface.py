@@ -15,7 +15,7 @@ class TestCPPythonInterface(InterfaceIntegrationTests[MockInterface]):
     """
 
     @pytest.fixture(name="interface_type")
-    def fixture_generator_type(self) -> Type[MockInterface]:
+    def fixture_interface_type(self) -> Type[MockInterface]:
         """
         A required testing hook that allows type generation
         """
