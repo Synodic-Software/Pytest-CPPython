@@ -1,6 +1,7 @@
 """
 Direct Fixtures
 """
+from pathlib import Path
 from typing import cast
 
 import pytest
@@ -71,3 +72,12 @@ class CPPythonFixtures:
         """
 
         return cast(InterfaceConfiguration, request.param)
+
+    @pytest.fixture(
+        name="workspace",
+        scope="session",
+    )
+    def fixture_workspace(self, temp_path: Path):
+        """
+        TODO
+        """
