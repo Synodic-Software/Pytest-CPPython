@@ -78,10 +78,11 @@ class GeneratorIntegrationTests(GeneratorTests[GeneratorT, GeneratorDataT]):
 
         assert generator.generator_downloaded(tmp_path)
 
-    def test_install(self, generator: GeneratorT, tmp_path: Path):
+    def test_install(self, generator: GeneratorT, workspace: Path):
         """
         TODO
         """
+        generator.install()
 
 
 class GeneratorUnitTests(GeneratorTests[GeneratorT, GeneratorDataT]):

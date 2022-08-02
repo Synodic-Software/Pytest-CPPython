@@ -73,11 +73,10 @@ class CPPythonFixtures:
 
         return cast(InterfaceConfiguration, request.param)
 
-    @pytest.fixture(
-        name="workspace",
-        scope="session",
-    )
-    def fixture_workspace(self, temp_path: Path):
+    @pytest.fixture(name="workspace")
+    def fixture_workspace(self, tmp_path_factory: pytest.TempPathFactory):
         """
         TODO
         """
+
+        return tmp_path_factory.mktemp("workspace-")
