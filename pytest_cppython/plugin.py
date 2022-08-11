@@ -84,6 +84,12 @@ class GeneratorIntegrationTests(GeneratorTests[GeneratorT, GeneratorDataT]):
         """
         generator.install()
 
+    def test_update(self, generator: GeneratorT, workspace: Path):
+        """
+        TODO
+        """
+        generator.update()
+
 
 class GeneratorUnitTests(GeneratorTests[GeneratorT, GeneratorDataT]):
     """

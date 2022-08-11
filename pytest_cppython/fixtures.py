@@ -1,7 +1,6 @@
 """
 Direct Fixtures
 """
-from pathlib import Path
 from typing import cast
 
 import pytest
@@ -24,6 +23,14 @@ class CPPythonFixtures:
     """
     Object containing the CPPython data fixtures
     """
+
+    @pytest.fixture(name="workspace")
+    def fixture_workspace(self, tmp_path_factory: pytest.TempPathFactory):
+        """
+        TODO
+        """
+        tmp_path = tmp_path_factory.mktemp("workspace-")
+        return tmp_path
 
     @pytest.fixture(
         name="pep621",
@@ -72,11 +79,3 @@ class CPPythonFixtures:
         """
 
         return cast(InterfaceConfiguration, request.param)
-
-    @pytest.fixture(name="workspace")
-    def fixture_workspace(self, tmp_path_factory: pytest.TempPathFactory):
-        """
-        TODO
-        """
-
-        return tmp_path_factory.mktemp("workspace-")
