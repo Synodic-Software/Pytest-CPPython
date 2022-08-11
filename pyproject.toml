@@ -16,7 +16,7 @@ requires-python = ">=3.10"
 
 dependencies = [
   "cppython-core>=0.4.1.dev13",
-  "pydantic>=1.9.0",
+  "pydantic>=1.9.2",
 ]
 
 [project.license-files]
