@@ -1,5 +1,6 @@
 """
-TODO
+Shared definitions for testing.
+TODO: Replace with conftest.py
 """
 
 
@@ -17,15 +18,8 @@ from cppython_core.schema import (
     GeneratorDataT,
     Interface,
     InterfaceConfiguration,
-    PyProject,
-    TargetEnum,
-    ToolData,
+    ProjectConfiguration,
 )
-
-test_cppython = CPPythonData(**{"target": TargetEnum.EXE})
-test_tool = ToolData(cppython=test_cppython)
-test_pep621 = PEP621(name="test-project", version="1.0.0", description="This is a test project")
-test_pyproject = PyProject(project=test_pep621, tool=test_tool)
 
 test_logger = logging.getLogger(__name__)
 test_configuration = GeneratorConfiguration(root_path=Path())
@@ -33,7 +27,7 @@ test_configuration = GeneratorConfiguration(root_path=Path())
 
 class MockInterface(Interface):
     """
-    TODO
+    A mock interface class for behavior testing
     """
 
     def __init__(self, configuration: InterfaceConfiguration) -> None:
@@ -45,20 +39,23 @@ class MockInterface(Interface):
 
     def read_generator_data(self, generator_data_type: Type[GeneratorDataT]) -> GeneratorDataT:
         """
-        TODO
+        Implementation of Interface function
         """
         return generator_data_type()
 
     def write_pyproject(self) -> None:
         """
-        TODO
+        Implementation of Interface function
         """
 
 
 class MockGeneratorData(GeneratorData):
     """
-    TODO
+    Mock generator data class
     """
+
+    def resolve(self: GeneratorDataT, project_configuration: ProjectConfiguration) -> GeneratorDataT:
+        return self
 
 
 test_generator = MockGeneratorData()
@@ -66,7 +63,7 @@ test_generator = MockGeneratorData()
 
 class MockGenerator(Generator[MockGeneratorData]):
     """
-    TODO
+    A mock generator class for behavior testing
     """
 
     def __init__(

@@ -15,8 +15,8 @@ dynamic = ["version"]
 requires-python = ">=3.10"
 
 dependencies = [
-  "cppython-core>=0.3.3.dev0",
-  "pydantic>=1.9.0",
+  "cppython-core>=0.4.1.dev13",
+  "pydantic>=1.9.2",
 ]
 
 [project.license-files]
@@ -31,14 +31,14 @@ version = {use_scm = true}
 
 [tool.pdm.dev-dependencies]
 lint = [
-  "black>=22.3.0",
-  "pylint>=2.13.8",
+  "black>=22.6.0",
+  "pylint>=2.14.4",
   "isort>=5.10.1",
 ]
 test = [
   "pytest >=7.1.2",
   "pytest-cov>=3.0.0",
-  "pytest-mock>=3.7.0",
+  "pytest-mock>=3.8.2",
 ]
 
 [tool.entry-points.pytest11]
@@ -53,13 +53,11 @@ testpaths = [
 
 [tool.black]
 line-length = 120
-preview = true
 
 [tool.isort]
 profile = "black"
 
 [tool.pylint.messages_control]
-disable = "C0330, C0326"
 extension-pkg-whitelist = "pydantic"
 
 [tool.pylint.format]

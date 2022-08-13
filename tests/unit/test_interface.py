@@ -1,9 +1,10 @@
 """
-TODO
+Test the functions related to the internal interface implementation and the 'Interface' interface itself
 """
 
+from typing import Type
+
 import pytest
-from cppython_core.schema import InterfaceConfiguration
 
 from pytest_cppython.plugin import InterfaceUnitTests
 from tests.data import MockInterface
@@ -14,13 +15,9 @@ class TestCPPythonInterface(InterfaceUnitTests[MockInterface]):
     The tests for the PDM interface
     """
 
-    @pytest.fixture(name="interface")
-    def fixture_interface(self) -> MockInterface:
+    @pytest.fixture(name="interface_type")
+    def fixture_interface_type(self) -> Type[MockInterface]:
         """
-        Override of the plugin provided interface fixture.
-
-        Returns:
-            ConsoleInterface -- The Interface object to use for the CPPython defined tests
+        A required testing hook that allows type generation
         """
-        configuration = InterfaceConfiguration()
-        return MockInterface(configuration)
+        return MockInterface
