@@ -18,6 +18,7 @@ from cppython_core.schema import (
     GeneratorDataT,
     Interface,
     InterfaceConfiguration,
+    ProjectConfiguration,
 )
 
 test_logger = logging.getLogger(__name__)
@@ -52,6 +53,9 @@ class MockGeneratorData(GeneratorData):
     """
     Mock generator data class
     """
+
+    def resolve(self: GeneratorDataT, project_configuration: ProjectConfiguration) -> GeneratorDataT:
+        return self
 
 
 test_generator = MockGeneratorData()

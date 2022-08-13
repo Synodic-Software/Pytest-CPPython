@@ -15,6 +15,7 @@ from cppython_core.schema import (
     GeneratorT,
     InterfaceConfiguration,
     InterfaceT,
+    ProjectConfiguration,
 )
 
 from pytest_cppython.fixtures import CPPythonFixtures
@@ -47,12 +48,20 @@ class GeneratorTests(ABC, CPPythonFixtures, Generic[GeneratorT, GeneratorDataT])
         pep621: PEP621,
         cppython: CPPythonData,
         generator_data: GeneratorDataT,
+        workspace: ProjectConfiguration,
     ) -> GeneratorT:
         """
         A hook allowing implementations to override the fixture with a parameterization
             @pytest.mark.parametrize("generator", [CustomGenerator])
         """
-        return generator_type(generator_configuration, pep621, cppython, generator_data)
+
+        modified_project_data = pep621.resolve(workspace)
+        modified_cppython_data = cppython.resolve(workspace)
+        modified_generator_data = generator_data.resolve(workspace)
+
+        return generator_type(
+            generator_configuration, modified_project_data, modified_cppython_data, modified_generator_data
+        )
 
 
 class GeneratorIntegrationTests(GeneratorTests[GeneratorT, GeneratorDataT]):

@@ -68,12 +68,12 @@ dependencies = [
 
 [[package]]
 name = "cppython-core"
-version = "0.4.1.dev13"
+version = "0.4.1.dev19"
 requires_python = ">=3.10"
 summary = "Data definitions for CPPython"
 dependencies = [
     "packaging>=21.3",
-    "pydantic>=1.9",
+    "pydantic>=1.9.2",
 ]
 
 [[package]]
@@ -330,9 +330,9 @@ content_hash = "sha256:352a0189f8f500bab9348f8bd27afcc469580608a03bc03d2bf5dafdb
     {url = "https://files.pythonhosted.org/packages/ea/ff/bd5f5401d25b53dcf6e4da2e46cfb0e139bf3ddbf3468179af0319774e83/coverage-6.4.3-cp37-cp37m-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:59fc88bc13e30f25167e807b8cad3c41b7218ef4473a20c86fd98a7968733083"},
     {url = "https://files.pythonhosted.org/packages/ee/1a/ea125bdde30f3d5089eda690de51ee07f1f8851c2e9b50c0ee10e3f1acda/coverage-6.4.3-cp39-cp39-musllinux_1_1_i686.whl", hash = "sha256:a42eaaae772f14a5194f181740a67bfd48e8806394b8c67aa4399e09d0d6b5db"},
 ]
-"cppython-core 0.4.1.dev13" = [
-    {url = "https://files.pythonhosted.org/packages/8a/d5/df3b6f1aa018e9bc8ef2a78fc377dda628eafd97daf67862689620fc9649/cppython-core-0.4.1.dev13.tar.gz", hash = "sha256:5ba60c3b6dd4334582e63820859fb9d96c8a79e28b5c13ab5715ffa6cf067fe5"},
-    {url = "https://files.pythonhosted.org/packages/c8/de/2f3a92027c0fcf217450ba615df381d819ec7e55f8f059e25bba3f50f3e0/cppython_core-0.4.1.dev13-py3-none-any.whl", hash = "sha256:fcab13064a707f1ecba0b54020ba300a5565c5cf4d48c1d94aaea0d6d17e443b"},
+"cppython-core 0.4.1.dev19" = [
+    {url = "https://files.pythonhosted.org/packages/23/07/d9afb28ba9c18894e714c8b50171d6bb0fabaaf382cc023963fcae0deec6/cppython_core-0.4.1.dev19-py3-none-any.whl", hash = "sha256:92594e12e17b6190e63506d506da089633d229a38c921f2d4b4656ad04dd60de"},
+    {url = "https://files.pythonhosted.org/packages/d8/a0/079e47abde407f6491efc5f63d97e8c0408ef88dbc968f637ac4344d1b98/cppython-core-0.4.1.dev19.tar.gz", hash = "sha256:1a77a838f26f8c18972c8cc0571321c05a9b14107594346d42d920025d615390"},
 ]
 "dill 0.3.5.1" = [
     {url = "https://files.pythonhosted.org/packages/12/ff/3b1a8f5d59600393506c64fa14d13afdfe6fe79ed65a18d64026fe9f8356/dill-0.3.5.1-py2.py3-none-any.whl", hash = "sha256:33501d03270bbe410c72639b350e941882a8b0fd55357580fbc873fba0c59302"},
