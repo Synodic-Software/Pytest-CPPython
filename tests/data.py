@@ -9,20 +9,21 @@ from pathlib import Path
 from typing import Type
 
 from cppython_core.schema import (
-    PEP621,
     ConfigurePreset,
-    CPPythonData,
+    CPPythonDataResolved,
     Generator,
     GeneratorConfiguration,
     GeneratorData,
+    GeneratorDataResolved,
     GeneratorDataT,
     Interface,
     InterfaceConfiguration,
+    PEP621Resolved,
     ProjectConfiguration,
 )
 
 test_logger = logging.getLogger(__name__)
-test_configuration = GeneratorConfiguration(root_path=Path())
+test_configuration = GeneratorConfiguration(root_directory=Path())
 
 
 class MockInterface(Interface):
@@ -49,19 +50,25 @@ class MockInterface(Interface):
         """
 
 
-class MockGeneratorData(GeneratorData):
+class MockGeneratorDataResolved(GeneratorDataResolved):
+    """
+    Mock resolved generator data class
+    """
+
+
+class MockGeneratorData(GeneratorData[MockGeneratorDataResolved]):
     """
     Mock generator data class
     """
 
-    def resolve(self: GeneratorDataT, project_configuration: ProjectConfiguration) -> GeneratorDataT:
-        return self
+    def resolve(self, project_configuration: ProjectConfiguration) -> MockGeneratorDataResolved:
+        return MockGeneratorDataResolved()
 
 
 test_generator = MockGeneratorData()
 
 
-class MockGenerator(Generator[MockGeneratorData]):
+class MockGenerator(Generator[MockGeneratorDataResolved]):
     """
     A mock generator class for behavior testing
     """
@@ -69,9 +76,9 @@ class MockGenerator(Generator[MockGeneratorData]):
     def __init__(
         self,
         configuration: GeneratorConfiguration,
-        project: PEP621,
-        cppython: CPPythonData,
-        generator: MockGeneratorData,
+        project: PEP621Resolved,
+        cppython: CPPythonDataResolved,
+        generator: MockGeneratorDataResolved,
     ) -> None:
         super().__init__(configuration, project, cppython, generator)
 
@@ -82,8 +89,8 @@ class MockGenerator(Generator[MockGeneratorData]):
         return "mock"
 
     @staticmethod
-    def data_type() -> Type[MockGeneratorData]:
-        return MockGeneratorData
+    def data_type() -> Type[MockGeneratorDataResolved]:
+        return MockGeneratorDataResolved
 
     def generator_downloaded(self, path: Path) -> bool:
         return self.downloaded
@@ -98,9 +105,6 @@ class MockGenerator(Generator[MockGeneratorData]):
         pass
 
     def update(self) -> None:
-        pass
-
-    def build(self) -> None:
         pass
 
     def generate_cmake_config(self) -> ConfigurePreset:
