@@ -67,7 +67,7 @@ class MockGeneratorData(GeneratorData[MockGeneratorDataResolved]):
 test_generator = MockGeneratorData()
 
 
-class MockGenerator(Generator[MockGeneratorDataResolved]):
+class MockGenerator(Generator[MockGeneratorData, MockGeneratorDataResolved]):
     """
     A mock generator class for behavior testing
     """
@@ -88,7 +88,11 @@ class MockGenerator(Generator[MockGeneratorDataResolved]):
         return "mock"
 
     @staticmethod
-    def data_type() -> Type[MockGeneratorDataResolved]:
+    def data_type() -> Type[MockGeneratorData]:
+        return MockGeneratorData
+
+    @staticmethod
+    def resolved_data_type() -> Type[MockGeneratorDataResolved]:
         return MockGeneratorDataResolved
 
     def generator_downloaded(self, path: Path) -> bool:
