@@ -6,8 +6,8 @@ from typing import Type
 
 import pytest
 
+from pytest_cppython.mock import MockGenerator, MockGeneratorData
 from pytest_cppython.plugin import GeneratorIntegrationTests
-from tests.data import MockGenerator, MockGeneratorData
 
 
 class TestMockGenerator(GeneratorIntegrationTests[MockGenerator, MockGeneratorData]):

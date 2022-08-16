@@ -6,8 +6,8 @@ from typing import Type
 
 import pytest
 
+from pytest_cppython.mock import MockInterface
 from pytest_cppython.plugin import InterfaceIntegrationTests
-from tests.data import MockInterface
 
 
 class TestCPPythonInterface(InterfaceIntegrationTests[MockInterface]):

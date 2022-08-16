@@ -1,6 +1,5 @@
 """
 Shared definitions for testing.
-TODO: Replace with conftest.py
 """
 
 
