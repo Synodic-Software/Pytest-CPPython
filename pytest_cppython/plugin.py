@@ -10,6 +10,7 @@ import pytest
 from cppython_core.schema import (
     PEP621,
     CPPythonData,
+    CPPythonDataResolved,
     GeneratorConfiguration,
     GeneratorDataT,
     GeneratorT,
@@ -56,7 +57,7 @@ class GeneratorTests(ABC, CPPythonFixtures, Generic[GeneratorT, GeneratorDataT])
         """
 
         modified_project_data = pep621.resolve(workspace)
-        modified_cppython_data = cppython.resolve(workspace)
+        modified_cppython_data = cppython.resolve(CPPythonDataResolved, workspace)
         modified_generator_data = generator_data.resolve(workspace)
 
         return generator_type(
