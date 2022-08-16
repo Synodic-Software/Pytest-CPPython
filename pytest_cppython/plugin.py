@@ -89,13 +89,13 @@ class GeneratorIntegrationTests(GeneratorTests[GeneratorT, GeneratorDataT]):
 
     def test_install(self, generator: GeneratorT):
         """
-        TODO
+        Ensure that the vanilla install command functions
         """
         generator.install()
 
     def test_update(self, generator: GeneratorT):
         """
-        TODO
+        Ensure that the vanilla update command functions
         """
         generator.update()
 

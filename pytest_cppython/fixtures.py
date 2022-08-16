@@ -50,7 +50,7 @@ class CPPythonFixtures:
         Fixture defining all testable variations of PEP621
         """
 
-        return cast(PEP621, request.param)
+        return cast(PEP621, request.param)  # type: ignore
 
     @pytest.fixture(
         name="cppython",
@@ -62,7 +62,7 @@ class CPPythonFixtures:
         Fixture defining all testable variations of CPPythonData
         """
 
-        return cast(CPPythonData, request.param)
+        return cast(CPPythonData, request.param)  # type: ignore
 
     @pytest.fixture(
         name="generator_configuration",
@@ -74,7 +74,7 @@ class CPPythonFixtures:
         Fixture defining all testable variations of GeneratorConfiguration
         """
 
-        return cast(GeneratorConfiguration, request.param)
+        return cast(GeneratorConfiguration, request.param)  # type: ignore
 
     @pytest.fixture(
         name="interface_configuration",
@@ -86,4 +86,4 @@ class CPPythonFixtures:
         Fixture defining all testable variations of InterfaceConfiguration
         """
 
-        return cast(InterfaceConfiguration, request.param)
+        return cast(InterfaceConfiguration, request.param)  # type: ignore
