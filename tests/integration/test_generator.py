@@ -15,21 +15,16 @@ class TestMockGenerator(GeneratorIntegrationTests[MockGenerator, MockGeneratorDa
     The tests for our Mock generator
     """
 
-    @pytest.fixture(name="generator_data")
+    @pytest.fixture(name="generator_data", scope="session")
     def fixture_generator_data(self) -> MockGeneratorData:
         """
         A required testing hook that allows GeneratorData generation
         """
         return MockGeneratorData()
 
-    @pytest.fixture(name="generator_type")
+    @pytest.fixture(name="generator_type", scope="session")
     def fixture_generator_type(self) -> Type[MockGenerator]:
         """
         A required testing hook that allows type generation
         """
         return MockGenerator
-
-    def test_plugin_registration(self, generator: MockGenerator):
-        """
-        Override the base class 'GeneratorIntegrationTests' preventing a registration check for the Mock
-        """

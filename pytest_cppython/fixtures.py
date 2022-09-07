@@ -57,12 +57,18 @@ class CPPythonFixtures:
         scope="session",
         params=cppython_test_list,
     )
-    def fixture_cppython(self, request: pytest.FixtureRequest) -> CPPythonData:
+    def fixture_cppython(
+        self, request: pytest.FixtureRequest, tmp_path_factory: pytest.TempPathFactory
+    ) -> CPPythonData:
         """
         Fixture defining all testable variations of CPPythonData
         """
+        cppython_data = cast(CPPythonData, request.param)  # type: ignore
 
-        return cast(CPPythonData, request.param)  # type: ignore
+        # Pin the install location to the base temporary directory
+        cppython_data.install_path = tmp_path_factory.getbasetemp()
+
+        return cppython_data
 
     @pytest.fixture(
         name="generator_configuration",
