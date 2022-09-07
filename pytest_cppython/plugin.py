@@ -27,19 +27,27 @@ class GeneratorTests(ABC, CPPythonFixtures, Generic[GeneratorT, GeneratorDataT])
     Shared functionality between the different Generator testing categories
     """
 
-    @pytest.fixture(name="generator_data")
+    @pytest.fixture(name="generator_data", scope="session")
     def fixture_generator_data(self) -> GeneratorDataT:
         """
         A required testing hook that allows GeneratorData generation
         """
         raise NotImplementedError("Subclasses should override this fixture")
 
-    @pytest.fixture(name="generator_type")
+    @pytest.fixture(name="generator_type", scope="session")
     def fixture_generator_type(self) -> Type[GeneratorT]:
         """
         A required testing hook that allows type generation
         """
         raise NotImplementedError("Subclasses should override this fixture")
+
+    @pytest.fixture(autouse=True, scope="session")
+    def _fixture_install_dependency(self, generator_type: Type[GeneratorT], cppython: CPPythonData):
+        """
+        Forces the download to only happen once per test session
+        """
+
+        generator_type.download_generator(cppython.install_path)
 
     @pytest.fixture(name="generator")
     def fixture_generator(
@@ -70,23 +78,19 @@ class GeneratorIntegrationTests(GeneratorTests[GeneratorT, GeneratorDataT]):
     Base class for all generator integration tests that test plugin agnostic behavior
     """
 
-    def test_plugin_registration(self, generator: GeneratorT):
+    def test_is_downloaded(self, generator: GeneratorT, cppython: CPPythonData):
         """
-        Test the registration with setuptools entry_points
+        Verify the generator's download capability
         """
-        plugin_entries = entry_points(group=f"cppython.{generator.group()}")
-        assert len(plugin_entries) > 0
 
-    def test_is_downloaded(self, generator: GeneratorT, tmp_path: Path):
+        assert generator.generator_downloaded(cppython.install_path)
+
+    def test_not_downloaded(self, generator: GeneratorT, tmp_path: Path):
         """
-        Tests the generators ability to download external tooling and report the state of its download
+        Tests the generators ability to recognize an empty dependency
         """
 
         assert not generator.generator_downloaded(tmp_path)
-
-        generator.download_generator(tmp_path)
-
-        assert generator.generator_downloaded(tmp_path)
 
     def test_install(self, generator: GeneratorT):
         """
@@ -107,6 +111,13 @@ class GeneratorUnitTests(GeneratorTests[GeneratorT, GeneratorDataT]):
     Base class for all generator unit tests that test plugin agnostic behavior
     """
 
+    def test_plugin_registration(self, generator: GeneratorT):
+        """
+        Test the registration with setuptools entry_points
+        """
+        plugin_entries = entry_points(group=f"cppython.{generator.group()}")
+        assert len(plugin_entries) > 0
+
     def test_preset_generation(self, generator: GeneratorT):
         """
         Tests the generation of the cmake configuration preset
@@ -119,7 +130,7 @@ class InterfaceTests(ABC, CPPythonFixtures, Generic[InterfaceT]):
     Shared functionality between the different Interface testing categories
     """
 
-    @pytest.fixture(name="interface_type")
+    @pytest.fixture(name="interface_type", scope="session")
     def fixture_interface_type(self) -> Type[InterfaceT]:
         """
         A required testing hook that allows type generation

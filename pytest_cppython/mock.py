@@ -72,6 +72,8 @@ class MockGenerator(Generator[MockGeneratorData, MockGeneratorDataResolved]):
     A mock generator class for behavior testing
     """
 
+    downloaded = None
+
     def __init__(
         self,
         configuration: GeneratorConfiguration,
@@ -80,8 +82,6 @@ class MockGenerator(Generator[MockGeneratorData, MockGeneratorDataResolved]):
         generator: MockGeneratorDataResolved,
     ) -> None:
         super().__init__(configuration, project, cppython, generator)
-
-        self.downloaded = False
 
     @staticmethod
     def name() -> str:
@@ -95,13 +95,17 @@ class MockGenerator(Generator[MockGeneratorData, MockGeneratorDataResolved]):
     def resolved_data_type() -> Type[MockGeneratorDataResolved]:
         return MockGeneratorDataResolved
 
-    def generator_downloaded(self, path: Path) -> bool:
-        return self.downloaded
+    @classmethod
+    def generator_downloaded(cls, path: Path) -> bool:
 
-    def download_generator(self, path: Path) -> None:
-        self.downloaded = True
+        return path == cls.downloaded
 
-    def update_generator(self, path: Path) -> None:
+    @classmethod
+    def download_generator(cls, path: Path) -> None:
+        cls.downloaded = path
+
+    @classmethod
+    def update_generator(cls, path: Path) -> None:
         pass
 
     def install(self) -> None:

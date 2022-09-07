@@ -15,7 +15,7 @@ class TestCPPythonInterface(InterfaceUnitTests[MockInterface]):
     The tests for the PDM interface
     """
 
-    @pytest.fixture(name="interface_type")
+    @pytest.fixture(name="interface_type", scope="session")
     def fixture_interface_type(self) -> Type[MockInterface]:
         """
         A required testing hook that allows type generation
