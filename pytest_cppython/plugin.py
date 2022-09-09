@@ -79,12 +79,12 @@ class GeneratorIntegrationTests(GeneratorTests[GeneratorT, GeneratorDataT]):
     Base class for all generator integration tests that test plugin agnostic behavior
     """
 
-    def test_is_downloaded(self, generator: GeneratorT, cppython: CPPythonData):
+    def test_is_downloaded(self, generator_type: Type[GeneratorT], cppython: CPPythonData):
         """
         Verify the generator's download capability
         """
 
-        assert generator.generator_downloaded(cppython.install_path)
+        assert generator_type.generator_downloaded(cppython.install_path / generator_type.name())
 
     def test_not_downloaded(self, generator: GeneratorT, tmp_path: Path):
         """
