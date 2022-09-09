@@ -62,7 +62,7 @@ dependencies = [
 
 [[package]]
 name = "cppython-core"
-version = "0.4.1.dev29"
+version = "0.4.1.dev31"
 requires_python = ">=3.10"
 summary = "Data definitions for CPPython"
 dependencies = [
@@ -148,11 +148,11 @@ dependencies = [
 
 [[package]]
 name = "pylint"
-version = "2.15.0"
+version = "2.15.2"
 requires_python = ">=3.7.2"
 summary = "python code static checker"
 dependencies = [
-    "astroid<=2.14.0-dev0,>=2.12.4",
+    "astroid<=2.14.0-dev0,>=2.12.9",
     "colorama>=0.4.5; sys_platform == \"win32\"",
     "dill>=0.2",
     "isort<6,>=4.2.5",
@@ -324,9 +324,9 @@ content_hash = "sha256:352a0189f8f500bab9348f8bd27afcc469580608a03bc03d2bf5dafdb
     {url = "https://files.pythonhosted.org/packages/ff/3b/b3f7aabd4045d9f8bda678fdc7d9b41055ac134756aa2c02b1e8f417ca30/coverage-6.4.4-cp311-cp311-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:d5dd4b8e9cd0deb60e6fcc7b0647cbc1da6c33b9e786f9c79721fd303994832f"},
     {url = "https://files.pythonhosted.org/packages/ff/ea/6c2a493978acccf81e15cc33089156dbfa89db9c68a4b36e018a4a7fbfe7/coverage-6.4.4-cp38-cp38-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:e431e305a1f3126477abe9a184624a85308da8edf8486a863601d58419d26ffa"},
 ]
-"cppython-core 0.4.1.dev29" = [
-    {url = "https://files.pythonhosted.org/packages/4a/4f/4e7f9436217c22da07cb88ae37bd484507e64f166d4ed22a88d2e852a714/cppython-core-0.4.1.dev29.tar.gz", hash = "sha256:b3c11e528e20708ec495c5aff0788a3fa8cf7f43c6c4adb0672d58379ebe4880"},
-    {url = "https://files.pythonhosted.org/packages/78/65/7a0ca7787f9bec41ba8953b83eb2009dabda73a7e0bc8057b24639306fcd/cppython_core-0.4.1.dev29-py3-none-any.whl", hash = "sha256:81a4a8efc70bf0e18bcb2def3f03600df8c69c2051c620309e4edacfb79ac400"},
+"cppython-core 0.4.1.dev31" = [
+    {url = "https://files.pythonhosted.org/packages/8c/f6/92e76711c3dfd8b14403b8a9eec44bfea4b4c4450acbbf3406759316a206/cppython_core-0.4.1.dev31-py3-none-any.whl", hash = "sha256:0e827fb852a21fac273687e5d3ecad173d97a82023efa967b7cf1707d54290ca"},
+    {url = "https://files.pythonhosted.org/packages/c9/d0/2a0cbe985b7e3d28000b4706c9cae7875856f1f8353ea018d01b41ed1b94/cppython-core-0.4.1.dev31.tar.gz", hash = "sha256:4d83ff601c73dff657731d5f9931d288ef1ba8313635a20e438470e7cc997e3d"},
 ]
 "dill 0.3.5.1" = [
     {url = "https://files.pythonhosted.org/packages/12/ff/3b1a8f5d59600393506c64fa14d13afdfe6fe79ed65a18d64026fe9f8356/dill-0.3.5.1-py2.py3-none-any.whl", hash = "sha256:33501d03270bbe410c72639b350e941882a8b0fd55357580fbc873fba0c59302"},
@@ -445,9 +445,9 @@ content_hash = "sha256:352a0189f8f500bab9348f8bd27afcc469580608a03bc03d2bf5dafdb
     {url = "https://files.pythonhosted.org/packages/fe/5b/6f77e6ebc93e5e3c7fd480e1b171a6547407eba901a56a65d2745df24144/pydantic-1.10.2-cp37-cp37m-manylinux_2_5_i686.manylinux1_i686.manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:bedf309630209e78582ffacda64a21f96f3ed2e51fbf3962d4d488e503420254"},
     {url = "https://files.pythonhosted.org/packages/fe/fd/8f7f8271d526378c927babd1229501e576760cef9a509909a3415eec3c0d/pydantic-1.10.2-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:bb6ad4489af1bac6955d38ebcb95079a836af31e4c4f74aba1ca05bb9f6027bd"},
 ]
-"pylint 2.15.0" = [
-    {url = "https://files.pythonhosted.org/packages/5e/1b/920b36e0db0fe3d4b583a934e1889153699bcccbca0a41b18202d2d2e1e9/pylint-2.15.0-py3-none-any.whl", hash = "sha256:4b124affc198b7f7c9b5f9ab690d85db48282a025ef9333f51d2d7281b92a6c3"},
-    {url = "https://files.pythonhosted.org/packages/76/4e/e0420c7283541d984aa03d48b8758d514ac002a1d08a56e48f16302d6a98/pylint-2.15.0.tar.gz", hash = "sha256:4f3f7e869646b0bd63b3dfb79f3c0f28fc3d2d923ea220d52620fd625aed92b0"},
+"pylint 2.15.2" = [
+    {url = "https://files.pythonhosted.org/packages/a0/a9/6538482ccd86ef43326b7aa2c806256ab8281f9bd969f58acc526af1a986/pylint-2.15.2.tar.gz", hash = "sha256:f63404a2547edb5247da263748771ac9a806ed1de4174cda01293c08ddbc2999"},
+    {url = "https://files.pythonhosted.org/packages/c3/43/9cf96f794b36516881910c6b47d4b4f0cc3aec323effda61d0bd16a305ff/pylint-2.15.2-py3-none-any.whl", hash = "sha256:cc3da458ba810c49d330e09013dec7ced5217772dec8f043ccdd34dae648fde8"},
 ]
 "pyparsing 3.0.9" = [
     {url = "https://files.pythonhosted.org/packages/6c/10/a7d0fa5baea8fe7b50f448ab742f26f52b80bfca85ac2be9d35cdd9a3246/pyparsing-3.0.9-py3-none-any.whl", hash = "sha256:5026bae9a10eeaefb61dab2f09052b9f4307d44aee4eda64b309723d8d206bbc"},

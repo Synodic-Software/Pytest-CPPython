@@ -47,7 +47,8 @@ class GeneratorTests(ABC, CPPythonFixtures, Generic[GeneratorT, GeneratorDataT])
         Forces the download to only happen once per test session
         """
 
-        generator_type.download_generator(cppython.install_path)
+        # Install the generator to a subdirectory of the install path
+        generator_type.download_generator(cppython.install_path / generator_type.name())
 
     @pytest.fixture(name="generator")
     def fixture_generator(
