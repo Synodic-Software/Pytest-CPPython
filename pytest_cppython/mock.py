@@ -106,7 +106,7 @@ class MockGenerator(Generator[MockGeneratorData, MockGeneratorDataResolved]):
 
     @classmethod
     def update_generator(cls, path: Path) -> None:
-        pass
+        cls.downloaded = path
 
     def install(self) -> None:
         pass
