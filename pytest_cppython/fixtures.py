@@ -1,6 +1,7 @@
 """
 Direct Fixtures
 """
+from pathlib import Path
 from typing import cast
 
 import pytest
@@ -53,20 +54,31 @@ class CPPythonFixtures:
         return cast(PEP621, request.param)  # type: ignore
 
     @pytest.fixture(
+        name="install_path",
+        scope="session",
+    )
+    def fixture_install_path(self, tmp_path_factory: pytest.TempPathFactory) -> Path:
+        """
+        Test install location
+        """
+        path = tmp_path_factory.getbasetemp()
+        path.mkdir(parents=True, exist_ok=True)
+
+        return path
+
+    @pytest.fixture(
         name="cppython",
         scope="session",
         params=cppython_test_list,
     )
-    def fixture_cppython(
-        self, request: pytest.FixtureRequest, tmp_path_factory: pytest.TempPathFactory
-    ) -> CPPythonData:
+    def fixture_cppython(self, request: pytest.FixtureRequest, install_path: Path) -> CPPythonData:
         """
         Fixture defining all testable variations of CPPythonData
         """
         cppython_data = cast(CPPythonData, request.param)  # type: ignore
 
         # Pin the install location to the base temporary directory
-        cppython_data.install_path = tmp_path_factory.getbasetemp()
+        cppython_data.install_path = install_path
 
         return cppython_data
 
