@@ -96,17 +96,12 @@ class MockGenerator(Generator[MockGeneratorData, MockGeneratorDataResolved]):
         return MockGeneratorDataResolved
 
     @classmethod
-    def generator_downloaded(cls, path: Path) -> bool:
-
-        return path == cls.downloaded
+    def tooling_downloaded(cls, path: Path) -> bool:
+        return cls.downloaded == path
 
     @classmethod
-    def download_generator(cls, path: Path) -> None:
+    async def download_tooling(cls, path: Path) -> None:
         cls.downloaded = path
-
-    @classmethod
-    def update_generator(cls, path: Path) -> None:
-        pass
 
     def install(self) -> None:
         pass

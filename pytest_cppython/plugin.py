@@ -1,6 +1,7 @@
 """
 Helper fixtures and plugin definitions for pytest
 """
+import asyncio
 from abc import ABC
 from importlib.metadata import entry_points
 from pathlib import Path
@@ -42,13 +43,15 @@ class GeneratorTests(ABC, CPPythonFixtures, Generic[GeneratorT, GeneratorDataT])
         raise NotImplementedError("Subclasses should override this fixture")
 
     @pytest.fixture(autouse=True, scope="session")
-    def _fixture_install_dependency(self, generator_type: Type[GeneratorT], cppython: CPPythonData):
+    def _fixture_install_dependency(self, generator_type: Type[GeneratorT], install_path: Path):
         """
         Forces the download to only happen once per test session
         """
 
-        # Install the generator to a subdirectory of the install path
-        generator_type.download_generator(cppython.install_path / generator_type.name())
+        path = install_path / generator_type.name()
+        path.mkdir(parents=True, exist_ok=True)
+
+        asyncio.run(generator_type.download_tooling(path))
 
     @pytest.fixture(name="generator")
     def fixture_generator(
@@ -67,6 +70,7 @@ class GeneratorTests(ABC, CPPythonFixtures, Generic[GeneratorT, GeneratorDataT])
 
         modified_project_data = pep621.resolve(workspace)
         modified_cppython_data = cppython.resolve(CPPythonDataResolved, workspace)
+        modified_cppython_data = modified_cppython_data.generator_resolve(generator_type)
         modified_generator_data = generator_data.resolve(workspace)
 
         return generator_type(
@@ -79,19 +83,19 @@ class GeneratorIntegrationTests(GeneratorTests[GeneratorT, GeneratorDataT]):
     Base class for all generator integration tests that test plugin agnostic behavior
     """
 
-    def test_is_downloaded(self, generator_type: Type[GeneratorT], cppython: CPPythonData):
+    def test_is_downloaded(self, generator: GeneratorT):
         """
-        Verify the generator's download capability
-        """
-
-        assert generator_type.generator_downloaded(cppython.install_path / generator_type.name())
-
-    def test_not_downloaded(self, generator: GeneratorT, tmp_path: Path):
-        """
-        Tests the generators ability to recognize an empty dependency
+        Verify the generator is downloaded from fixture
         """
 
-        assert not generator.generator_downloaded(tmp_path)
+        assert generator.tooling_downloaded(generator.cppython.install_path)
+
+    def test_not_downloaded(self, generator_type: Type[GeneratorT], tmp_path: Path):
+        """
+        Verify the generator can identify an empty tool
+        """
+
+        assert not generator_type.tooling_downloaded(tmp_path)
 
     def test_install(self, generator: GeneratorT):
         """
