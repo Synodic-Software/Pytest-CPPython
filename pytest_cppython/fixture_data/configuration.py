@@ -1,5 +1,4 @@
-"""
-Defines variations of Interface/Generator data
+"""Defines variations of Interface/Generator data
 """
 
 from pathlib import Path

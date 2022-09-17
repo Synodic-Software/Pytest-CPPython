@@ -1,5 +1,4 @@
-"""
-Defines the CPPythonData variations to use for fixture testing
+"""Defines the CPPythonData variations to use for fixture testing
 """
 
 from cppython_core.schema import CPPythonData

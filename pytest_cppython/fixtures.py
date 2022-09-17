@@ -1,6 +1,6 @@
+"""Direct Fixtures
 """
-Direct Fixtures
-"""
+
 from pathlib import Path
 from typing import cast
 
@@ -22,14 +22,17 @@ from pytest_cppython.fixture_data.pep621 import pep621_test_list
 
 
 class CPPythonFixtures:
-    """
-    Object containing the CPPython data fixtures
-    """
+    """Fixtures available to CPPython test classes"""
 
     @pytest.fixture(name="workspace")
-    def fixture_workspace(self, tmp_path_factory: pytest.TempPathFactory):
-        """
-        Fixture that creates a project configuration at 'workspace/test_project/pyproject.toml'
+    def fixture_workspace(self, tmp_path_factory: pytest.TempPathFactory) -> ProjectConfiguration:
+        """Fixture that creates a project configuration at 'workspace/test_project/pyproject.toml'
+
+        Args:
+            tmp_path_factory: Factory for centralized temporary directories
+
+        Returns:
+            A project configuration that has populated a function level temporary directory
         """
         tmp_path = tmp_path_factory.mktemp("workspace-")
 
@@ -47,19 +50,29 @@ class CPPythonFixtures:
         params=pep621_test_list,
     )
     def fixture_pep621(self, request: pytest.FixtureRequest) -> PEP621:
-        """
-        Fixture defining all testable variations of PEP621
+        """Fixture defining all testable variations of PEP621
+
+        Args:
+            request: Parameterization list
+
+        Returns:
+            PEP621 variant
         """
 
-        return cast(PEP621, request.param)  # type: ignore
+        return cast(PEP621, request.param)
 
     @pytest.fixture(
         name="install_path",
         scope="session",
     )
     def fixture_install_path(self, tmp_path_factory: pytest.TempPathFactory) -> Path:
-        """
-        Test install location
+        """Creates temporary install location
+
+        Args:
+            tmp_path_factory: Factory for centralized temporary directories
+
+        Returns:
+            A temporary directory
         """
         path = tmp_path_factory.getbasetemp()
         path.mkdir(parents=True, exist_ok=True)
@@ -72,10 +85,16 @@ class CPPythonFixtures:
         params=cppython_test_list,
     )
     def fixture_cppython(self, request: pytest.FixtureRequest, install_path: Path) -> CPPythonData:
+        """Fixture defining all testable variations of CPPythonData
+
+        Args:
+            request: Parameterization list
+            install_path: The temporary install directory
+
+        Returns:
+            Variation of CPPython data
         """
-        Fixture defining all testable variations of CPPythonData
-        """
-        cppython_data = cast(CPPythonData, request.param)  # type: ignore
+        cppython_data = cast(CPPythonData, request.param)
 
         # Pin the install location to the base temporary directory
         cppython_data.install_path = install_path
@@ -83,16 +102,38 @@ class CPPythonFixtures:
         return cppython_data
 
     @pytest.fixture(
+        name="static_pyproject_data",
+        scope="session",
+    )
+    def fixture_static_pyproject_data(self, pep621: PEP621, cppython: CPPythonData) -> tuple[PEP621, CPPythonData]:
+        """Collects the static pyproject data as a tuple
+
+        Args:
+            pep621: PEP621 variant
+            cppython: Variation of CPPython data
+
+        Returns:
+            Tuple containing the pep621 and cppython fixture results
+        """
+
+        return pep621, cppython
+
+    @pytest.fixture(
         name="generator_configuration",
         scope="session",
         params=generator_config_test_list,
     )
     def fixture_generator_config(self, request: pytest.FixtureRequest) -> GeneratorConfiguration:
-        """
-        Fixture defining all testable variations of GeneratorConfiguration
+        """Fixture defining all testable variations of GeneratorConfiguration
+
+        Args:
+            request: Parameterization list
+
+        Returns:
+            Variation of generator configuration data
         """
 
-        return cast(GeneratorConfiguration, request.param)  # type: ignore
+        return cast(GeneratorConfiguration, request.param)
 
     @pytest.fixture(
         name="interface_configuration",
@@ -100,8 +141,13 @@ class CPPythonFixtures:
         params=interface_config_test_list,
     )
     def fixture_interface_config(self, request: pytest.FixtureRequest) -> InterfaceConfiguration:
-        """
-        Fixture defining all testable variations of InterfaceConfiguration
+        """Fixture defining all testable variations of InterfaceConfiguration
+
+        Args:
+            request: Parameterization list
+
+        Returns:
+            Variation of interface configuration data
         """
 
-        return cast(InterfaceConfiguration, request.param)  # type: ignore
+        return cast(InterfaceConfiguration, request.param)
