@@ -1,8 +1,5 @@
+"""Tests the integration test plugin
 """
-Tests the integration test plugin
-"""
-
-from typing import Type
 
 import pytest
 
@@ -11,13 +8,13 @@ from pytest_cppython.plugin import InterfaceIntegrationTests
 
 
 class TestCPPythonInterface(InterfaceIntegrationTests[MockInterface]):
-    """
-    The tests for the PDM interface
-    """
+    """The tests for the PDM interface"""
 
     @pytest.fixture(name="interface_type", scope="session")
-    def fixture_interface_type(self) -> Type[MockInterface]:
-        """
-        A required testing hook that allows type generation
+    def fixture_interface_type(self) -> type[MockInterface]:
+        """A required testing hook that allows type generation
+
+        Returns:
+            An overridden interface type
         """
         return MockInterface
