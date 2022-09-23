@@ -19,6 +19,7 @@ from cppython_core.schema import (
     ProviderConfiguration,
     ProviderDataT,
     ProviderT,
+    VersionControlT,
 )
 
 from pytest_cppython.fixtures import CPPythonFixtures
@@ -208,10 +209,40 @@ class GeneratorTests(PluginTests, ABC, Generic[GeneratorT]):
 
 
 class GeneratorIntegrationTests(GeneratorTests[GeneratorT]):
-    """Base class for all generator integration tests that test plugin agnostic behavior"""
+    """Base class for all vcs integration tests that test plugin agnostic behavior"""
 
 
 class GeneratorUnitTests(GeneratorTests[GeneratorT]):
+    """Custom implementations of the Generator class should inherit from this class for its tests.
+    Base class for all Generator unit tests that test plugin agnostic behavior"""
+
+
+class VersionControlTests(PluginTests, ABC, Generic[VersionControlT]):
+    """Shared functionality between the different VersionControl testing categories"""
+
+    @pytest.fixture(name="version_control_type", scope="session")
+    def fixture_version_control_type(self) -> type[VersionControlT]:
+        """A required testing hook that allows type generation"""
+        raise NotImplementedError("Subclasses should override this fixture")
+
+    @pytest.fixture(name="version_control")
+    def fixture_version_control(self, version_control_type: type[VersionControlT]) -> VersionControlT:
+        """A hook allowing implementations to override the fixture
+
+        Args:
+            version_control_type: An input version_control type
+
+        Returns:
+            A newly constructed version_control
+        """
+        return version_control_type()
+
+
+class VersionControlIntegrationTests(VersionControlTests[VersionControlT]):
+    """Base class for all generator integration tests that test plugin agnostic behavior"""
+
+
+class VersionControlUnitTests(VersionControlTests[VersionControlT]):
     """Custom implementations of the Generator class should inherit from this class for its tests.
     Base class for all Generator unit tests that test plugin agnostic behavior
     """

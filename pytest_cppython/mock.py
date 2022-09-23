@@ -15,6 +15,7 @@ from cppython_core.schema import (
     ProviderData,
     ProviderDataResolved,
     ProviderDataT,
+    VersionControl,
 )
 
 test_logger = logging.getLogger(__name__)
@@ -136,4 +137,8 @@ class MockProvider(Provider[MockProviderData, MockProviderDataResolved]):
 
 
 class MockGenerator(Generator):
+    """A mock generator class for behavior testing"""
+
+
+class MockVersionControl(VersionControl):
     """A mock generator class for behavior testing"""
