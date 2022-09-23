@@ -12,12 +12,13 @@ from cppython_core.schema import (
     PEP621,
     CPPythonData,
     CPPythonDataResolved,
-    GeneratorConfiguration,
-    GeneratorDataT,
     GeneratorT,
     InterfaceConfiguration,
     InterfaceT,
     ProjectConfiguration,
+    ProviderConfiguration,
+    ProviderDataT,
+    ProviderT,
 )
 
 from pytest_cppython.fixtures import CPPythonFixtures
@@ -27,136 +28,136 @@ class PluginTests(CPPythonFixtures):
     """Shared testing information for all plugin test classes"""
 
 
-class GeneratorTests(PluginTests, ABC, Generic[GeneratorT, GeneratorDataT]):
-    """Shared functionality between the different Generator testing categories"""
+class ProviderTests(PluginTests, ABC, Generic[ProviderT, ProviderDataT]):
+    """Shared functionality between the different Provider testing categories"""
 
-    @pytest.fixture(name="generator_data", scope="session")
-    def fixture_generator_data(self) -> GeneratorDataT:
-        """A required testing hook that allows GeneratorData generation"""
+    @pytest.fixture(name="provider_data", scope="session")
+    def fixture_provider_data(self) -> ProviderDataT:
+        """A required testing hook that allows ProviderData generation"""
         raise NotImplementedError("Subclasses should override this fixture")
 
-    @pytest.fixture(name="generator_type", scope="session")
-    def fixture_generator_type(self) -> type[GeneratorT]:
+    @pytest.fixture(name="provider_type", scope="session")
+    def fixture_provider_type(self) -> type[ProviderT]:
         """A required testing hook that allows type generation"""
         raise NotImplementedError("Subclasses should override this fixture")
 
-    @pytest.fixture(name="generator_construction_data", scope="session")
-    def fixture_generator_construction_data(
-        self, generator_type: type[GeneratorT], generator_data: GeneratorDataT
-    ) -> tuple[type[GeneratorT], GeneratorDataT]:
-        """Collects the generator type construction data as a tuple
+    @pytest.fixture(name="provider_construction_data", scope="session")
+    def fixture_provider_construction_data(
+        self, provider_type: type[ProviderT], provider_data: ProviderDataT
+    ) -> tuple[type[ProviderT], ProviderDataT]:
+        """Collects the provider type construction data as a tuple
 
         Args:
-            generator_type: Overridden generator type
-            generator_data: Overridden generator data
+            provider_type: Overridden provider type
+            provider_data: Overridden provider data
 
         Returns:
             Tuple containing the overridden fixture results
         """
-        return generator_type, generator_data
+        return provider_type, provider_data
 
     @pytest.fixture(autouse=True, scope="session")
-    def _fixture_install_dependency(self, generator_type: type[GeneratorT], install_path: Path) -> None:
+    def _fixture_install_dependency(self, provider_type: type[ProviderT], install_path: Path) -> None:
         """Forces the download to only happen once per test session"""
 
-        path = install_path / generator_type.name()
+        path = install_path / provider_type.name()
         path.mkdir(parents=True, exist_ok=True)
 
-        asyncio.run(generator_type.download_tooling(path))
+        asyncio.run(provider_type.download_tooling(path))
 
-    @pytest.fixture(name="generator")
-    def fixture_generator(
+    @pytest.fixture(name="provider")
+    def fixture_provider(
         self,
-        generator_construction_data: tuple[type[GeneratorT], GeneratorDataT],
-        generator_configuration: GeneratorConfiguration,
+        provider_construction_data: tuple[type[ProviderT], ProviderDataT],
+        provider_configuration: ProviderConfiguration,
         static_pyproject_data: tuple[PEP621, CPPythonData],
         workspace: ProjectConfiguration,
-    ) -> GeneratorT:
+    ) -> ProviderT:
         """A hook allowing implementations to override the fixture
 
         Args:
-            generator_construction_data: Generator construction data
-            generator_configuration: Generator configuration data
+            provider_construction_data: Provider construction data
+            provider_configuration: Provider configuration data
             static_pyproject_data: Generated static project definition
             workspace: Temporary directory defined by a configuration object
 
         Returns:
-            A newly constructed generator
+            A newly constructed provider
         """
 
         pep621, cppython = static_pyproject_data
-        generator_type, generator_data = generator_construction_data
+        provider_type, provider_data = provider_construction_data
 
         modified_project_data = pep621.resolve(workspace)
         modified_cppython_data = cppython.resolve(CPPythonDataResolved, workspace)
-        modified_cppython_data = modified_cppython_data.generator_resolve(generator_type)
-        modified_generator_data = generator_data.resolve(workspace)
+        modified_cppython_data = modified_cppython_data.provider_resolve(provider_type)
+        modified_provider_data = provider_data.resolve(workspace)
 
-        return generator_type(
-            generator_configuration, modified_project_data, modified_cppython_data, modified_generator_data
+        return provider_type(
+            provider_configuration, modified_project_data, modified_cppython_data, modified_provider_data
         )
 
 
-class GeneratorIntegrationTests(GeneratorTests[GeneratorT, GeneratorDataT]):
-    """Base class for all generator integration tests that test plugin agnostic behavior"""
+class ProviderIntegrationTests(ProviderTests[ProviderT, ProviderDataT]):
+    """Base class for all provider integration tests that test plugin agnostic behavior"""
 
-    def test_is_downloaded(self, generator: GeneratorT) -> None:
-        """Verify the generator is downloaded from fixture
+    def test_is_downloaded(self, provider: ProviderT) -> None:
+        """Verify the provider is downloaded from fixture
 
         Args:
-            generator: A newly constructed generator
+            provider: A newly constructed provider
         """
 
-        assert generator.tooling_downloaded(generator.cppython.install_path)
+        assert provider.tooling_downloaded(provider.cppython.install_path)
 
-    def test_not_downloaded(self, generator_type: type[GeneratorT], tmp_path: Path) -> None:
-        """Verify the generator can identify an empty tool
+    def test_not_downloaded(self, provider_type: type[ProviderT], tmp_path: Path) -> None:
+        """Verify the provider can identify an empty tool
 
         Args:
-            generator_type: An input generator type
+            provider_type: An input provider type
             tmp_path: A temporary path for the lifetime of the function
         """
 
-        assert not generator_type.tooling_downloaded(tmp_path)
+        assert not provider_type.tooling_downloaded(tmp_path)
 
-    def test_install(self, generator: GeneratorT) -> None:
+    def test_install(self, provider: ProviderT) -> None:
         """Ensure that the vanilla install command functions
 
         Args:
-            generator: A newly constructed generator
+            provider: A newly constructed provider
         """
-        generator.install()
+        provider.install()
 
-    def test_update(self, generator: GeneratorT) -> None:
+    def test_update(self, provider: ProviderT) -> None:
         """Ensure that the vanilla update command functions
 
         Args:
-            generator: A newly constructed generator
+            provider: A newly constructed provider
         """
-        generator.update()
+        provider.update()
 
 
-class GeneratorUnitTests(GeneratorTests[GeneratorT, GeneratorDataT]):
-    """Custom implementations of the Generator class should inherit from this class for its tests.
-    Base class for all generator unit tests that test plugin agnostic behavior
+class ProviderUnitTests(ProviderTests[ProviderT, ProviderDataT]):
+    """Custom implementations of the Provider class should inherit from this class for its tests.
+    Base class for all provider unit tests that test plugin agnostic behavior
     """
 
-    def test_plugin_registration(self, generator: GeneratorT) -> None:
+    def test_plugin_registration(self, provider: ProviderT) -> None:
         """Test the registration with setuptools entry_points
 
         Args:
-            generator: A newly constructed generator
+            provider: A newly constructed provider
         """
-        plugin_entries = entry_points(group=f"cppython.{generator.group()}")
+        plugin_entries = entry_points(group=f"cppython.{provider.group()}")
         assert len(plugin_entries) > 0
 
-    def test_preset_generation(self, generator: GeneratorT) -> None:
+    def test_preset_generation(self, provider: ProviderT) -> None:
         """Tests the generation of the cmake configuration preset
 
         Args:
-            generator: A newly constructed generator
+            provider: A newly constructed provider
         """
-        generator.generate_cmake_config()
+        provider.generate_cmake_config()
 
 
 class InterfaceTests(PluginTests, ABC, Generic[InterfaceT]):
@@ -190,4 +191,35 @@ class InterfaceIntegrationTests(InterfaceTests[InterfaceT]):
 class InterfaceUnitTests(InterfaceTests[InterfaceT]):
     """Custom implementations of the Interface class should inherit from this class for its tests.
     Base class for all interface unit tests that test plugin agnostic behavior
+    """
+
+
+class GeneratorTests(PluginTests, ABC, Generic[GeneratorT]):
+    """Shared functionality between the different Generator testing categories"""
+
+    @pytest.fixture(name="generator_type", scope="session")
+    def fixture_generator_type(self) -> type[GeneratorT]:
+        """A required testing hook that allows type generation"""
+        raise NotImplementedError("Subclasses should override this fixture")
+
+    @pytest.fixture(name="generator")
+    def fixture_generator(self, generator_type: type[GeneratorT]) -> GeneratorT:
+        """A hook allowing implementations to override the fixture
+
+        Args:
+            generator_type: An input generator type
+
+        Returns:
+            A newly constructed generator
+        """
+        return generator_type()
+
+
+class GeneratorIntegrationTests(GeneratorTests[GeneratorT]):
+    """Base class for all generator integration tests that test plugin agnostic behavior"""
+
+
+class GeneratorUnitTests(GeneratorTests[GeneratorT]):
+    """Custom implementations of the Generator class should inherit from this class for its tests.
+    Base class for all Generator unit tests that test plugin agnostic behavior
     """

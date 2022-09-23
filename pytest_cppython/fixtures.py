@@ -8,14 +8,14 @@ import pytest
 from cppython_core.schema import (
     PEP621,
     CPPythonData,
-    GeneratorConfiguration,
     InterfaceConfiguration,
     ProjectConfiguration,
+    ProviderConfiguration,
 )
 
 from pytest_cppython.fixture_data.configuration import (
-    generator_config_test_list,
     interface_config_test_list,
+    provider_config_test_list,
 )
 from pytest_cppython.fixture_data.cppython import cppython_test_list
 from pytest_cppython.fixture_data.pep621 import pep621_test_list
@@ -119,21 +119,21 @@ class CPPythonFixtures:
         return pep621, cppython
 
     @pytest.fixture(
-        name="generator_configuration",
+        name="provider_configuration",
         scope="session",
-        params=generator_config_test_list,
+        params=provider_config_test_list,
     )
-    def fixture_generator_config(self, request: pytest.FixtureRequest) -> GeneratorConfiguration:
-        """Fixture defining all testable variations of GeneratorConfiguration
+    def fixture_provider_config(self, request: pytest.FixtureRequest) -> ProviderConfiguration:
+        """Fixture defining all testable variations of ProviderConfiguration
 
         Args:
             request: Parameterization list
 
         Returns:
-            Variation of generator configuration data
+            Variation of provider configuration data
         """
 
-        return cast(GeneratorConfiguration, request.param)
+        return cast(ProviderConfiguration, request.param)
 
     @pytest.fixture(
         name="interface_configuration",

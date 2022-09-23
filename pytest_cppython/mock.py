@@ -8,17 +8,18 @@ from cppython_core.schema import (
     ConfigurePreset,
     CPPythonDataResolved,
     Generator,
-    GeneratorConfiguration,
-    GeneratorData,
-    GeneratorDataResolved,
-    GeneratorDataT,
     Interface,
     PEP621Resolved,
     ProjectConfiguration,
+    Provider,
+    ProviderConfiguration,
+    ProviderData,
+    ProviderDataResolved,
+    ProviderDataT,
 )
 
 test_logger = logging.getLogger(__name__)
-test_configuration = GeneratorConfiguration(root_directory=Path())
+test_configuration = ProviderConfiguration(root_directory=Path())
 
 
 class MockInterface(Interface):
@@ -33,30 +34,30 @@ class MockInterface(Interface):
         """
         return "mock"
 
-    def read_generator_data(self, generator_data_type: type[GeneratorDataT]) -> GeneratorDataT:
+    def read_provider_data(self, provider_data_type: type[ProviderDataT]) -> ProviderDataT:
         """Implementation of Interface function
 
         Args:
-            generator_data_type: _description_
+            provider_data_type: _description_
 
         Returns:
             _description_
         """
 
-        return generator_data_type()
+        return provider_data_type()
 
     def write_pyproject(self) -> None:
         """Implementation of Interface function"""
 
 
-class MockGeneratorDataResolved(GeneratorDataResolved):
-    """Mock resolved generator data class"""
+class MockProviderDataResolved(ProviderDataResolved):
+    """Mock resolved provider data class"""
 
 
-class MockGeneratorData(GeneratorData[MockGeneratorDataResolved]):
-    """Mock generator data class"""
+class MockProviderData(ProviderData[MockProviderDataResolved]):
+    """Mock provider data class"""
 
-    def resolve(self, project_configuration: ProjectConfiguration) -> MockGeneratorDataResolved:
+    def resolve(self, project_configuration: ProjectConfiguration) -> MockProviderDataResolved:
         """_summary_
 
         Args:
@@ -65,25 +66,25 @@ class MockGeneratorData(GeneratorData[MockGeneratorDataResolved]):
         Returns:
             _description_
         """
-        return MockGeneratorDataResolved()
+        return MockProviderDataResolved()
 
 
-test_generator = MockGeneratorData()
+test_provider = MockProviderData()
 
 
-class MockGenerator(Generator[MockGeneratorData, MockGeneratorDataResolved]):
-    """A mock generator class for behavior testing"""
+class MockProvider(Provider[MockProviderData, MockProviderDataResolved]):
+    """A mock provider class for behavior testing"""
 
     downloaded: Path | None = None
 
     def __init__(
         self,
-        configuration: GeneratorConfiguration,
+        configuration: ProviderConfiguration,
         project: PEP621Resolved,
         cppython: CPPythonDataResolved,
-        generator: MockGeneratorDataResolved,
+        provider: MockProviderDataResolved,
     ) -> None:
-        super().__init__(configuration, project, cppython, generator)
+        super().__init__(configuration, project, cppython, provider)
 
     @staticmethod
     def name() -> str:
@@ -95,22 +96,22 @@ class MockGenerator(Generator[MockGeneratorData, MockGeneratorDataResolved]):
         return "mock"
 
     @staticmethod
-    def data_type() -> type[MockGeneratorData]:
+    def data_type() -> type[MockProviderData]:
         """_summary_
 
         Returns:
             _description_
         """
-        return MockGeneratorData
+        return MockProviderData
 
     @staticmethod
-    def resolved_data_type() -> type[MockGeneratorDataResolved]:
+    def resolved_data_type() -> type[MockProviderDataResolved]:
         """_summary_
 
         Returns:
             _description_
         """
-        return MockGeneratorDataResolved
+        return MockProviderDataResolved
 
     @classmethod
     def tooling_downloaded(cls, path: Path) -> bool:
@@ -142,3 +143,7 @@ class MockGenerator(Generator[MockGeneratorData, MockGeneratorDataResolved]):
         """
 
         return ConfigurePreset(name="mock-config")
+
+
+class MockGenerator(Generator):
+    """A mock generator class for behavior testing"""
