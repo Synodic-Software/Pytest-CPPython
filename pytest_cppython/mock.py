@@ -5,7 +5,6 @@ import logging
 from pathlib import Path
 
 from cppython_core.schema import (
-    ConfigurePreset,
     CPPythonDataResolved,
     Generator,
     Interface,
@@ -134,15 +133,6 @@ class MockProvider(Provider[MockProviderData, MockProviderDataResolved]):
 
     def update(self) -> None:
         pass
-
-    def generate_cmake_config(self) -> ConfigurePreset:
-        """_summary_
-
-        Returns:
-            _description_
-        """
-
-        return ConfigurePreset(name="mock-config")
 
 
 class MockGenerator(Generator):

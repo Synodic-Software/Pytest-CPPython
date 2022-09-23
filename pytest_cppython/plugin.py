@@ -151,14 +151,6 @@ class ProviderUnitTests(ProviderTests[ProviderT, ProviderDataT]):
         plugin_entries = entry_points(group=f"cppython.{provider.group()}")
         assert len(plugin_entries) > 0
 
-    def test_preset_generation(self, provider: ProviderT) -> None:
-        """Tests the generation of the cmake configuration preset
-
-        Args:
-            provider: A newly constructed provider
-        """
-        provider.generate_cmake_config()
-
 
 class InterfaceTests(PluginTests, ABC, Generic[InterfaceT]):
     """Shared functionality between the different Interface testing categories"""
