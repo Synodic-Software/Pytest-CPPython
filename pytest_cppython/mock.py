@@ -139,6 +139,46 @@ class MockProvider(Provider[MockProviderData, MockProviderDataResolved]):
 class MockGenerator(Generator):
     """A mock generator class for behavior testing"""
 
+    @staticmethod
+    def name() -> str:
+        """_summary_
+
+        Returns:
+            _description_
+        """
+        return "mock"
+
 
 class MockVersionControl(VersionControl):
     """A mock generator class for behavior testing"""
+
+    @staticmethod
+    def name() -> str:
+        """_summary_
+
+        Returns:
+            _description_
+        """
+        return "mock"
+
+    def extract_version(self, path: Path) -> str:
+        """_summary_
+
+        Args:
+            path: _description_
+
+        Returns:
+            _description_
+        """
+        return "1.0.0"
+
+    def is_repository(self, path: Path) -> bool:
+        """_summary_
+
+        Args:
+            path: _description_
+
+        Returns:
+            _description_
+        """
+        return False

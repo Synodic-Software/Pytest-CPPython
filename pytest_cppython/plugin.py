@@ -246,3 +246,13 @@ class VersionControlUnitTests(VersionControlTests[VersionControlT]):
     """Custom implementations of the Generator class should inherit from this class for its tests.
     Base class for all Generator unit tests that test plugin agnostic behavior
     """
+
+    def test_not_repository(self, version_control: VersionControlT, tmp_path: Path) -> None:
+        """Tests that the temporary directory path will not be registered as a repository
+
+        Args:
+            version_control: The VCS constructed type
+            tmp_path: Temporary directory
+        """
+
+        assert not version_control.is_repository(tmp_path)
