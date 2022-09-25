@@ -27,10 +27,10 @@ class MockInterface(Interface):
 
     @staticmethod
     def name() -> str:
-        """_summary_
+        """The name of the plugin, canonicalized
 
         Returns:
-            _description_
+            Plugin name
         """
         return "mock"
 
@@ -58,13 +58,13 @@ class MockProviderData(ProviderData[MockProviderDataResolved]):
     """Mock provider data class"""
 
     def resolve(self, project_configuration: ProjectConfiguration) -> MockProviderDataResolved:
-        """_summary_
+        """Creates a copy and resolves dynamic attributes
 
         Args:
-            project_configuration: _description_
+            project_configuration: The configuration data used to help the resolution
 
         Returns:
-            _description_
+            The resolved provider data type
         """
         return MockProviderDataResolved()
 
@@ -88,40 +88,40 @@ class MockProvider(Provider[MockProviderData, MockProviderDataResolved]):
 
     @staticmethod
     def name() -> str:
-        """_summary_
+        """The name of the plugin, canonicalized
 
         Returns:
-            _description_
+            The plugin name
         """
         return "mock"
 
     @staticmethod
     def data_type() -> type[MockProviderData]:
-        """_summary_
+        """Returns the pydantic type to cast the provider configuration data to
 
         Returns:
-            _description_
+            The type
         """
         return MockProviderData
 
     @staticmethod
     def resolved_data_type() -> type[MockProviderDataResolved]:
-        """_summary_
+        """Returns the pydantic type to cast the resolved provider configuration data to
 
         Returns:
-            _description_
+            The resolved type
         """
         return MockProviderDataResolved
 
     @classmethod
     def tooling_downloaded(cls, path: Path) -> bool:
-        """_summary_
+        """Returns whether the provider tooling needs to be downloaded
 
         Args:
-            path: _description_
+            path: The directory to check for downloaded tooling
 
         Returns:
-            _description_
+            Whether the tooling has been downloaded or not
         """
         return cls.downloaded == path
 
@@ -141,10 +141,10 @@ class MockGenerator(Generator):
 
     @staticmethod
     def name() -> str:
-        """_summary_
+        """The plugin name
 
         Returns:
-            _description_
+            The name
         """
         return "mock"
 
@@ -154,31 +154,31 @@ class MockVersionControl(VersionControl):
 
     @staticmethod
     def name() -> str:
-        """_summary_
+        """The plugin name
 
         Returns:
-            _description_
+            The name
         """
         return "mock"
 
     def extract_version(self, path: Path) -> str:
-        """_summary_
+        """Extracts the system's version metadata
 
         Args:
-            path: _description_
+            path: The repository path
 
         Returns:
-            _description_
+            A version
         """
         return "1.0.0"
 
     def is_repository(self, path: Path) -> bool:
-        """_summary_
+        """Queries repository status of a path
 
         Args:
-            path: _description_
+            path: The input path to query
 
         Returns:
-            _description_
+            Whether the given path is a repository root
         """
         return False
