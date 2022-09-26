@@ -13,7 +13,6 @@ from cppython_core.schema import (
     CPPythonData,
     CPPythonDataResolved,
     GeneratorT,
-    InterfaceConfiguration,
     InterfaceT,
     ProjectConfiguration,
     ProviderConfiguration,
@@ -162,19 +161,16 @@ class InterfaceTests(PluginTests, ABC, Generic[InterfaceT]):
         raise NotImplementedError("Subclasses should override this fixture")
 
     @pytest.fixture(name="interface")
-    def fixture_interface(
-        self, interface_type: type[InterfaceT], interface_configuration: InterfaceConfiguration
-    ) -> InterfaceT:
+    def fixture_interface(self, interface_type: type[InterfaceT]) -> InterfaceT:
         """A hook allowing implementations to override the fixture
 
         Args:
             interface_type: An input interface type
-            interface_configuration: Interface configuration data
 
         Returns:
             A newly constructed interface
         """
-        return interface_type(interface_configuration)
+        return interface_type()
 
 
 class InterfaceIntegrationTests(InterfaceTests[InterfaceT]):

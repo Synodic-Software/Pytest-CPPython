@@ -8,15 +8,11 @@ import pytest
 from cppython_core.schema import (
     PEP621,
     CPPythonData,
-    InterfaceConfiguration,
     ProjectConfiguration,
     ProviderConfiguration,
 )
 
-from pytest_cppython.fixture_data.configuration import (
-    interface_config_test_list,
-    provider_config_test_list,
-)
+from pytest_cppython.fixture_data.configuration import provider_config_test_list
 from pytest_cppython.fixture_data.cppython import cppython_test_list
 from pytest_cppython.fixture_data.pep621 import pep621_test_list
 
@@ -134,20 +130,3 @@ class CPPythonFixtures:
         """
 
         return cast(ProviderConfiguration, request.param)
-
-    @pytest.fixture(
-        name="interface_configuration",
-        scope="session",
-        params=interface_config_test_list,
-    )
-    def fixture_interface_config(self, request: pytest.FixtureRequest) -> InterfaceConfiguration:
-        """Fixture defining all testable variations of InterfaceConfiguration
-
-        Args:
-            request: Parameterization list
-
-        Returns:
-            Variation of interface configuration data
-        """
-
-        return cast(InterfaceConfiguration, request.param)

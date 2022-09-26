@@ -3,8 +3,6 @@
 
 from pathlib import Path
 
-from cppython_core.schema import InterfaceConfiguration, ProviderConfiguration
+from cppython_core.schema import ProviderConfiguration
 
 provider_config_test_list: list[ProviderConfiguration] = [ProviderConfiguration(root_directory=Path("."))]
-
-interface_config_test_list: list[InterfaceConfiguration] = [InterfaceConfiguration()]
