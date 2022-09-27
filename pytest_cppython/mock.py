@@ -3,6 +3,7 @@
 
 import logging
 from pathlib import Path
+from typing import Any
 
 from cppython_core.schema import (
     CPPythonDataResolved,
@@ -17,6 +18,7 @@ from cppython_core.schema import (
     ProviderDataT,
     VersionControl,
 )
+from pydantic import Field
 
 test_logger = logging.getLogger(__name__)
 test_configuration = ProviderConfiguration(root_directory=Path())
@@ -53,9 +55,13 @@ class MockInterface(Interface):
 class MockProviderDataResolved(ProviderDataResolved):
     """Mock resolved provider data class"""
 
+    data_out: bool = Field(description="Value to force resolution type change")
+
 
 class MockProviderData(ProviderData[MockProviderDataResolved]):
     """Mock provider data class"""
+
+    data_out: Any = Field(default=None, description="Value to force resolution type change + alias", alias="data-out")
 
     def resolve(self, project_configuration: ProjectConfiguration) -> MockProviderDataResolved:
         """Creates a copy and resolves dynamic attributes
@@ -66,10 +72,10 @@ class MockProviderData(ProviderData[MockProviderDataResolved]):
         Returns:
             The resolved provider data type
         """
-        return MockProviderDataResolved()
 
+        mock_data: bool = self.data_out is None
 
-test_provider = MockProviderData()
+        return MockProviderDataResolved(data_out=mock_data)
 
 
 class MockProvider(Provider[MockProviderData, MockProviderDataResolved]):
