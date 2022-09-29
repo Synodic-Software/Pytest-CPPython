@@ -11,7 +11,6 @@ import pytest
 from cppython_core.schema import (
     PEP621,
     CPPythonData,
-    CPPythonDataResolved,
     GeneratorT,
     InterfaceT,
     ProjectConfiguration,
@@ -89,7 +88,7 @@ class ProviderTests(PluginTests, ABC, Generic[ProviderT, ProviderDataT]):
         provider_type, provider_data = provider_construction_data
 
         modified_project_data = pep621.resolve(workspace)
-        modified_cppython_data = cppython.resolve(CPPythonDataResolved, workspace)
+        modified_cppython_data = cppython.resolve(workspace)
         modified_cppython_data = modified_cppython_data.provider_resolve(provider_type)
         modified_provider_data = provider_data.resolve(workspace)
 
