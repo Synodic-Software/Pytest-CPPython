@@ -11,13 +11,14 @@ import pytest
 from cppython_core.schema import (
     PEP621,
     CPPythonData,
-    CPPythonDataResolved,
+    GeneratorDataT,
     GeneratorT,
     InterfaceT,
     ProjectConfiguration,
     ProviderConfiguration,
     ProviderDataT,
     ProviderT,
+    VersionControlDataT,
     VersionControlT,
 )
 
@@ -89,7 +90,7 @@ class ProviderTests(PluginTests, ABC, Generic[ProviderT, ProviderDataT]):
         provider_type, provider_data = provider_construction_data
 
         modified_project_data = pep621.resolve(workspace)
-        modified_cppython_data = cppython.resolve(CPPythonDataResolved, workspace)
+        modified_cppython_data = cppython.resolve(workspace)
         modified_cppython_data = modified_cppython_data.provider_resolve(provider_type)
         modified_provider_data = provider_data.resolve(workspace)
 
@@ -183,8 +184,13 @@ class InterfaceUnitTests(InterfaceTests[InterfaceT]):
     """
 
 
-class GeneratorTests(PluginTests, ABC, Generic[GeneratorT]):
+class GeneratorTests(PluginTests, ABC, Generic[GeneratorT, GeneratorDataT]):
     """Shared functionality between the different Generator testing categories"""
+
+    @pytest.fixture(name="generator_data", scope="session")
+    def fixture_generator_data(self) -> GeneratorDataT:
+        """A required testing hook that allows GeneratorData generation"""
+        raise NotImplementedError("Subclasses should override this fixture")
 
     @pytest.fixture(name="generator_type", scope="session")
     def fixture_generator_type(self) -> type[GeneratorT]:
@@ -204,17 +210,22 @@ class GeneratorTests(PluginTests, ABC, Generic[GeneratorT]):
         return generator_type()
 
 
-class GeneratorIntegrationTests(GeneratorTests[GeneratorT]):
+class GeneratorIntegrationTests(GeneratorTests[GeneratorT, GeneratorDataT]):
     """Base class for all vcs integration tests that test plugin agnostic behavior"""
 
 
-class GeneratorUnitTests(GeneratorTests[GeneratorT]):
+class GeneratorUnitTests(GeneratorTests[GeneratorT, GeneratorDataT]):
     """Custom implementations of the Generator class should inherit from this class for its tests.
     Base class for all Generator unit tests that test plugin agnostic behavior"""
 
 
-class VersionControlTests(PluginTests, ABC, Generic[VersionControlT]):
+class VersionControlTests(PluginTests, ABC, Generic[VersionControlT, VersionControlDataT]):
     """Shared functionality between the different VersionControl testing categories"""
+
+    @pytest.fixture(name="version_control_data", scope="session")
+    def fixture_version_control_data(self) -> VersionControlDataT:
+        """A required testing hook that allows ProviderData generation"""
+        raise NotImplementedError("Subclasses should override this fixture")
 
     @pytest.fixture(name="version_control_type", scope="session")
     def fixture_version_control_type(self) -> type[VersionControlT]:
@@ -234,11 +245,11 @@ class VersionControlTests(PluginTests, ABC, Generic[VersionControlT]):
         return version_control_type()
 
 
-class VersionControlIntegrationTests(VersionControlTests[VersionControlT]):
+class VersionControlIntegrationTests(VersionControlTests[VersionControlT, VersionControlDataT]):
     """Base class for all generator integration tests that test plugin agnostic behavior"""
 
 
-class VersionControlUnitTests(VersionControlTests[VersionControlT]):
+class VersionControlUnitTests(VersionControlTests[VersionControlT, VersionControlDataT]):
     """Custom implementations of the Generator class should inherit from this class for its tests.
     Base class for all Generator unit tests that test plugin agnostic behavior
     """

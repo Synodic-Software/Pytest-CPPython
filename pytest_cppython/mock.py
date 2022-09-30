@@ -8,6 +8,8 @@ from typing import Any
 from cppython_core.schema import (
     CPPythonDataResolved,
     Generator,
+    GeneratorData,
+    GeneratorDataResolved,
     Interface,
     PEP621Resolved,
     ProjectConfiguration,
@@ -17,6 +19,8 @@ from cppython_core.schema import (
     ProviderDataResolved,
     ProviderDataT,
     VersionControl,
+    VersionControlData,
+    VersionControlDataResolved,
 )
 from pydantic import Field
 
@@ -142,6 +146,14 @@ class MockProvider(Provider[MockProviderData, MockProviderDataResolved]):
         pass
 
 
+class MockGeneratorDataResolved(GeneratorDataResolved):
+    """Mocked resolved GeneratorData"""
+
+
+class MockGeneratorData(GeneratorData[MockGeneratorDataResolved]):
+    """Mocked GeneratorData"""
+
+
 class MockGenerator(Generator):
     """A mock generator class for behavior testing"""
 
@@ -153,6 +165,14 @@ class MockGenerator(Generator):
             The name
         """
         return "mock"
+
+
+class MockVersionControlDataResolved(VersionControlDataResolved):
+    """Mocked resolved VersionControlData"""
+
+
+class MockVersionControlData(VersionControlData[MockVersionControlDataResolved]):
+    """Mocked VersionControlData"""
 
 
 class MockVersionControl(VersionControl):

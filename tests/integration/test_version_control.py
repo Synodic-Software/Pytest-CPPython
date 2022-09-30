@@ -3,11 +3,11 @@
 
 import pytest
 
-from pytest_cppython.mock import MockVersionControl
+from pytest_cppython.mock import MockVersionControl, MockVersionControlData
 from pytest_cppython.plugin import VersionControlIntegrationTests
 
 
-class TestCPPythonGenerator(VersionControlIntegrationTests[MockVersionControl]):
+class TestCPPythonGenerator(VersionControlIntegrationTests[MockVersionControl, MockVersionControlData]):
     """The tests for the Mock version control"""
 
     @pytest.fixture(name="version_control_type", scope="session")

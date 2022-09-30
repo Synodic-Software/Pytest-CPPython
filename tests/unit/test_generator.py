@@ -3,11 +3,11 @@
 
 import pytest
 
-from pytest_cppython.mock import MockGenerator
+from pytest_cppython.mock import MockGenerator, MockGeneratorData
 from pytest_cppython.plugin import GeneratorUnitTests
 
 
-class TestCPPythonGenerator(GeneratorUnitTests[MockGenerator]):
+class TestCPPythonGenerator(GeneratorUnitTests[MockGenerator, MockGeneratorData]):
     """The tests for the Mock generator"""
 
     @pytest.fixture(name="generator_type", scope="session")
