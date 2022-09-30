@@ -2,7 +2,7 @@
 """
 
 from pathlib import Path
-from typing import cast
+from typing import Any, cast
 
 import pytest
 from cppython_core.schema import (
@@ -10,11 +10,21 @@ from cppython_core.schema import (
     CPPythonData,
     ProjectConfiguration,
     ProviderConfiguration,
+    PyProject,
+    ToolData,
 )
 
 from pytest_cppython.fixture_data.configuration import provider_config_test_list
 from pytest_cppython.fixture_data.cppython import cppython_test_list
 from pytest_cppython.fixture_data.pep621 import pep621_test_list
+from pytest_cppython.mock import (
+    MockGenerator,
+    MockGeneratorData,
+    MockProvider,
+    MockProviderData,
+    MockVersionControl,
+    MockVersionControlData,
+)
 
 
 class CPPythonFixtures:
@@ -98,23 +108,6 @@ class CPPythonFixtures:
         return cppython_data
 
     @pytest.fixture(
-        name="static_pyproject_data",
-        scope="session",
-    )
-    def fixture_static_pyproject_data(self, pep621: PEP621, cppython: CPPythonData) -> tuple[PEP621, CPPythonData]:
-        """Collects the static pyproject data as a tuple
-
-        Args:
-            pep621: PEP621 variant
-            cppython: Variation of CPPython data
-
-        Returns:
-            Tuple containing the pep621 and cppython fixture results
-        """
-
-        return pep621, cppython
-
-    @pytest.fixture(
         name="provider_configuration",
         scope="session",
         params=provider_config_test_list,
@@ -130,3 +123,48 @@ class CPPythonFixtures:
         """
 
         return cast(ProviderConfiguration, request.param)
+
+    @pytest.fixture(name="tool", scope="session")
+    def fixture_tool(self, cppython: CPPythonData) -> ToolData:
+        """The tool data
+
+        Args:
+            cppython: The parameterized cppython table
+
+        Returns:
+            Wrapped CPPython data
+        """
+
+        return ToolData(cppython=cppython)
+
+    @pytest.fixture(name="project", scope="session")
+    def fixture_project(self, tool: ToolData, pep621: PEP621) -> PyProject:
+        """Parameterized construction of PyProject data
+
+        Args:
+            tool: The tool table with internal cppython data
+            pep621: The project table
+
+        Returns:
+            All the data as one object
+        """
+
+        return PyProject(project=pep621, tool=tool)
+
+    @pytest.fixture(name="project_with_mocks", scope="session")
+    def fixture_project_with_mocks(self, project: PyProject) -> dict[str, Any]:
+        """Extension of the 'project' fixture with mock data attached
+
+        Args:
+            project: The input project
+
+        Returns:
+            All the data as a dictionary
+        """
+
+        mocked_pyproject = project.dict(by_alias=True)
+        mocked_pyproject["tool"]["cppython"]["provider"][MockProvider.name()] = MockProviderData()
+        mocked_pyproject["tool"]["cppython"]["generator"][MockGenerator.name()] = MockGeneratorData()
+        mocked_pyproject["tool"]["cppython"]["vcs"][MockVersionControl.name()] = MockVersionControlData()
+
+        return mocked_pyproject
