@@ -153,8 +153,20 @@ class MockGeneratorDataResolved(GeneratorDataResolved):
 class MockGeneratorData(GeneratorData[MockGeneratorDataResolved]):
     """Mocked GeneratorData"""
 
+    def resolve(self, project_configuration: ProjectConfiguration) -> MockGeneratorDataResolved:
+        """_summary_
 
-class MockGenerator(Generator):
+        Args:
+            project_configuration: _description_
+
+        Returns:
+            _description_
+        """
+
+        return MockGeneratorDataResolved()
+
+
+class MockGenerator(Generator[MockGeneratorData, MockGeneratorDataResolved]):
     """A mock generator class for behavior testing"""
 
     @staticmethod
@@ -174,8 +186,20 @@ class MockVersionControlDataResolved(VersionControlDataResolved):
 class MockVersionControlData(VersionControlData[MockVersionControlDataResolved]):
     """Mocked VersionControlData"""
 
+    def resolve(self, project_configuration: ProjectConfiguration) -> MockVersionControlDataResolved:
+        """_summary_
 
-class MockVersionControl(VersionControl):
+        Args:
+            project_configuration: _description_
+
+        Returns:
+            _description_
+        """
+
+        return MockVersionControlDataResolved()
+
+
+class MockVersionControl(VersionControl[MockVersionControlData, MockVersionControlDataResolved]):
     """A mock generator class for behavior testing"""
 
     @staticmethod

@@ -9,8 +9,6 @@ from typing import Generic
 
 import pytest
 from cppython_core.schema import (
-    PEP621,
-    CPPythonData,
     GeneratorDataT,
     GeneratorT,
     InterfaceT,
@@ -18,6 +16,7 @@ from cppython_core.schema import (
     ProviderConfiguration,
     ProviderDataT,
     ProviderT,
+    PyProject,
     VersionControlDataT,
     VersionControlT,
 )
@@ -71,7 +70,7 @@ class ProviderTests(PluginTests, ABC, Generic[ProviderT, ProviderDataT]):
         self,
         provider_construction_data: tuple[type[ProviderT], ProviderDataT],
         provider_configuration: ProviderConfiguration,
-        static_pyproject_data: tuple[PEP621, CPPythonData],
+        project: PyProject,
         workspace: ProjectConfiguration,
     ) -> ProviderT:
         """A hook allowing implementations to override the fixture
@@ -79,18 +78,17 @@ class ProviderTests(PluginTests, ABC, Generic[ProviderT, ProviderDataT]):
         Args:
             provider_construction_data: Provider construction data
             provider_configuration: Provider configuration data
-            static_pyproject_data: Generated static project definition
+            project: Generated static project definition
             workspace: Temporary directory defined by a configuration object
 
         Returns:
             A newly constructed provider
         """
 
-        pep621, cppython = static_pyproject_data
         provider_type, provider_data = provider_construction_data
 
-        modified_project_data = pep621.resolve(workspace)
-        modified_cppython_data = cppython.resolve(workspace)
+        modified_project_data = project.project.resolve(workspace)
+        modified_cppython_data = project.tool.cppython.resolve(workspace)
         modified_cppython_data = modified_cppython_data.provider_resolve(provider_type)
         modified_provider_data = provider_data.resolve(workspace)
 
@@ -151,6 +149,28 @@ class ProviderUnitTests(ProviderTests[ProviderT, ProviderDataT]):
         """
         plugin_entries = entry_points(group=f"cppython.{provider.group()}")
         assert len(plugin_entries) > 0
+
+    def test_data_construction(self, project: PyProject, provider_data: ProviderDataT, provider: ProviderT) -> None:
+        """Tests that the pyproject cant correctly accept and extract the plugin data
+
+        Args:
+            project: Test project fixture
+            provider_data: The overridden provider data
+            provider: The overridden provider
+        """
+        project_data = project.dict(by_alias=True)
+
+        project_data["tool"]["cppython"]["provider"][provider.name()] = provider_data.dict(by_alias=True)
+        result = PyProject(**project_data)
+
+        assert result.tool is not None
+        assert result.tool.cppython is not None
+        assert result.tool.cppython.provider is not None
+
+        data = result.tool.cppython.extract_provider(provider.name(), provider.data_type())
+
+        assert data.dict(by_alias=True) == provider_data.dict(by_alias=True)
+        assert data.dict() == provider_data.dict()
 
 
 class InterfaceTests(PluginTests, ABC, Generic[InterfaceT]):
@@ -218,6 +238,37 @@ class GeneratorUnitTests(GeneratorTests[GeneratorT, GeneratorDataT]):
     """Custom implementations of the Generator class should inherit from this class for its tests.
     Base class for all Generator unit tests that test plugin agnostic behavior"""
 
+    def test_plugin_registration(self, generator: GeneratorT) -> None:
+        """Test the registration with setuptools entry_points
+
+        Args:
+            generator: A newly constructed generator
+        """
+        plugin_entries = entry_points(group=f"cppython.{generator.group()}")
+        assert len(plugin_entries) > 0
+
+    def test_data_construction(self, project: PyProject, generator_data: GeneratorDataT, generator: GeneratorT) -> None:
+        """Tests that the pyproject cant correctly accept and extract the plugin data
+
+        Args:
+            project: Test project fixture
+            generator_data: The overridden generator data
+            generator: The overridden generator
+        """
+        project_data = project.dict(by_alias=True)
+
+        project_data["tool"]["cppython"]["generator"][generator.name()] = generator_data.dict(by_alias=True)
+        result = PyProject(**project_data)
+
+        assert result.tool is not None
+        assert result.tool.cppython is not None
+        assert result.tool.cppython.generator is not None
+
+        data = result.tool.cppython.extract_generator(generator.name(), generator.data_type())
+
+        assert data.dict(by_alias=True) == generator_data.dict(by_alias=True)
+        assert data.dict() == generator_data.dict()
+
 
 class VersionControlTests(PluginTests, ABC, Generic[VersionControlT, VersionControlDataT]):
     """Shared functionality between the different VersionControl testing categories"""
@@ -263,3 +314,38 @@ class VersionControlUnitTests(VersionControlTests[VersionControlT, VersionContro
         """
 
         assert not version_control.is_repository(tmp_path)
+
+    def test_plugin_registration(self, version_control: VersionControlT) -> None:
+        """Test the registration with setuptools entry_points
+
+        Args:
+            version_control: A newly constructed version_control
+        """
+        plugin_entries = entry_points(group=f"cppython.{version_control.group()}")
+        assert len(plugin_entries) > 0
+
+    def test_data_construction(
+        self, project: PyProject, version_control_data: VersionControlDataT, version_control: VersionControlT
+    ) -> None:
+        """Tests that the pyproject cant correctly accept and extract the plugin data
+
+        Args:
+            project: Test project fixture
+            version_control_data: The overridden version_control data
+            version_control: The overridden version_control
+        """
+        project_data = project.dict(by_alias=True)
+
+        project_data["tool"]["cppython"]["version_control"][version_control.name()] = version_control_data.dict(
+            by_alias=True
+        )
+        result = PyProject(**project_data)
+
+        assert result.tool is not None
+        assert result.tool.cppython is not None
+        assert result.tool.cppython.vcs is not None
+
+        data = result.tool.cppython.extract_vcs(version_control.name(), version_control.data_type())
+
+        assert data.dict(by_alias=True) == version_control_data.dict(by_alias=True)
+        assert data.dict() == version_control_data.dict()
