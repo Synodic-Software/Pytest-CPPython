@@ -8,76 +8,98 @@ from pathlib import Path
 from typing import Generic
 
 import pytest
-from cppython_core.schema import (
+from cppython_core.plugin_schema.generator import (
+    GeneratorConfiguration,
     GeneratorDataT,
     GeneratorT,
-    InterfaceT,
-    ProjectConfiguration,
+)
+from cppython_core.plugin_schema.interface import InterfaceT
+from cppython_core.plugin_schema.provider import (
     ProviderConfiguration,
     ProviderDataT,
     ProviderT,
-    PyProject,
+)
+from cppython_core.plugin_schema.vcs import (
+    VersionControlConfiguration,
     VersionControlDataT,
     VersionControlT,
+)
+from cppython_core.schema import (
+    DataPluginT,
+    PluginDataConfigurationT,
+    PluginDataT,
+    PluginT,
+    ProjectConfiguration,
+    PyProject,
 )
 
 from pytest_cppython.fixtures import CPPythonFixtures
 
 
-class PluginTests(CPPythonFixtures):
+class PluginTests(CPPythonFixtures, ABC, Generic[PluginT]):
     """Shared testing information for all plugin test classes"""
 
-
-class ProviderTests(PluginTests, ABC, Generic[ProviderT, ProviderDataT]):
-    """Shared functionality between the different Provider testing categories"""
-
-    @pytest.fixture(name="provider_data", scope="session")
-    def fixture_provider_data(self) -> ProviderDataT:
-        """A required testing hook that allows ProviderData generation"""
-        raise NotImplementedError("Subclasses should override this fixture")
-
-    @pytest.fixture(name="provider_type", scope="session")
-    def fixture_provider_type(self) -> type[ProviderT]:
+    @pytest.fixture(name="plugin_type", scope="session")
+    def fixture_plugin_type(self) -> type[PluginT]:
         """A required testing hook that allows type generation"""
+
         raise NotImplementedError("Subclasses should override this fixture")
 
-    @pytest.fixture(name="provider_construction_data", scope="session")
-    def fixture_provider_construction_data(
-        self, provider_type: type[ProviderT], provider_data: ProviderDataT
-    ) -> tuple[type[ProviderT], ProviderDataT]:
-        """Collects the provider type construction data as a tuple
-
-        Args:
-            provider_type: Overridden provider type
-            provider_data: Overridden provider data
-
-        Returns:
-            Tuple containing the overridden fixture results
-        """
-        return provider_type, provider_data
-
-    @pytest.fixture(autouse=True, scope="session")
-    def _fixture_install_dependency(self, provider_type: type[ProviderT], install_path: Path) -> None:
-        """Forces the download to only happen once per test session"""
-
-        path = install_path / provider_type.name()
-        path.mkdir(parents=True, exist_ok=True)
-
-        asyncio.run(provider_type.download_tooling(path))
-
-    @pytest.fixture(name="provider")
-    def fixture_provider(
-        self,
-        provider_construction_data: tuple[type[ProviderT], ProviderDataT],
-        provider_configuration: ProviderConfiguration,
-        project: PyProject,
-        workspace: ProjectConfiguration,
-    ) -> ProviderT:
+    @pytest.fixture(name="plugin")
+    def fixture_plugin(self, plugin_type: type[PluginT]) -> PluginT:
         """A hook allowing implementations to override the fixture
 
         Args:
-            provider_construction_data: Provider construction data
-            provider_configuration: Provider configuration data
+            plugin_type: An input interface type
+
+        Returns:
+            A newly constructed plugin
+        """
+        raise NotImplementedError("Subclasses should override this fixture")
+
+
+class PluginIntegrationTests(PluginTests[PluginT]):
+    """Integration testing information for all plugin test classes"""
+
+
+class PluginUnitTests(PluginTests[PluginT]):
+    """Unit testing information for all plugin test classes"""
+
+
+class DataPluginTests(PluginTests[DataPluginT], Generic[PluginDataConfigurationT, DataPluginT, PluginDataT]):
+    """Shared testing information for all data plugin test classes"""
+
+    @pytest.fixture(name="plugin_configuration", scope="session")
+    def fixture_plugin_configuration(
+        self,
+    ) -> PluginDataConfigurationT:
+        """A required testing hook that allows plugin configuration data generation"""
+
+        raise NotImplementedError("Subclasses should override this fixture")
+
+    @pytest.fixture(name="plugin_data", scope="session")
+    def fixture_plugin_data(
+        self,
+    ) -> PluginDataT:
+        """A required testing hook that allows plugin data generation"""
+
+        raise NotImplementedError("Subclasses should override this fixture")
+
+    @pytest.fixture(name="plugin")
+    def fixture_plugin(
+        self,
+        plugin_type: type[DataPluginT],
+        plugin_data: PluginDataT,
+        plugin_configuration: PluginDataConfigurationT,
+        project: PyProject,
+        workspace: ProjectConfiguration,
+    ) -> DataPluginT:
+        """Overridden plugin generator for creating a populated data plugin type
+
+        Args:
+            plugin_type: Plugin type
+            plugin_data: Plugin data
+            plugin_configuration: Plugin configuration data
             project: Generated static project definition
             workspace: Temporary directory defined by a configuration object
 
@@ -85,267 +107,190 @@ class ProviderTests(PluginTests, ABC, Generic[ProviderT, ProviderDataT]):
             A newly constructed provider
         """
 
-        provider_type, provider_data = provider_construction_data
+        assert project.tool is not None
+        assert project.tool.cppython is not None
 
         modified_project_data = project.project.resolve(workspace)
         modified_cppython_data = project.tool.cppython.resolve(workspace)
-        modified_cppython_data = modified_cppython_data.provider_resolve(provider_type)
-        modified_provider_data = provider_data.resolve(workspace)
+        modified_cppython_data = modified_cppython_data.resolve_plugin(plugin_type)
+        modified_provider_data = plugin_data.resolve(workspace)
 
-        return provider_type(
-            provider_configuration, modified_project_data, modified_cppython_data, modified_provider_data
-        )
+        return plugin_type(plugin_configuration, modified_project_data, modified_cppython_data, modified_provider_data)
 
 
-class ProviderIntegrationTests(ProviderTests[ProviderT, ProviderDataT]):
-    """Base class for all provider integration tests that test plugin agnostic behavior"""
-
-    def test_is_downloaded(self, provider: ProviderT) -> None:
-        """Verify the provider is downloaded from fixture
-
-        Args:
-            provider: A newly constructed provider
-        """
-
-        assert provider.tooling_downloaded(provider.cppython.install_path)
-
-    def test_not_downloaded(self, provider_type: type[ProviderT], tmp_path: Path) -> None:
-        """Verify the provider can identify an empty tool
-
-        Args:
-            provider_type: An input provider type
-            tmp_path: A temporary path for the lifetime of the function
-        """
-
-        assert not provider_type.tooling_downloaded(tmp_path)
-
-    def test_install(self, provider: ProviderT) -> None:
-        """Ensure that the vanilla install command functions
-
-        Args:
-            provider: A newly constructed provider
-        """
-        provider.install()
-
-    def test_update(self, provider: ProviderT) -> None:
-        """Ensure that the vanilla update command functions
-
-        Args:
-            provider: A newly constructed provider
-        """
-        provider.update()
+class DataPluginIntegrationTests(
+    PluginIntegrationTests[DataPluginT], DataPluginTests[PluginDataConfigurationT, DataPluginT, PluginDataT]
+):
+    """Integration testing information for all data plugin test classes"""
 
 
-class ProviderUnitTests(ProviderTests[ProviderT, ProviderDataT]):
-    """Custom implementations of the Provider class should inherit from this class for its tests.
-    Base class for all provider unit tests that test plugin agnostic behavior
-    """
+class DataPluginUnitTests(
+    PluginUnitTests[DataPluginT], DataPluginTests[PluginDataConfigurationT, DataPluginT, PluginDataT]
+):
+    """Unit testing information for all data plugin test classes"""
 
-    def test_plugin_registration(self, provider: ProviderT) -> None:
+    def test_plugin_registration(self, plugin: DataPluginT) -> None:
         """Test the registration with setuptools entry_points
 
         Args:
-            provider: A newly constructed provider
+            plugin: A newly constructed provider
         """
-        plugin_entries = entry_points(group=f"cppython.{provider.group()}")
+        plugin_entries = entry_points(group=f"cppython.{plugin.group()}")
         assert len(plugin_entries) > 0
 
-    def test_data_construction(self, project: PyProject, provider_data: ProviderDataT, provider: ProviderT) -> None:
+    def test_data_construction(
+        self, project: PyProject, plugin_data: PluginDataT, plugin: DataPluginT, plugin_type: type[DataPluginT]
+    ) -> None:
         """Tests that the pyproject cant correctly accept and extract the plugin data
 
         Args:
             project: Test project fixture
-            provider_data: The overridden provider data
-            provider: The overridden provider
+            plugin_data: The overridden plugin data
+            plugin: The overridden plugin,
+            plugin_type: The overridden plugin type
         """
         project_data = project.dict(by_alias=True)
 
-        project_data["tool"]["cppython"]["provider"][provider.name()] = provider_data.dict(by_alias=True)
+        project_data["tool"]["cppython"]["provider"][plugin.name()] = plugin_data.dict(by_alias=True)
         result = PyProject(**project_data)
 
         assert result.tool is not None
         assert result.tool.cppython is not None
         assert result.tool.cppython.provider is not None
 
-        data = result.tool.cppython.extract_provider(provider.name(), provider.data_type())
+        data = result.tool.cppython.extract_plugin_data(plugin_type, plugin.data_type())
 
-        assert data.dict(by_alias=True) == provider_data.dict(by_alias=True)
-        assert data.dict() == provider_data.dict()
+        assert data.dict(by_alias=True) == plugin_data.dict(by_alias=True)
+        assert data.dict() == plugin_data.dict()
 
 
-class InterfaceTests(PluginTests, ABC, Generic[InterfaceT]):
+class InterfaceTests(PluginTests[InterfaceT]):
     """Shared functionality between the different Interface testing categories"""
 
-    @pytest.fixture(name="interface_type", scope="session")
-    def fixture_interface_type(self) -> type[InterfaceT]:
-        """A required testing hook that allows type generation"""
-        raise NotImplementedError("Subclasses should override this fixture")
-
-    @pytest.fixture(name="interface")
-    def fixture_interface(self, interface_type: type[InterfaceT]) -> InterfaceT:
-        """A hook allowing implementations to override the fixture
-
+    @pytest.fixture(name="plugin")
+    def fixture_plugin(self, plugin_type: type[InterfaceT]) -> InterfaceT:
+        """Fixture creating the interface.
         Args:
-            interface_type: An input interface type
-
+            plugin_type: An input interface type
         Returns:
             A newly constructed interface
         """
-        return interface_type()
+        return plugin_type()
 
 
-class InterfaceIntegrationTests(InterfaceTests[InterfaceT]):
+class InterfaceIntegrationTests(PluginIntegrationTests[InterfaceT], InterfaceTests[InterfaceT]):
     """Base class for all interface integration tests that test plugin agnostic behavior"""
 
 
-class InterfaceUnitTests(InterfaceTests[InterfaceT]):
+class InterfaceUnitTests(PluginUnitTests[InterfaceT], InterfaceTests[InterfaceT]):
     """Custom implementations of the Interface class should inherit from this class for its tests.
     Base class for all interface unit tests that test plugin agnostic behavior
     """
 
 
-class GeneratorTests(PluginTests, ABC, Generic[GeneratorT, GeneratorDataT]):
-    """Shared functionality between the different Generator testing categories"""
+class ProviderTests(DataPluginTests[ProviderConfiguration, ProviderT, ProviderDataT]):
+    """Shared functionality between the different Provider testing categories"""
 
-    @pytest.fixture(name="generator_data", scope="session")
-    def fixture_generator_data(self) -> GeneratorDataT:
-        """A required testing hook that allows GeneratorData generation"""
-        raise NotImplementedError("Subclasses should override this fixture")
 
-    @pytest.fixture(name="generator_type", scope="session")
-    def fixture_generator_type(self) -> type[GeneratorT]:
-        """A required testing hook that allows type generation"""
-        raise NotImplementedError("Subclasses should override this fixture")
+class ProviderIntegrationTests(
+    DataPluginIntegrationTests[ProviderConfiguration, ProviderT, ProviderDataT],
+    ProviderTests[ProviderT, ProviderDataT],
+):
+    """Base class for all provider integration tests that test plugin agnostic behavior"""
 
-    @pytest.fixture(name="generator")
-    def fixture_generator(self, generator_type: type[GeneratorT]) -> GeneratorT:
-        """A hook allowing implementations to override the fixture
+    @pytest.fixture(autouse=True, scope="session")
+    def _fixture_install_dependency(self, plugin_type: type[ProviderT], install_path: Path) -> None:
+        """Forces the download to only happen once per test session"""
+
+        path = install_path / plugin_type.name()
+        path.mkdir(parents=True, exist_ok=True)
+
+        asyncio.run(plugin_type.download_tooling(path))
+
+    def test_is_downloaded(self, plugin: ProviderT) -> None:
+        """Verify the plugin is downloaded from fixture
 
         Args:
-            generator_type: An input generator type
-
-        Returns:
-            A newly constructed generator
+            plugin: A newly constructed provider
         """
-        return generator_type()
+
+        assert plugin.tooling_downloaded(plugin.cppython.install_path)
+
+    def test_not_downloaded(self, plugin_type: type[ProviderT], tmp_path: Path) -> None:
+        """Verify the provider can identify an empty tool
+
+        Args:
+            plugin_type: An input provider type
+            tmp_path: A temporary path for the lifetime of the function
+        """
+
+        assert not plugin_type.tooling_downloaded(tmp_path)
+
+    def test_install(self, plugin: ProviderT) -> None:
+        """Ensure that the vanilla install command functions
+
+        Args:
+            plugin: A newly constructed provider
+        """
+        plugin.install()
+
+    def test_update(self, plugin: ProviderT) -> None:
+        """Ensure that the vanilla update command functions
+
+        Args:
+            plugin: A newly constructed provider
+        """
+        plugin.update()
 
 
-class GeneratorIntegrationTests(GeneratorTests[GeneratorT, GeneratorDataT]):
+class ProviderUnitTests(
+    DataPluginUnitTests[ProviderConfiguration, ProviderT, ProviderDataT],
+    ProviderTests[ProviderT, ProviderDataT],
+):
+    """Custom implementations of the Provider class should inherit from this class for its tests.
+    Base class for all provider unit tests that test plugin agnostic behavior
+    """
+
+
+class GeneratorTests(DataPluginTests[GeneratorConfiguration, GeneratorT, GeneratorDataT]):
+    """Shared functionality between the different Generator testing categories"""
+
+
+class GeneratorIntegrationTests(
+    DataPluginIntegrationTests[GeneratorT, GeneratorDataT], GeneratorTests[GeneratorT, GeneratorDataT]
+):
     """Base class for all vcs integration tests that test plugin agnostic behavior"""
 
 
-class GeneratorUnitTests(GeneratorTests[GeneratorT, GeneratorDataT]):
+class GeneratorUnitTests(DataPluginUnitTests[GeneratorT, GeneratorDataT], GeneratorTests[GeneratorT, GeneratorDataT]):
     """Custom implementations of the Generator class should inherit from this class for its tests.
     Base class for all Generator unit tests that test plugin agnostic behavior"""
 
-    def test_plugin_registration(self, generator: GeneratorT) -> None:
-        """Test the registration with setuptools entry_points
 
-        Args:
-            generator: A newly constructed generator
-        """
-        plugin_entries = entry_points(group=f"cppython.{generator.group()}")
-        assert len(plugin_entries) > 0
-
-    def test_data_construction(self, project: PyProject, generator_data: GeneratorDataT, generator: GeneratorT) -> None:
-        """Tests that the pyproject cant correctly accept and extract the plugin data
-
-        Args:
-            project: Test project fixture
-            generator_data: The overridden generator data
-            generator: The overridden generator
-        """
-        project_data = project.dict(by_alias=True)
-
-        project_data["tool"]["cppython"]["generator"][generator.name()] = generator_data.dict(by_alias=True)
-        result = PyProject(**project_data)
-
-        assert result.tool is not None
-        assert result.tool.cppython is not None
-        assert result.tool.cppython.generator is not None
-
-        data = result.tool.cppython.extract_generator(generator.name(), generator.data_type())
-
-        assert data.dict(by_alias=True) == generator_data.dict(by_alias=True)
-        assert data.dict() == generator_data.dict()
-
-
-class VersionControlTests(PluginTests, ABC, Generic[VersionControlT, VersionControlDataT]):
+class VersionControlTests(DataPluginTests[VersionControlConfiguration, VersionControlT, VersionControlDataT]):
     """Shared functionality between the different VersionControl testing categories"""
 
-    @pytest.fixture(name="version_control_data", scope="session")
-    def fixture_version_control_data(self) -> VersionControlDataT:
-        """A required testing hook that allows ProviderData generation"""
-        raise NotImplementedError("Subclasses should override this fixture")
 
-    @pytest.fixture(name="version_control_type", scope="session")
-    def fixture_version_control_type(self) -> type[VersionControlT]:
-        """A required testing hook that allows type generation"""
-        raise NotImplementedError("Subclasses should override this fixture")
-
-    @pytest.fixture(name="version_control")
-    def fixture_version_control(self, version_control_type: type[VersionControlT]) -> VersionControlT:
-        """A hook allowing implementations to override the fixture
-
-        Args:
-            version_control_type: An input version_control type
-
-        Returns:
-            A newly constructed version_control
-        """
-        return version_control_type()
-
-
-class VersionControlIntegrationTests(VersionControlTests[VersionControlT, VersionControlDataT]):
+class VersionControlIntegrationTests(
+    DataPluginIntegrationTests[VersionControlT, VersionControlDataT],
+    VersionControlTests[VersionControlT, VersionControlDataT],
+):
     """Base class for all generator integration tests that test plugin agnostic behavior"""
 
 
-class VersionControlUnitTests(VersionControlTests[VersionControlT, VersionControlDataT]):
+class VersionControlUnitTests(
+    DataPluginUnitTests[VersionControlT, VersionControlDataT], VersionControlTests[VersionControlT, VersionControlDataT]
+):
     """Custom implementations of the Generator class should inherit from this class for its tests.
     Base class for all Generator unit tests that test plugin agnostic behavior
     """
 
-    def test_not_repository(self, version_control: VersionControlT, tmp_path: Path) -> None:
+    def test_not_repository(self, plugin: VersionControlT, tmp_path: Path) -> None:
         """Tests that the temporary directory path will not be registered as a repository
 
         Args:
-            version_control: The VCS constructed type
+            plugin: The VCS constructed type
             tmp_path: Temporary directory
         """
 
-        assert not version_control.is_repository(tmp_path)
-
-    def test_plugin_registration(self, version_control: VersionControlT) -> None:
-        """Test the registration with setuptools entry_points
-
-        Args:
-            version_control: A newly constructed version_control
-        """
-        plugin_entries = entry_points(group=f"cppython.{version_control.group()}")
-        assert len(plugin_entries) > 0
-
-    def test_data_construction(
-        self, project: PyProject, version_control_data: VersionControlDataT, version_control: VersionControlT
-    ) -> None:
-        """Tests that the pyproject cant correctly accept and extract the plugin data
-
-        Args:
-            project: Test project fixture
-            version_control_data: The overridden version_control data
-            version_control: The overridden version_control
-        """
-        project_data = project.dict(by_alias=True)
-
-        project_data["tool"]["cppython"]["version_control"][version_control.name()] = version_control_data.dict(
-            by_alias=True
-        )
-        result = PyProject(**project_data)
-
-        assert result.tool is not None
-        assert result.tool.cppython is not None
-        assert result.tool.cppython.vcs is not None
-
-        data = result.tool.cppython.extract_vcs(version_control.name(), version_control.data_type())
-
-        assert data.dict(by_alias=True) == version_control_data.dict(by_alias=True)
-        assert data.dict() == version_control_data.dict()
+        assert not plugin.is_repository(tmp_path)
