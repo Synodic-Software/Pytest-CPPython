@@ -5,22 +5,28 @@ import logging
 from pathlib import Path
 from typing import Any
 
-from cppython_core.schema import (
-    CPPythonDataResolved,
+from cppython_core.plugin_schema.generator import (
     Generator,
     GeneratorData,
     GeneratorDataResolved,
-    Interface,
-    PEP621Resolved,
-    ProjectConfiguration,
+)
+from cppython_core.plugin_schema.interface import Interface
+from cppython_core.plugin_schema.provider import (
     Provider,
     ProviderConfiguration,
     ProviderData,
     ProviderDataResolved,
     ProviderDataT,
+)
+from cppython_core.plugin_schema.vcs import (
     VersionControl,
     VersionControlData,
     VersionControlDataResolved,
+)
+from cppython_core.schema import (
+    CPPythonDataResolved,
+    PEP621Resolved,
+    ProjectConfiguration,
 )
 from pydantic import Field
 

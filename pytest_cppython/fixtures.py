@@ -5,16 +5,22 @@ from pathlib import Path
 from typing import Any, cast
 
 import pytest
+from cppython_core.plugin_schema.generator import GeneratorConfiguration
+from cppython_core.plugin_schema.provider import ProviderConfiguration
+from cppython_core.plugin_schema.vcs import VersionControlConfiguration
 from cppython_core.schema import (
     PEP621,
     CPPythonData,
     ProjectConfiguration,
-    ProviderConfiguration,
     PyProject,
     ToolData,
 )
 
-from pytest_cppython.fixture_data.configuration import provider_config_test_list
+from pytest_cppython.fixture_data.configuration import (
+    generator_config_test_list,
+    provider_config_test_list,
+    vcs_config_test_list,
+)
 from pytest_cppython.fixture_data.cppython import cppython_test_list
 from pytest_cppython.fixture_data.pep621 import pep621_test_list
 from pytest_cppython.mock import (
@@ -123,6 +129,40 @@ class CPPythonFixtures:
         """
 
         return cast(ProviderConfiguration, request.param)
+
+    @pytest.fixture(
+        name="generator_configuration",
+        scope="session",
+        params=generator_config_test_list,
+    )
+    def fixture_generator_config(self, request: pytest.FixtureRequest) -> GeneratorConfiguration:
+        """Fixture defining all testable variations of GeneratorConfiguration
+
+        Args:
+            request: Parameterization list
+
+        Returns:
+            Variation of generator configuration data
+        """
+
+        return cast(GeneratorConfiguration, request.param)
+
+    @pytest.fixture(
+        name="version_control_configuration",
+        scope="session",
+        params=vcs_config_test_list,
+    )
+    def fixture_vcs_config(self, request: pytest.FixtureRequest) -> VersionControlConfiguration:
+        """Fixture defining all testable variations of VersionControlConfiguration
+
+        Args:
+            request: Parameterization list
+
+        Returns:
+            Variation of vcs configuration data
+        """
+
+        return cast(VersionControlConfiguration, request.param)
 
     @pytest.fixture(name="tool", scope="session")
     def fixture_tool(self, cppython: CPPythonData) -> ToolData:
