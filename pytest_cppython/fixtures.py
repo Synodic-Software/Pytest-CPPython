@@ -23,14 +23,7 @@ from pytest_cppython.fixture_data.configuration import (
 )
 from pytest_cppython.fixture_data.cppython import cppython_test_list
 from pytest_cppython.fixture_data.pep621 import pep621_test_list
-from pytest_cppython.mock import (
-    MockGenerator,
-    MockGeneratorData,
-    MockProvider,
-    MockProviderData,
-    MockVersionControl,
-    MockVersionControlData,
-)
+from pytest_cppython.mock import MockGenerator, MockProvider, MockVersionControl
 
 
 class CPPythonFixtures:
@@ -203,8 +196,8 @@ class CPPythonFixtures:
         """
 
         mocked_pyproject = project.dict(by_alias=True)
-        mocked_pyproject["tool"]["cppython"]["provider"][MockProvider.name()] = MockProviderData()
-        mocked_pyproject["tool"]["cppython"]["generator"][MockGenerator.name()] = MockGeneratorData()
-        mocked_pyproject["tool"]["cppython"]["vcs"][MockVersionControl.name()] = MockVersionControlData()
+        mocked_pyproject["tool"]["cppython"]["provider"][MockProvider.name()] = {}
+        mocked_pyproject["tool"]["cppython"]["generator"][MockGenerator.name()] = {}
+        mocked_pyproject["tool"]["cppython"]["vcs"][MockVersionControl.name()] = {}
 
         return mocked_pyproject

@@ -1,23 +1,26 @@
 """Test the functions related to the internal provider implementation and the 'Provider' interface itself
 """
 
+from typing import Any
+
 import pytest
 
-from pytest_cppython.mock import MockProvider, MockProviderData
+from pytest_cppython.mock import MockProvider
 from pytest_cppython.plugin import ProviderUnitTests
 
 
-class TestMockProvider(ProviderUnitTests[MockProvider, MockProviderData]):
+class TestMockProvider(ProviderUnitTests[MockProvider]):
     """The tests for our Mock provider"""
 
     @pytest.fixture(name="plugin_data", scope="session")
-    def fixture_provider_data(self) -> MockProviderData:
-        """A required testing hook that allows ProviderData generation
+    def fixture_provider_data(self) -> dict[str, Any]:
+        """Returns mock data
 
         Returns:
             An overridden data instance
         """
-        return MockProviderData()
+
+        return {}
 
     @pytest.fixture(name="plugin_type", scope="session")
     def fixture_provider_type(self) -> type[MockProvider]:

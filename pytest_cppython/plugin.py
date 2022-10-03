@@ -5,29 +5,16 @@ import asyncio
 from abc import ABC
 from importlib.metadata import entry_points
 from pathlib import Path
-from typing import Generic
+from typing import Any, Generic
 
 import pytest
-from cppython_core.plugin_schema.generator import (
-    GeneratorConfiguration,
-    GeneratorDataT,
-    GeneratorT,
-)
+from cppython_core.plugin_schema.generator import GeneratorConfiguration, GeneratorT
 from cppython_core.plugin_schema.interface import InterfaceT
-from cppython_core.plugin_schema.provider import (
-    ProviderConfiguration,
-    ProviderDataT,
-    ProviderT,
-)
-from cppython_core.plugin_schema.vcs import (
-    VersionControlConfiguration,
-    VersionControlDataT,
-    VersionControlT,
-)
+from cppython_core.plugin_schema.provider import ProviderConfiguration, ProviderT
+from cppython_core.plugin_schema.vcs import VersionControlConfiguration, VersionControlT
 from cppython_core.schema import (
     DataPluginT,
     PluginDataConfigurationT,
-    PluginDataT,
     PluginT,
     ProjectConfiguration,
     PyProject,
@@ -66,7 +53,7 @@ class PluginUnitTests(PluginTests[PluginT]):
     """Unit testing information for all plugin test classes"""
 
 
-class DataPluginTests(PluginTests[DataPluginT], Generic[PluginDataConfigurationT, DataPluginT, PluginDataT]):
+class DataPluginTests(PluginTests[DataPluginT], Generic[PluginDataConfigurationT, DataPluginT]):
     """Shared testing information for all data plugin test classes"""
 
     @pytest.fixture(name="plugin_configuration", scope="session")
@@ -80,7 +67,7 @@ class DataPluginTests(PluginTests[DataPluginT], Generic[PluginDataConfigurationT
     @pytest.fixture(name="plugin_data", scope="session")
     def fixture_plugin_data(
         self,
-    ) -> PluginDataT:
+    ) -> dict[str, Any]:
         """A required testing hook that allows plugin data generation"""
 
         raise NotImplementedError("Subclasses should override this fixture")
@@ -89,7 +76,7 @@ class DataPluginTests(PluginTests[DataPluginT], Generic[PluginDataConfigurationT
     def fixture_plugin(
         self,
         plugin_type: type[DataPluginT],
-        plugin_data: PluginDataT,
+        plugin_data: dict[str, Any],
         plugin_configuration: PluginDataConfigurationT,
         project: PyProject,
         workspace: ProjectConfiguration,
@@ -113,19 +100,22 @@ class DataPluginTests(PluginTests[DataPluginT], Generic[PluginDataConfigurationT
         modified_project_data = project.project.resolve(workspace)
         modified_cppython_data = project.tool.cppython.resolve(workspace)
         modified_cppython_data = modified_cppython_data.resolve_plugin(plugin_type)
-        modified_provider_data = plugin_data.resolve(workspace)
 
-        return plugin_type(plugin_configuration, modified_project_data, modified_cppython_data, modified_provider_data)
+        return plugin_type(plugin_configuration, modified_project_data, modified_cppython_data, plugin_data)
 
 
 class DataPluginIntegrationTests(
-    PluginIntegrationTests[DataPluginT], DataPluginTests[PluginDataConfigurationT, DataPluginT, PluginDataT]
+    PluginIntegrationTests[DataPluginT],
+    DataPluginTests[PluginDataConfigurationT, DataPluginT],
+    Generic[PluginDataConfigurationT, DataPluginT],
 ):
     """Integration testing information for all data plugin test classes"""
 
 
 class DataPluginUnitTests(
-    PluginUnitTests[DataPluginT], DataPluginTests[PluginDataConfigurationT, DataPluginT, PluginDataT]
+    PluginUnitTests[DataPluginT],
+    DataPluginTests[PluginDataConfigurationT, DataPluginT],
+    Generic[PluginDataConfigurationT, DataPluginT],
 ):
     """Unit testing information for all data plugin test classes"""
 
@@ -137,31 +127,6 @@ class DataPluginUnitTests(
         """
         plugin_entries = entry_points(group=f"cppython.{plugin.group()}")
         assert len(plugin_entries) > 0
-
-    def test_data_construction(
-        self, project: PyProject, plugin_data: PluginDataT, plugin: DataPluginT, plugin_type: type[DataPluginT]
-    ) -> None:
-        """Tests that the pyproject cant correctly accept and extract the plugin data
-
-        Args:
-            project: Test project fixture
-            plugin_data: The overridden plugin data
-            plugin: The overridden plugin,
-            plugin_type: The overridden plugin type
-        """
-        project_data = project.dict(by_alias=True)
-
-        project_data["tool"]["cppython"]["provider"][plugin.name()] = plugin_data.dict(by_alias=True)
-        result = PyProject(**project_data)
-
-        assert result.tool is not None
-        assert result.tool.cppython is not None
-        assert result.tool.cppython.provider is not None
-
-        data = result.tool.cppython.extract_plugin_data(plugin_type, plugin.data_type())
-
-        assert data.dict(by_alias=True) == plugin_data.dict(by_alias=True)
-        assert data.dict() == plugin_data.dict()
 
 
 class InterfaceTests(PluginTests[InterfaceT]):
@@ -178,23 +143,30 @@ class InterfaceTests(PluginTests[InterfaceT]):
         return plugin_type()
 
 
-class InterfaceIntegrationTests(PluginIntegrationTests[InterfaceT], InterfaceTests[InterfaceT]):
+class InterfaceIntegrationTests(PluginIntegrationTests[InterfaceT], InterfaceTests[InterfaceT], Generic[InterfaceT]):
     """Base class for all interface integration tests that test plugin agnostic behavior"""
 
 
-class InterfaceUnitTests(PluginUnitTests[InterfaceT], InterfaceTests[InterfaceT]):
+class InterfaceUnitTests(PluginUnitTests[InterfaceT], InterfaceTests[InterfaceT], Generic[InterfaceT]):
     """Custom implementations of the Interface class should inherit from this class for its tests.
     Base class for all interface unit tests that test plugin agnostic behavior
     """
 
 
-class ProviderTests(DataPluginTests[ProviderConfiguration, ProviderT, ProviderDataT]):
+class ProviderTests(DataPluginTests[ProviderConfiguration, ProviderT], Generic[ProviderT]):
     """Shared functionality between the different Provider testing categories"""
+
+    @pytest.fixture(name="plugin_configuration", scope="session")
+    def fixture_plugin_configuration(self, provider_configuration: ProviderConfiguration) -> ProviderConfiguration:
+        """A required testing hook that allows plugin configuration data generation"""
+
+        return provider_configuration
 
 
 class ProviderIntegrationTests(
-    DataPluginIntegrationTests[ProviderConfiguration, ProviderT, ProviderDataT],
-    ProviderTests[ProviderT, ProviderDataT],
+    DataPluginIntegrationTests[ProviderConfiguration, ProviderT],
+    ProviderTests[ProviderT],
+    Generic[ProviderT],
 ):
     """Base class for all provider integration tests that test plugin agnostic behavior"""
 
@@ -244,42 +216,69 @@ class ProviderIntegrationTests(
 
 
 class ProviderUnitTests(
-    DataPluginUnitTests[ProviderConfiguration, ProviderT, ProviderDataT],
-    ProviderTests[ProviderT, ProviderDataT],
+    DataPluginUnitTests[ProviderConfiguration, ProviderT],
+    ProviderTests[ProviderT],
+    Generic[ProviderT],
 ):
     """Custom implementations of the Provider class should inherit from this class for its tests.
     Base class for all provider unit tests that test plugin agnostic behavior
     """
 
 
-class GeneratorTests(DataPluginTests[GeneratorConfiguration, GeneratorT, GeneratorDataT]):
+class GeneratorTests(DataPluginTests[GeneratorConfiguration, GeneratorT], Generic[GeneratorT]):
     """Shared functionality between the different Generator testing categories"""
+
+    @pytest.fixture(name="plugin_configuration", scope="session")
+    def fixture_plugin_configuration(self, generator_configuration: GeneratorConfiguration) -> GeneratorConfiguration:
+        """A required testing hook that allows plugin configuration data generation"""
+
+        return generator_configuration
 
 
 class GeneratorIntegrationTests(
-    DataPluginIntegrationTests[GeneratorT, GeneratorDataT], GeneratorTests[GeneratorT, GeneratorDataT]
+    DataPluginIntegrationTests[GeneratorConfiguration, GeneratorT],
+    GeneratorTests[GeneratorT],
+    Generic[GeneratorT],
 ):
     """Base class for all vcs integration tests that test plugin agnostic behavior"""
 
 
-class GeneratorUnitTests(DataPluginUnitTests[GeneratorT, GeneratorDataT], GeneratorTests[GeneratorT, GeneratorDataT]):
+class GeneratorUnitTests(
+    DataPluginUnitTests[GeneratorConfiguration, GeneratorT],
+    GeneratorTests[GeneratorT],
+    Generic[GeneratorT],
+):
     """Custom implementations of the Generator class should inherit from this class for its tests.
     Base class for all Generator unit tests that test plugin agnostic behavior"""
 
 
-class VersionControlTests(DataPluginTests[VersionControlConfiguration, VersionControlT, VersionControlDataT]):
+class VersionControlTests(
+    DataPluginTests[VersionControlConfiguration, VersionControlT],
+    Generic[VersionControlT],
+):
     """Shared functionality between the different VersionControl testing categories"""
+
+    @pytest.fixture(name="plugin_configuration", scope="session")
+    def fixture_plugin_configuration(
+        self, version_control_configuration: VersionControlConfiguration
+    ) -> VersionControlConfiguration:
+        """A required testing hook that allows plugin configuration data generation"""
+
+        return version_control_configuration
 
 
 class VersionControlIntegrationTests(
-    DataPluginIntegrationTests[VersionControlT, VersionControlDataT],
-    VersionControlTests[VersionControlT, VersionControlDataT],
+    DataPluginIntegrationTests[VersionControlConfiguration, VersionControlT],
+    VersionControlTests[VersionControlT],
+    Generic[VersionControlT],
 ):
     """Base class for all generator integration tests that test plugin agnostic behavior"""
 
 
 class VersionControlUnitTests(
-    DataPluginUnitTests[VersionControlT, VersionControlDataT], VersionControlTests[VersionControlT, VersionControlDataT]
+    DataPluginUnitTests[VersionControlConfiguration, VersionControlT],
+    VersionControlTests[VersionControlT],
+    Generic[VersionControlT],
 ):
     """Custom implementations of the Generator class should inherit from this class for its tests.
     Base class for all Generator unit tests that test plugin agnostic behavior

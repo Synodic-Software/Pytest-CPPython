@@ -1,37 +1,12 @@
 """Shared definitions for testing.
 """
 
-import logging
 from pathlib import Path
-from typing import Any
 
-from cppython_core.plugin_schema.generator import (
-    Generator,
-    GeneratorData,
-    GeneratorDataResolved,
-)
+from cppython_core.plugin_schema.generator import Generator
 from cppython_core.plugin_schema.interface import Interface
-from cppython_core.plugin_schema.provider import (
-    Provider,
-    ProviderConfiguration,
-    ProviderData,
-    ProviderDataResolved,
-    ProviderDataT,
-)
-from cppython_core.plugin_schema.vcs import (
-    VersionControl,
-    VersionControlData,
-    VersionControlDataResolved,
-)
-from cppython_core.schema import (
-    CPPythonDataResolved,
-    PEP621Resolved,
-    ProjectConfiguration,
-)
-from pydantic import Field
-
-test_logger = logging.getLogger(__name__)
-test_configuration = ProviderConfiguration(root_directory=Path())
+from cppython_core.plugin_schema.provider import Provider
+from cppython_core.plugin_schema.vcs import VersionControl
 
 
 class MockInterface(Interface):
@@ -46,61 +21,14 @@ class MockInterface(Interface):
         """
         return "mock"
 
-    def read_provider_data(self, provider_data_type: type[ProviderDataT]) -> ProviderDataT:
-        """Implementation of Interface function
-
-        Args:
-            provider_data_type: _description_
-
-        Returns:
-            _description_
-        """
-
-        return provider_data_type()
-
     def write_pyproject(self) -> None:
         """Implementation of Interface function"""
 
 
-class MockProviderDataResolved(ProviderDataResolved):
-    """Mock resolved provider data class"""
-
-    data_out: bool = Field(description="Value to force resolution type change")
-
-
-class MockProviderData(ProviderData[MockProviderDataResolved]):
-    """Mock provider data class"""
-
-    data_out: Any = Field(default=None, description="Value to force resolution type change + alias", alias="data-out")
-
-    def resolve(self, project_configuration: ProjectConfiguration) -> MockProviderDataResolved:
-        """Creates a copy and resolves dynamic attributes
-
-        Args:
-            project_configuration: The configuration data used to help the resolution
-
-        Returns:
-            The resolved provider data type
-        """
-
-        mock_data: bool = self.data_out is None
-
-        return MockProviderDataResolved(data_out=mock_data)
-
-
-class MockProvider(Provider[MockProviderData, MockProviderDataResolved]):
+class MockProvider(Provider):
     """A mock provider class for behavior testing"""
 
     downloaded: Path | None = None
-
-    def __init__(
-        self,
-        configuration: ProviderConfiguration,
-        project: PEP621Resolved,
-        cppython: CPPythonDataResolved,
-        provider: MockProviderDataResolved,
-    ) -> None:
-        super().__init__(configuration, project, cppython, provider)
 
     @staticmethod
     def name() -> str:
@@ -110,24 +38,6 @@ class MockProvider(Provider[MockProviderData, MockProviderDataResolved]):
             The plugin name
         """
         return "mock"
-
-    @staticmethod
-    def data_type() -> type[MockProviderData]:
-        """Returns the pydantic type to cast the provider configuration data to
-
-        Returns:
-            The type
-        """
-        return MockProviderData
-
-    @staticmethod
-    def resolved_data_type() -> type[MockProviderDataResolved]:
-        """Returns the pydantic type to cast the resolved provider configuration data to
-
-        Returns:
-            The resolved type
-        """
-        return MockProviderDataResolved
 
     @classmethod
     def tooling_downloaded(cls, path: Path) -> bool:
@@ -152,27 +62,7 @@ class MockProvider(Provider[MockProviderData, MockProviderDataResolved]):
         pass
 
 
-class MockGeneratorDataResolved(GeneratorDataResolved):
-    """Mocked resolved GeneratorData"""
-
-
-class MockGeneratorData(GeneratorData[MockGeneratorDataResolved]):
-    """Mocked GeneratorData"""
-
-    def resolve(self, project_configuration: ProjectConfiguration) -> MockGeneratorDataResolved:
-        """_summary_
-
-        Args:
-            project_configuration: _description_
-
-        Returns:
-            _description_
-        """
-
-        return MockGeneratorDataResolved()
-
-
-class MockGenerator(Generator[MockGeneratorData, MockGeneratorDataResolved]):
+class MockGenerator(Generator):
     """A mock generator class for behavior testing"""
 
     @staticmethod
@@ -185,27 +75,7 @@ class MockGenerator(Generator[MockGeneratorData, MockGeneratorDataResolved]):
         return "mock"
 
 
-class MockVersionControlDataResolved(VersionControlDataResolved):
-    """Mocked resolved VersionControlData"""
-
-
-class MockVersionControlData(VersionControlData[MockVersionControlDataResolved]):
-    """Mocked VersionControlData"""
-
-    def resolve(self, project_configuration: ProjectConfiguration) -> MockVersionControlDataResolved:
-        """_summary_
-
-        Args:
-            project_configuration: _description_
-
-        Returns:
-            _description_
-        """
-
-        return MockVersionControlDataResolved()
-
-
-class MockVersionControl(VersionControl[MockVersionControlData, MockVersionControlDataResolved]):
+class MockVersionControl(VersionControl):
     """A mock generator class for behavior testing"""
 
     @staticmethod
