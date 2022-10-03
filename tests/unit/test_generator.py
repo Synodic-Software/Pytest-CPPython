@@ -1,26 +1,29 @@
 """Tests the integration test plugin
 """
 
+from typing import Any
+
 import pytest
 
-from pytest_cppython.mock import MockGenerator, MockGeneratorData
+from pytest_cppython.mock import MockGenerator
 from pytest_cppython.plugin import GeneratorUnitTests
 
 
-class TestCPPythonGenerator(GeneratorUnitTests[MockGenerator, MockGeneratorData]):
+class TestCPPythonGenerator(GeneratorUnitTests[MockGenerator]):
     """The tests for the Mock generator"""
 
     @pytest.fixture(name="plugin_data", scope="session")
-    def fixture_plugin_data(self) -> MockGeneratorData:
-        """A required testing hook that allows GeneratorData generation
+    def fixture_plugin_data(self) -> dict[str, Any]:
+        """Returns mock data
 
         Returns:
             An overridden data instance
         """
-        return MockGeneratorData()
+
+        return {}
 
     @pytest.fixture(name="plugin_type", scope="session")
-    def fixture_generator_type(self) -> type[MockGenerator]:
+    def fixture_plugin_type(self) -> type[MockGenerator]:
         """A required testing hook that allows type generation
 
         Returns:

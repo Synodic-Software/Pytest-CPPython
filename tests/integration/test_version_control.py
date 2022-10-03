@@ -1,23 +1,26 @@
 """Tests the integration test plugin
 """
 
+from typing import Any
+
 import pytest
 
-from pytest_cppython.mock import MockVersionControl, MockVersionControlData
+from pytest_cppython.mock import MockVersionControl
 from pytest_cppython.plugin import VersionControlIntegrationTests
 
 
-class TestCPPythonVersionControl(VersionControlIntegrationTests[MockVersionControl, MockVersionControlData]):
+class TestCPPythonVersionControl(VersionControlIntegrationTests[MockVersionControl]):
     """The tests for the Mock version control"""
 
     @pytest.fixture(name="plugin_data", scope="session")
-    def fixture_plugin_data(self) -> MockVersionControlData:
-        """A required testing hook that allows VersionControl generation
+    def fixture_plugin_data(self) -> dict[str, Any]:
+        """Returns mock data
 
         Returns:
             An overridden data instance
         """
-        return MockVersionControlData()
+
+        return {}
 
     @pytest.fixture(name="plugin_type", scope="session")
     def fixture_version_control_type(self) -> type[MockVersionControl]:
