@@ -23,7 +23,7 @@ class TestCPPythonVersionControl(VersionControlIntegrationTests[MockVersionContr
         return {}
 
     @pytest.fixture(name="plugin_type", scope="session")
-    def fixture_version_control_type(self) -> type[MockVersionControl]:
+    def fixture_plugin_type(self) -> type[MockVersionControl]:
         """A required testing hook that allows type generation
 
         Returns:

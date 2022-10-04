@@ -23,7 +23,7 @@ class TestMockProvider(ProviderUnitTests[MockProvider]):
         return {}
 
     @pytest.fixture(name="plugin_type", scope="session")
-    def fixture_provider_type(self) -> type[MockProvider]:
+    def fixture_plugin_type(self) -> type[MockProvider]:
         """A required testing hook that allows type generation
 
         Returns:

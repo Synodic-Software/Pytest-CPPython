@@ -2,7 +2,7 @@
 """
 
 import asyncio
-from abc import ABC
+from abc import ABC, abstractmethod
 from importlib.metadata import entry_points
 from pathlib import Path
 from typing import Any, Generic
@@ -26,22 +26,11 @@ from pytest_cppython.fixtures import CPPythonFixtures
 class PluginTests(CPPythonFixtures, ABC, Generic[PluginT]):
     """Shared testing information for all plugin test classes"""
 
+    @abstractmethod
     @pytest.fixture(name="plugin_type", scope="session")
     def fixture_plugin_type(self) -> type[PluginT]:
         """A required testing hook that allows type generation"""
 
-        raise NotImplementedError("Subclasses should override this fixture")
-
-    @pytest.fixture(name="plugin")
-    def fixture_plugin(self, plugin_type: type[PluginT]) -> PluginT:
-        """A hook allowing implementations to override the fixture
-
-        Args:
-            plugin_type: An input interface type
-
-        Returns:
-            A newly constructed plugin
-        """
         raise NotImplementedError("Subclasses should override this fixture")
 
 
@@ -56,50 +45,63 @@ class PluginUnitTests(PluginTests[PluginT]):
 class DataPluginTests(PluginTests[DataPluginT], Generic[PluginDataConfigurationT, DataPluginT]):
     """Shared testing information for all data plugin test classes"""
 
-    @pytest.fixture(name="plugin_configuration", scope="session")
-    def fixture_plugin_configuration(
+    @pytest.fixture(name="mock_project")
+    def fixture_mock_project(
         self,
-    ) -> PluginDataConfigurationT:
-        """A required testing hook that allows plugin configuration data generation"""
+        plugin_type: type[DataPluginT],
+        plugin_data: dict[str, Any],
+        project: PyProject,
+    ) -> PyProject:
+        """_summary_
 
-        raise NotImplementedError("Subclasses should override this fixture")
+        Args:
+            plugin_type: _description_
+            plugin_data: _description_
+            project: _description_
 
-    @pytest.fixture(name="plugin_data", scope="session")
-    def fixture_plugin_data(
-        self,
-    ) -> dict[str, Any]:
-        """A required testing hook that allows plugin data generation"""
+        Returns:
+            _description_
+        """
 
-        raise NotImplementedError("Subclasses should override this fixture")
+        mock_project = project.copy(deep=True)
+
+        assert mock_project.tool is not None
+        assert mock_project.tool.cppython is not None
+
+        plugin_attribute = getattr(mock_project.tool.cppython, plugin_type.group())
+        plugin_attribute[plugin_type.name()] = plugin_data
+
+        return mock_project
 
     @pytest.fixture(name="plugin")
     def fixture_plugin(
         self,
         plugin_type: type[DataPluginT],
-        plugin_data: dict[str, Any],
         plugin_configuration: PluginDataConfigurationT,
-        project: PyProject,
+        mock_project: PyProject,
         workspace: ProjectConfiguration,
     ) -> DataPluginT:
         """Overridden plugin generator for creating a populated data plugin type
 
         Args:
             plugin_type: Plugin type
-            plugin_data: Plugin data
             plugin_configuration: Plugin configuration data
-            project: Generated static project definition
+            mock_project: Generated static project definition
             workspace: Temporary directory defined by a configuration object
 
         Returns:
             A newly constructed provider
         """
 
-        assert project.tool is not None
-        assert project.tool.cppython is not None
+        assert mock_project.tool is not None
+        assert mock_project.tool.cppython is not None
 
-        modified_project_data = project.project.resolve(workspace)
-        modified_cppython_data = project.tool.cppython.resolve(workspace)
+        modified_project_data = mock_project.project.resolve(workspace)
+        modified_cppython_data = mock_project.tool.cppython.resolve(workspace)
         modified_cppython_data = modified_cppython_data.resolve_plugin(plugin_type)
+
+        plugin_attribute = getattr(mock_project.tool.cppython, plugin_type.group())
+        plugin_data = plugin_attribute[plugin_type.name()]
 
         return plugin_type(plugin_configuration, modified_project_data, modified_cppython_data, plugin_data)
 
@@ -158,7 +160,14 @@ class ProviderTests(DataPluginTests[ProviderConfiguration, ProviderT], Generic[P
 
     @pytest.fixture(name="plugin_configuration", scope="session")
     def fixture_plugin_configuration(self, provider_configuration: ProviderConfiguration) -> ProviderConfiguration:
-        """A required testing hook that allows plugin configuration data generation"""
+        """A required testing hook that allows plugin configuration data generation
+
+        Args:
+            provider_configuration: The configuration object
+
+        Returns:
+            The configuration object
+        """
 
         return provider_configuration
 
@@ -230,7 +239,14 @@ class GeneratorTests(DataPluginTests[GeneratorConfiguration, GeneratorT], Generi
 
     @pytest.fixture(name="plugin_configuration", scope="session")
     def fixture_plugin_configuration(self, generator_configuration: GeneratorConfiguration) -> GeneratorConfiguration:
-        """A required testing hook that allows plugin configuration data generation"""
+        """A required testing hook that allows plugin configuration data generation
+
+        Args:
+            generator_configuration: The configuration object
+
+        Returns:
+            The configuration object
+        """
 
         return generator_configuration
 
@@ -262,7 +278,14 @@ class VersionControlTests(
     def fixture_plugin_configuration(
         self, version_control_configuration: VersionControlConfiguration
     ) -> VersionControlConfiguration:
-        """A required testing hook that allows plugin configuration data generation"""
+        """A required testing hook that allows plugin configuration data generation
+
+        Args:
+            version_control_configuration: The configuration object
+
+        Returns:
+            The configuration object
+        """
 
         return version_control_configuration
 
