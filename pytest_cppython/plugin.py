@@ -45,6 +45,22 @@ class PluginUnitTests(PluginTests[PluginT]):
 class DataPluginTests(PluginTests[DataPluginT], Generic[PluginDataConfigurationT, DataPluginT]):
     """Shared testing information for all data plugin test classes"""
 
+    @pytest.fixture(name="plugin_configuration")
+    def fixture_plugin_configuration(
+        self, plugin_configuration_type: type[PluginDataConfigurationT], workspace: ProjectConfiguration
+    ) -> PluginDataConfigurationT:
+        """Generates plugin configuration data generation from environment configuration
+
+        Args:
+            plugin_configuration_type: The type of configuration object to construct
+            workspace: The workspace configuration
+
+        Returns:
+            The plugin configuration
+        """
+
+        return plugin_configuration_type.create(workspace)
+
     @pytest.fixture(name="mock_project")
     def fixture_mock_project(
         self,
@@ -158,18 +174,15 @@ class InterfaceUnitTests(PluginUnitTests[InterfaceT], InterfaceTests[InterfaceT]
 class ProviderTests(DataPluginTests[ProviderConfiguration, ProviderT], Generic[ProviderT]):
     """Shared functionality between the different Provider testing categories"""
 
-    @pytest.fixture(name="plugin_configuration", scope="session")
-    def fixture_plugin_configuration(self, provider_configuration: ProviderConfiguration) -> ProviderConfiguration:
+    @pytest.fixture(name="plugin_configuration_type", scope="session")
+    def fixture_plugin_configuration_type(self) -> type[ProviderConfiguration]:
         """A required testing hook that allows plugin configuration data generation
 
-        Args:
-            provider_configuration: The configuration object
-
         Returns:
-            The configuration object
+            The configuration type
         """
 
-        return provider_configuration
+        return ProviderConfiguration
 
 
 class ProviderIntegrationTests(
@@ -237,18 +250,15 @@ class ProviderUnitTests(
 class GeneratorTests(DataPluginTests[GeneratorConfiguration, GeneratorT], Generic[GeneratorT]):
     """Shared functionality between the different Generator testing categories"""
 
-    @pytest.fixture(name="plugin_configuration", scope="session")
-    def fixture_plugin_configuration(self, generator_configuration: GeneratorConfiguration) -> GeneratorConfiguration:
+    @pytest.fixture(name="plugin_configuration_type", scope="session")
+    def fixture_plugin_configuration_type(self) -> type[GeneratorConfiguration]:
         """A required testing hook that allows plugin configuration data generation
 
-        Args:
-            generator_configuration: The configuration object
-
         Returns:
-            The configuration object
+            The configuration type
         """
 
-        return generator_configuration
+        return GeneratorConfiguration
 
 
 class GeneratorIntegrationTests(
@@ -274,20 +284,15 @@ class VersionControlTests(
 ):
     """Shared functionality between the different VersionControl testing categories"""
 
-    @pytest.fixture(name="plugin_configuration", scope="session")
-    def fixture_plugin_configuration(
-        self, version_control_configuration: VersionControlConfiguration
-    ) -> VersionControlConfiguration:
+    @pytest.fixture(name="plugin_configuration_type", scope="session")
+    def fixture_plugin_configuration_type(self) -> type[VersionControlConfiguration]:
         """A required testing hook that allows plugin configuration data generation
 
-        Args:
-            version_control_configuration: The configuration object
-
         Returns:
-            The configuration object
+            The configuration type
         """
 
-        return version_control_configuration
+        return VersionControlConfiguration
 
 
 class VersionControlIntegrationTests(
