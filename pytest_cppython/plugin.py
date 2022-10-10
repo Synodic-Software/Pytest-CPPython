@@ -166,17 +166,17 @@ class ProviderTests(DataPluginTests[ProviderData, ProviderT], Generic[ProviderT]
         return ProviderData
 
     @pytest.fixture(name="plugin_group_data")
-    def fixture_plugin_group_data(self, workspace: ProjectData) -> ProviderData:
+    def fixture_plugin_group_data(self, project_data: ProjectData) -> ProviderData:
         """Generates plugin configuration data generation from environment configuration
 
         Args:
-            workspace: The workspace configuration
+            project_data: The workspace configuration
 
         Returns:
             The plugin configuration
         """
 
-        return resolve_provider(workspace)
+        return resolve_provider(project_data)
 
 
 class ProviderIntegrationTests(
@@ -255,17 +255,17 @@ class GeneratorTests(DataPluginTests[GeneratorData, GeneratorT], Generic[Generat
         return GeneratorData
 
     @pytest.fixture(name="plugin_group_data")
-    def fixture_plugin_group_data(self, workspace: ProjectData) -> GeneratorData:
+    def fixture_plugin_group_data(self, project_data: ProjectData) -> GeneratorData:
         """Generates plugin configuration data generation from environment configuration
 
         Args:
-            workspace: The workspace configuration
+            project_data: The workspace configuration
 
         Returns:
             The plugin configuration
         """
 
-        return resolve_generator(workspace)
+        return resolve_generator(project_data)
 
 
 class GeneratorIntegrationTests(
