@@ -8,17 +8,25 @@ from pathlib import Path
 from typing import Any, Generic
 
 import pytest
-from cppython_core.plugin_schema.generator import GeneratorConfiguration, GeneratorT
+from cppython_core.plugin_schema.generator import GeneratorData, GeneratorT
 from cppython_core.plugin_schema.interface import InterfaceT
-from cppython_core.plugin_schema.provider import ProviderConfiguration, ProviderT
-from cppython_core.plugin_schema.vcs import VersionControlConfiguration, VersionControlT
-from cppython_core.schema import (
-    DataPluginT,
-    PluginDataConfigurationT,
-    PluginT,
-    ProjectConfiguration,
-    PyProject,
+from cppython_core.plugin_schema.provider import ProviderData, ProviderT
+from cppython_core.plugin_schema.vcs import VersionControlT
+from cppython_core.resolution import (
+    resolve_cppython_plugin,
+    resolve_generator,
+    resolve_provider,
 )
+from cppython_core.schema import (
+    CPPythonData,
+    CPPythonPluginData,
+    DataPluginT,
+    PEP621Data,
+    PluginGroupDataT,
+    PluginT,
+    ProjectData,
+)
+from packaging.utils import canonicalize_name
 
 from pytest_cppython.fixtures import CPPythonFixtures
 
@@ -41,99 +49,72 @@ class PluginIntegrationTests(PluginTests[PluginT]):
 class PluginUnitTests(PluginTests[PluginT]):
     """Unit testing information for all plugin test classes"""
 
-
-class DataPluginTests(PluginTests[DataPluginT], Generic[PluginDataConfigurationT, DataPluginT]):
-    """Shared testing information for all data plugin test classes"""
-
-    @pytest.fixture(name="plugin_configuration")
-    def fixture_plugin_configuration(
-        self, plugin_configuration_type: type[PluginDataConfigurationT], workspace: ProjectConfiguration
-    ) -> PluginDataConfigurationT:
-        """Generates plugin configuration data generation from environment configuration
+    def test_name(self, plugin_type: PluginT) -> None:
+        """Validates the name
 
         Args:
-            plugin_configuration_type: The type of configuration object to construct
-            workspace: The workspace configuration
-
-        Returns:
-            The plugin configuration
+            plugin_type: The input plugin type
         """
 
-        return plugin_configuration_type.create(workspace)
+        assert plugin_type.name() == canonicalize_name(plugin_type.name())
 
-    @pytest.fixture(name="mock_project")
-    def fixture_mock_project(
-        self,
-        plugin_type: type[DataPluginT],
-        plugin_data: dict[str, Any],
-        project: PyProject,
-    ) -> PyProject:
+
+class DataPluginTests(PluginTests[DataPluginT], Generic[PluginGroupDataT, DataPluginT]):
+    """Shared testing information for all data plugin test classes"""
+
+    @pytest.fixture(name="cppython_plugin_data")
+    def fixture_cppython_plugin_data(
+        self, cppython_data: CPPythonData, plugin_type: type[DataPluginT]
+    ) -> CPPythonPluginData:
         """_summary_
 
         Args:
+            cppython_data: _description_
             plugin_type: _description_
-            plugin_data: _description_
-            project: _description_
 
         Returns:
             _description_
         """
 
-        mock_project = project.copy(deep=True)
+        return resolve_cppython_plugin(cppython_data, plugin_type)
 
-        assert mock_project.tool is not None
-        assert mock_project.tool.cppython is not None
-
-        plugin_attribute = getattr(mock_project.tool.cppython, plugin_type.group())
-        plugin_attribute[plugin_type.name()] = plugin_data
-
-        return mock_project
-
+    @staticmethod
     @pytest.fixture(name="plugin")
     def fixture_plugin(
-        self,
         plugin_type: type[DataPluginT],
-        plugin_configuration: PluginDataConfigurationT,
-        mock_project: PyProject,
-        workspace: ProjectConfiguration,
+        plugin_group_data: PluginGroupDataT,
+        plugin_data: dict[str, Any],
+        cppython_plugin_data: CPPythonPluginData,
+        pep621_data: PEP621Data,
     ) -> DataPluginT:
         """Overridden plugin generator for creating a populated data plugin type
 
         Args:
             plugin_type: Plugin type
-            plugin_configuration: Plugin configuration data
-            mock_project: Generated static project definition
-            workspace: Temporary directory defined by a configuration object
+            plugin_group_data: TODO
+            plugin_data: TODO
+            cppython_plugin_data: TODO
+            pep621_data: TODO
 
         Returns:
             A newly constructed provider
         """
 
-        assert mock_project.tool is not None
-        assert mock_project.tool.cppython is not None
-
-        modified_project_data = mock_project.project.resolve(workspace)
-        modified_cppython_data = mock_project.tool.cppython.resolve(workspace)
-        modified_cppython_data = modified_cppython_data.resolve_plugin(plugin_type)
-
-        plugin_attribute = getattr(mock_project.tool.cppython, plugin_type.group())
-        plugin_data = plugin_attribute[plugin_type.name()]
-
-        return plugin_type(plugin_configuration, modified_project_data, modified_cppython_data, plugin_data)
+        return plugin_type(plugin_group_data, pep621_data, cppython_plugin_data, plugin_data)
 
 
 class DataPluginIntegrationTests(
     PluginIntegrationTests[DataPluginT],
-    DataPluginTests[PluginDataConfigurationT, DataPluginT],
-    Generic[PluginDataConfigurationT, DataPluginT],
+    DataPluginTests[PluginGroupDataT, DataPluginT],
+    Generic[PluginGroupDataT, DataPluginT],
 ):
     """Integration testing information for all data plugin test classes"""
 
 
 class DataPluginUnitTests(
     PluginUnitTests[DataPluginT],
-    DataPluginTests[PluginDataConfigurationT, DataPluginT],
-    Generic[PluginDataConfigurationT, DataPluginT],
+    DataPluginTests[PluginGroupDataT, DataPluginT],
+    Generic[PluginGroupDataT, DataPluginT],
 ):
     """Unit testing information for all data plugin test classes"""
 
@@ -171,22 +152,35 @@ class InterfaceUnitTests(PluginUnitTests[InterfaceT], InterfaceTests[InterfaceT]
     """
 
 
-class ProviderTests(DataPluginTests[ProviderConfiguration, ProviderT], Generic[ProviderT]):
+class ProviderTests(DataPluginTests[ProviderData, ProviderT], Generic[ProviderT]):
     """Shared functionality between the different Provider testing categories"""
 
     @pytest.fixture(name="plugin_configuration_type", scope="session")
-    def fixture_plugin_configuration_type(self) -> type[ProviderConfiguration]:
+    def fixture_plugin_configuration_type(self) -> type[ProviderData]:
         """A required testing hook that allows plugin configuration data generation
 
         Returns:
             The configuration type
         """
 
-        return ProviderConfiguration
+        return ProviderData
+
+    @pytest.fixture(name="plugin_group_data")
+    def fixture_plugin_group_data(self, workspace: ProjectData) -> ProviderData:
+        """Generates plugin configuration data generation from environment configuration
+
+        Args:
+            workspace: The workspace configuration
+
+        Returns:
+            The plugin configuration
+        """
+
+        return resolve_provider(workspace)
 
 
 class ProviderIntegrationTests(
-    DataPluginIntegrationTests[ProviderConfiguration, ProviderT],
+    DataPluginIntegrationTests[ProviderData, ProviderT],
     ProviderTests[ProviderT],
     Generic[ProviderT],
 ):
@@ -238,7 +232,7 @@ class ProviderIntegrationTests(
 
 
 class ProviderUnitTests(
-    DataPluginUnitTests[ProviderConfiguration, ProviderT],
+    DataPluginUnitTests[ProviderData, ProviderT],
     ProviderTests[ProviderT],
     Generic[ProviderT],
 ):
@@ -247,22 +241,35 @@ class ProviderUnitTests(
     """
 
 
-class GeneratorTests(DataPluginTests[GeneratorConfiguration, GeneratorT], Generic[GeneratorT]):
+class GeneratorTests(DataPluginTests[GeneratorData, GeneratorT], Generic[GeneratorT]):
     """Shared functionality between the different Generator testing categories"""
 
     @pytest.fixture(name="plugin_configuration_type", scope="session")
-    def fixture_plugin_configuration_type(self) -> type[GeneratorConfiguration]:
+    def fixture_plugin_configuration_type(self) -> type[GeneratorData]:
         """A required testing hook that allows plugin configuration data generation
 
         Returns:
             The configuration type
         """
 
-        return GeneratorConfiguration
+        return GeneratorData
+
+    @pytest.fixture(name="plugin_group_data")
+    def fixture_plugin_group_data(self, workspace: ProjectData) -> GeneratorData:
+        """Generates plugin configuration data generation from environment configuration
+
+        Args:
+            workspace: The workspace configuration
+
+        Returns:
+            The plugin configuration
+        """
+
+        return resolve_generator(workspace)
 
 
 class GeneratorIntegrationTests(
-    DataPluginIntegrationTests[GeneratorConfiguration, GeneratorT],
+    DataPluginIntegrationTests[GeneratorData, GeneratorT],
     GeneratorTests[GeneratorT],
     Generic[GeneratorT],
 ):
@@ -270,7 +277,7 @@ class GeneratorIntegrationTests(
 
 
 class GeneratorUnitTests(
-    DataPluginUnitTests[GeneratorConfiguration, GeneratorT],
+    DataPluginUnitTests[GeneratorData, GeneratorT],
     GeneratorTests[GeneratorT],
     Generic[GeneratorT],
 ):
@@ -279,24 +286,24 @@ class GeneratorUnitTests(
 
 
 class VersionControlTests(
-    DataPluginTests[VersionControlConfiguration, VersionControlT],
+    PluginTests[VersionControlT],
     Generic[VersionControlT],
 ):
     """Shared functionality between the different VersionControl testing categories"""
 
-    @pytest.fixture(name="plugin_configuration_type", scope="session")
-    def fixture_plugin_configuration_type(self) -> type[VersionControlConfiguration]:
-        """A required testing hook that allows plugin configuration data generation
-
+    @pytest.fixture(name="plugin")
+    def fixture_plugin(self, plugin_type: type[VersionControlT]) -> VersionControlT:
+        """Fixture creating the plugin.
+        Args:
+            plugin_type: An input plugin type
         Returns:
-            The configuration type
+            A newly constructed plugin
         """
-
-        return VersionControlConfiguration
+        return plugin_type()
 
 
 class VersionControlIntegrationTests(
-    DataPluginIntegrationTests[VersionControlConfiguration, VersionControlT],
+    PluginIntegrationTests[VersionControlT],
     VersionControlTests[VersionControlT],
     Generic[VersionControlT],
 ):
@@ -304,7 +311,7 @@ class VersionControlIntegrationTests(
 
 
 class VersionControlUnitTests(
-    DataPluginUnitTests[VersionControlConfiguration, VersionControlT],
+    PluginUnitTests[VersionControlT],
     VersionControlTests[VersionControlT],
     Generic[VersionControlT],
 ):
