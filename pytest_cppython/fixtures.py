@@ -41,7 +41,7 @@ class CPPythonFixtures:
 
     @staticmethod
     def _pep621_configuration_list() -> list[PEP621Configuration]:
-        """_summary_
+        """Creates a list of mocked configuration types
 
         Returns:
             A list of variants to test
@@ -73,21 +73,21 @@ class CPPythonFixtures:
     def fixture_pep621_data(
         self, pep621_configuration: PEP621Configuration, project_configuration: ProjectConfiguration
     ) -> PEP621Data:
-        """_summary_
+        """Resolved project table fixture
 
         Args:
-            pep621_configuration: _description_
-            project_configuration: _description_
+            pep621_configuration: The input configuration to resolve
+            project_configuration: The project configuration to help with the resolve
 
         Returns:
-            _description_
+            The resolved project table
         """
 
         return resolve_pep621(pep621_configuration, project_configuration)
 
     @staticmethod
     def _cppython_local_configuration_list() -> list[CPPythonLocalConfiguration]:
-        """_summary_
+        """Mocked list of local configuration data
 
         Returns:
             A list of variants to test
@@ -126,7 +126,7 @@ class CPPythonFixtures:
 
     @staticmethod
     def _cppython_global_configuration_list() -> list[CPPythonGlobalConfiguration]:
-        """_summary_
+        """Mocked list of global configuration data
 
         Returns:
             A list of variants to test
@@ -166,22 +166,22 @@ class CPPythonFixtures:
         cppython_global_configuration: CPPythonGlobalConfiguration,
         project_data: ProjectData,
     ) -> CPPythonData:
-        """_summary_
+        """Fixture for constructing resolved CPPython table data
 
         Args:
-            cppython_local_configuration: _description_
-            cppython_global_configuration: _description_
-            workspace: _description_
+            cppython_local_configuration: The local configuration to resolve
+            cppython_global_configuration: The global configuration to resolve
+            project_data: The project data to help with the resolve
 
         Returns:
-            _description_
+            The resolved CPPython table
         """
 
         return resolve_cppython(cppython_local_configuration, cppython_global_configuration, project_data)
 
     @staticmethod
     def _project_configuration_list() -> list[ProjectConfiguration]:
-        """_summary_
+        """Mocked list of project configuration data
 
         Returns:
             A list of variants to test
@@ -197,15 +197,15 @@ class CPPythonFixtures:
     def fixture_project_configuration(
         self, request: pytest.FixtureRequest, tmp_path_factory: pytest.TempPathFactory
     ) -> ProjectConfiguration:
-        """_summary_
+        """Project configuration fixture
 
         Args:
-            request: _description_
+            request: Parameterized configuration data
             tmp_path_factory: Factory for centralized temporary directories
 
 
         Returns:
-            _description_
+            Configuration with temporary directory capabilities
         """
 
         tmp_path = tmp_path_factory.mktemp("workspace-")

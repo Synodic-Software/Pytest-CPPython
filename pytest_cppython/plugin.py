@@ -66,14 +66,14 @@ class DataPluginTests(PluginTests[DataPluginT], Generic[PluginGroupDataT, DataPl
     def fixture_cppython_plugin_data(
         self, cppython_data: CPPythonData, plugin_type: type[DataPluginT]
     ) -> CPPythonPluginData:
-        """_summary_
+        """Fixture for created the plugin CPPython table
 
         Args:
-            cppython_data: _description_
-            plugin_type: _description_
+            cppython_data: The CPPython table to help the resolve
+            plugin_type: The data plugin type to resolve
 
         Returns:
-            _description_
+            The plugin specific CPPython table information
         """
 
         return resolve_cppython_plugin(cppython_data, plugin_type)
