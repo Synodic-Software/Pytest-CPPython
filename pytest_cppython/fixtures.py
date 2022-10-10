@@ -110,7 +110,7 @@ class CPPythonFixtures:
 
         Args:
             request: Parameterization list
-            install_path: TODO
+            install_path: The temporary install directory
 
         Returns:
             Variation of CPPython data
