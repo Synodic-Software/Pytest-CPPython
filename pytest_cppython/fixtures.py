@@ -40,39 +40,8 @@ class CPPythonFixtures:
         return path
 
     @staticmethod
-    def _project_configuration_list() -> list[ProjectConfiguration]:
-        """_summary_
-
-        Returns:
-            A list of variants to test
-        """
-        variants = []
-
-        # Use this plugins pyproject file for setup
-        variants.append(ProjectConfiguration(pyproject_file=Path("pyproject.toml"), version="0.1.0"))
-
-        return variants
-
-    @pytest.fixture(
-        name="project_configuration",
-        params=_project_configuration_list(),
-        scope="session",
-    )
-    def fixture_project_configuration(self, request: pytest.FixtureRequest) -> ProjectConfiguration:
-        """Fixture that creates a project configuration at 'workspace/test_project/pyproject.toml'
-
-        Args:
-            request: Parameterized data
-
-        Returns:
-            A project configuration that has populated a function level temporary directory
-        """
-
-        return cast(ProjectConfiguration, request.param)
-
-    @staticmethod
     def _pep621_configuration_list() -> list[PEP621Configuration]:
-        """_summary_
+        """Creates a list of mocked configuration types
 
         Returns:
             A list of variants to test
@@ -100,28 +69,25 @@ class CPPythonFixtures:
 
         return cast(PEP621Configuration, request.param)
 
-    @pytest.fixture(
-        name="pep621_data",
-        scope="session",
-    )
+    @pytest.fixture(name="pep621_data")
     def fixture_pep621_data(
         self, pep621_configuration: PEP621Configuration, project_configuration: ProjectConfiguration
     ) -> PEP621Data:
-        """_summary_
+        """Resolved project table fixture
 
         Args:
-            pep621_configuration: _description_
-            project_configuration: _description_
+            pep621_configuration: The input configuration to resolve
+            project_configuration: The project configuration to help with the resolve
 
         Returns:
-            _description_
+            The resolved project table
         """
 
         return resolve_pep621(pep621_configuration, project_configuration)
 
     @staticmethod
     def _cppython_local_configuration_list() -> list[CPPythonLocalConfiguration]:
-        """_summary_
+        """Mocked list of local configuration data
 
         Returns:
             A list of variants to test
@@ -144,7 +110,7 @@ class CPPythonFixtures:
 
         Args:
             request: Parameterization list
-            install_path: TODO
+            install_path: The temporary install directory
 
         Returns:
             Variation of CPPython data
@@ -160,7 +126,7 @@ class CPPythonFixtures:
 
     @staticmethod
     def _cppython_global_configuration_list() -> list[CPPythonGlobalConfiguration]:
-        """_summary_
+        """Mocked list of global configuration data
 
         Returns:
             A list of variants to test
@@ -198,43 +164,70 @@ class CPPythonFixtures:
         self,
         cppython_local_configuration: CPPythonLocalConfiguration,
         cppython_global_configuration: CPPythonGlobalConfiguration,
-        workspace: ProjectData,
+        project_data: ProjectData,
     ) -> CPPythonData:
-        """_summary_
+        """Fixture for constructing resolved CPPython table data
 
         Args:
-            cppython_local_configuration: _description_
-            cppython_global_configuration: _description_
-            workspace: _description_
+            cppython_local_configuration: The local configuration to resolve
+            cppython_global_configuration: The global configuration to resolve
+            project_data: The project data to help with the resolve
 
         Returns:
-            _description_
+            The resolved CPPython table
         """
 
-        return resolve_cppython(cppython_local_configuration, cppython_global_configuration, workspace)
+        return resolve_cppython(cppython_local_configuration, cppython_global_configuration, project_data)
 
-    @pytest.fixture(name="workspace")
-    def fixture_workspace(
-        self, project_configuration: ProjectConfiguration, tmp_path_factory: pytest.TempPathFactory
-    ) -> ProjectData:
-        """Fixture that creates a project space at 'workspace/test_project/pyproject.toml'
+    @staticmethod
+    def _project_configuration_list() -> list[ProjectConfiguration]:
+        """Mocked list of project configuration data
+
+        Returns:
+            A list of variants to test
+        """
+        variants = []
+
+        # Use this plugins pyproject file for setup
+        variants.append(ProjectConfiguration(pyproject_file=Path("pyproject.toml"), version="0.1.0"))
+
+        return variants
+
+    @pytest.fixture(name="project_configuration", params=_project_configuration_list())
+    def fixture_project_configuration(
+        self, request: pytest.FixtureRequest, tmp_path_factory: pytest.TempPathFactory
+    ) -> ProjectConfiguration:
+        """Project configuration fixture
+
         Args:
-            project_configuration: Project data
+            request: Parameterized configuration data
             tmp_path_factory: Factory for centralized temporary directories
+
+
         Returns:
-            A project data object that has populated a function level temporary directory
+            Configuration with temporary directory capabilities
         """
+
         tmp_path = tmp_path_factory.mktemp("workspace-")
         pyproject_path = tmp_path / "test_project"
         pyproject_path.mkdir(parents=True)
         pyproject_file = pyproject_path / "pyproject.toml"
         pyproject_file.write_text("Test Project File", encoding="utf-8")
 
-        configuration = project_configuration.dict()
+        configuration = cast(ProjectConfiguration, request.param)
 
         # Pin the project location
-        configuration["pyproject_file"] = pyproject_file
+        configuration.pyproject_file = pyproject_file
 
-        data = ProjectConfiguration(**configuration)
+        return configuration
 
-        return resolve_project_configuration(data)
+    @pytest.fixture(name="project_data")
+    def fixture_project_data(self, project_configuration: ProjectConfiguration) -> ProjectData:
+        """Fixture that creates a project space at 'workspace/test_project/pyproject.toml'
+        Args:
+            project_configuration: Project data
+        Returns:
+            A project data object that has populated a function level temporary directory
+        """
+
+        return resolve_project_configuration(project_configuration)
