@@ -111,9 +111,8 @@ class DataPluginTests(PluginTests[DataPluginT], Generic[PluginGroupDataT, DataPl
         Args:
             plugin_type: Plugin type
             plugin_group_data: The data group configuration
+            core_data: The core metadata
             plugin_data: The data table
-            cppython_plugin_data: The cppython resolved table
-            pep621_data: The project data
 
         Returns:
             A newly constructed provider
