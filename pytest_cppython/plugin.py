@@ -18,6 +18,7 @@ from cppython_core.resolution import (
     resolve_provider,
 )
 from cppython_core.schema import (
+    CoreData,
     CPPythonData,
     CPPythonPluginData,
     DataPluginT,
@@ -78,29 +79,46 @@ class DataPluginTests(PluginTests[DataPluginT], Generic[PluginGroupDataT, DataPl
 
         return resolve_cppython_plugin(cppython_data, plugin_type)
 
+    @pytest.fixture(
+        name="core_data",
+    )
+    def fixture_core_data(
+        self, cppython_plugin_data: CPPythonPluginData, project_data: ProjectData, pep621_data: PEP621Data
+    ) -> CoreData:
+        """Fixture for creating the wrapper CoreData type
+
+        Args:
+            cppython_plugin_data: CPPython data
+            project_data: The project data
+            pep621_data: Project table data
+
+        Returns:
+            Wrapper Core Type
+        """
+
+        return CoreData(cppython_data=cppython_plugin_data, project_data=project_data, pep621_data=pep621_data)
+
     @staticmethod
     @pytest.fixture(name="plugin")
     def fixture_plugin(
         plugin_type: type[DataPluginT],
         plugin_group_data: PluginGroupDataT,
+        core_data: CoreData,
         plugin_data: dict[str, Any],
-        cppython_plugin_data: CPPythonPluginData,
-        pep621_data: PEP621Data,
     ) -> DataPluginT:
         """Overridden plugin generator for creating a populated data plugin type
 
         Args:
             plugin_type: Plugin type
             plugin_group_data: The data group configuration
+            core_data: The core metadata
             plugin_data: The data table
-            cppython_plugin_data: The cppython resolved table
-            pep621_data: The project data
 
         Returns:
             A newly constructed provider
         """
 
-        return plugin_type(plugin_group_data, pep621_data, cppython_plugin_data, plugin_data)
+        return plugin_type(plugin_group_data, core_data, plugin_data)
 
 
 class DataPluginIntegrationTests(
@@ -202,7 +220,7 @@ class ProviderIntegrationTests(
             plugin: A newly constructed provider
         """
 
-        assert plugin.tooling_downloaded(plugin.cppython.install_path)
+        assert plugin.tooling_downloaded(plugin.core_data.cppython_data.install_path)
 
     def test_not_downloaded(self, plugin_type: type[ProviderT], tmp_path: Path) -> None:
         """Verify the provider can identify an empty tool
