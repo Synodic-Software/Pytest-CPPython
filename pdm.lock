@@ -62,7 +62,7 @@ dependencies = [
 
 [[package]]
 name = "cppython-core"
-version = "0.6.1.dev12"
+version = "0.6.1.dev13"
 requires_python = ">=3.10"
 summary = "Data definitions for CPPython"
 dependencies = [
@@ -333,9 +333,9 @@ content_hash = "sha256:7a2b24ae668d641db3d448f995ac6449b8fe183595f0ddbc9739c0027
     {url = "https://files.pythonhosted.org/packages/ea/52/c08080405329326a7ff16c0dfdb4feefaa8edd7446413df67386fe1bbfe0/coverage-6.5.0-cp39-cp39-macosx_10_9_x86_64.whl", hash = "sha256:633713d70ad6bfc49b34ead4060531658dc6dfc9b3eb7d8a716d5873377ab745"},
     {url = "https://files.pythonhosted.org/packages/ff/27/339089b558672f04e62d0cd2d49b9280270bad3bc95de24e7eb03deb4638/coverage-6.5.0-cp311-cp311-win32.whl", hash = "sha256:98e8a10b7a314f454d9eff4216a9a94d143a7ee65018dd12442e898ee2310578"},
 ]
-"cppython-core 0.6.1.dev12" = [
-    {url = "https://files.pythonhosted.org/packages/8c/a3/bd8f047fe440e6211c02bb570c916701a3e63043449bdece3946f1ae1bdd/cppython-core-0.6.1.dev12.tar.gz", hash = "sha256:a780c1cb918497e447af1e55e0aca96af6bb3fb5330af9cde3cb77917c73bc48"},
-    {url = "https://files.pythonhosted.org/packages/8d/16/cfced9e996a8975c50191f44be7634c969e9c899915437461a0f44a80767/cppython_core-0.6.1.dev12-py3-none-any.whl", hash = "sha256:2f8c2289f9247021bfb91b4f4433f929dcdc5cbeba99e7dcded04aab90351398"},
+"cppython-core 0.6.1.dev13" = [
+    {url = "https://files.pythonhosted.org/packages/8a/f5/25aa1bef2d91be11aecf376de9d644bf38ddbba975c4c6814fd149ef8712/cppython-core-0.6.1.dev13.tar.gz", hash = "sha256:25e6f909708c9d354f281044e8a33faf866d79365d80032e256291840c2c9957"},
+    {url = "https://files.pythonhosted.org/packages/a2/90/c821eaca0a5e9e1669147bfe82c0c5189b13308448e528914b63723cc442/cppython_core-0.6.1.dev13-py3-none-any.whl", hash = "sha256:7f4ff789fac89f35032b19f519ae16cd020fff681c399e9d1f7e3dd08c419256"},
 ]
 "dill 0.3.5.1" = [
     {url = "https://files.pythonhosted.org/packages/12/ff/3b1a8f5d59600393506c64fa14d13afdfe6fe79ed65a18d64026fe9f8356/dill-0.3.5.1-py2.py3-none-any.whl", hash = "sha256:33501d03270bbe410c72639b350e941882a8b0fd55357580fbc873fba0c59302"},
