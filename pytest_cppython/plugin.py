@@ -18,7 +18,7 @@ from cppython_core.resolution import (
     resolve_provider,
 )
 from cppython_core.schema import (
-    CoreData,
+    CorePluginData,
     CPPythonData,
     CPPythonPluginData,
     DataPluginT,
@@ -80,11 +80,11 @@ class DataPluginTests(PluginTests[DataPluginT], Generic[PluginGroupDataT, DataPl
         return resolve_cppython_plugin(cppython_data, plugin_type)
 
     @pytest.fixture(
-        name="core_data",
+        name="core_plugin_data",
     )
-    def fixture_core_data(
+    def fixture_core_plugin_data(
         self, cppython_plugin_data: CPPythonPluginData, project_data: ProjectData, pep621_data: PEP621Data
-    ) -> CoreData:
+    ) -> CorePluginData:
         """Fixture for creating the wrapper CoreData type
 
         Args:
@@ -96,14 +96,14 @@ class DataPluginTests(PluginTests[DataPluginT], Generic[PluginGroupDataT, DataPl
             Wrapper Core Type
         """
 
-        return CoreData(cppython_data=cppython_plugin_data, project_data=project_data, pep621_data=pep621_data)
+        return CorePluginData(cppython_data=cppython_plugin_data, project_data=project_data, pep621_data=pep621_data)
 
     @staticmethod
     @pytest.fixture(name="plugin")
     def fixture_plugin(
         plugin_type: type[DataPluginT],
         plugin_group_data: PluginGroupDataT,
-        core_data: CoreData,
+        core_plugin_data: CorePluginData,
         plugin_data: dict[str, Any],
     ) -> DataPluginT:
         """Overridden plugin generator for creating a populated data plugin type
@@ -111,14 +111,14 @@ class DataPluginTests(PluginTests[DataPluginT], Generic[PluginGroupDataT, DataPl
         Args:
             plugin_type: Plugin type
             plugin_group_data: The data group configuration
-            core_data: The core metadata
+            core_plugin_data: The core metadata
             plugin_data: The data table
 
         Returns:
             A newly constructed provider
         """
 
-        return plugin_type(plugin_group_data, core_data, plugin_data)
+        return plugin_type(plugin_group_data, core_plugin_data, plugin_data)
 
 
 class DataPluginIntegrationTests(

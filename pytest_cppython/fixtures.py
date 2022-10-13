@@ -11,6 +11,7 @@ from cppython_core.resolution import (
     resolve_project_configuration,
 )
 from cppython_core.schema import (
+    CoreData,
     CPPythonData,
     CPPythonGlobalConfiguration,
     CPPythonLocalConfiguration,
@@ -192,6 +193,25 @@ class CPPythonFixtures:
         variants.append(ProjectConfiguration(pyproject_file=Path("pyproject.toml"), version="0.1.0"))
 
         return variants
+
+    @pytest.fixture(
+        name="core_data",
+    )
+    def fixture_core_data(
+        self, cppython_data: CPPythonData, project_data: ProjectData, pep621_data: PEP621Data
+    ) -> CoreData:
+        """Fixture for creating the wrapper CoreData type
+
+        Args:
+            cppython_data: CPPython data
+            project_data: The project data
+            pep621_data: Project table data
+
+        Returns:
+            Wrapper Core Type
+        """
+
+        return CoreData(cppython_data=cppython_data, project_data=project_data, pep621_data=pep621_data)
 
     @pytest.fixture(name="project_configuration", params=_project_configuration_list())
     def fixture_project_configuration(
