@@ -118,7 +118,11 @@ class DataPluginTests(PluginTests[DataPluginT], Generic[PluginGroupDataT, DataPl
             A newly constructed provider
         """
 
-        return plugin_type(plugin_group_data, core_plugin_data, plugin_data)
+        plugin = plugin_type(plugin_group_data, core_plugin_data)
+
+        plugin.activate(plugin_data)
+
+        return plugin
 
 
 class DataPluginIntegrationTests(
