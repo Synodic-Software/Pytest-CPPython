@@ -21,6 +21,13 @@ from cppython_core.schema import (
     ProjectData,
 )
 
+from pytest_cppython.data import (
+    cppython_global_variants,
+    cppython_local_variants,
+    pep621_variants,
+    project_variants,
+)
+
 
 class CPPythonFixtures:
     """Fixtures available to CPPython test classes"""
@@ -40,23 +47,10 @@ class CPPythonFixtures:
         path.mkdir(parents=True, exist_ok=True)
         return path
 
-    @staticmethod
-    def _pep621_configuration_list() -> list[PEP621Configuration]:
-        """Creates a list of mocked configuration types
-
-        Returns:
-            A list of variants to test
-        """
-        variants = []
-
-        variants.append(PEP621Configuration(name="default-test", version="1.0.0"))
-
-        return variants
-
     @pytest.fixture(
         name="pep621_configuration",
         scope="session",
-        params=_pep621_configuration_list(),
+        params=pep621_variants,
     )
     def fixture_pep621_configuration(self, request: pytest.FixtureRequest) -> PEP621Configuration:
         """Fixture defining all testable variations of PEP621
@@ -86,23 +80,10 @@ class CPPythonFixtures:
 
         return resolve_pep621(pep621_configuration, project_configuration)
 
-    @staticmethod
-    def _cppython_local_configuration_list() -> list[CPPythonLocalConfiguration]:
-        """Mocked list of local configuration data
-
-        Returns:
-            A list of variants to test
-        """
-        variants = []
-
-        variants.append(CPPythonLocalConfiguration())
-
-        return variants
-
     @pytest.fixture(
         name="cppython_local_configuration",
         scope="session",
-        params=_cppython_local_configuration_list(),
+        params=cppython_local_variants,
     )
     def fixture_cppython_local_configuration(
         self, request: pytest.FixtureRequest, install_path: Path
@@ -125,25 +106,10 @@ class CPPythonFixtures:
 
         return CPPythonLocalConfiguration(**data)
 
-    @staticmethod
-    def _cppython_global_configuration_list() -> list[CPPythonGlobalConfiguration]:
-        """Mocked list of global configuration data
-
-        Returns:
-            A list of variants to test
-        """
-        variants = []
-
-        data = {"current-check": False}
-
-        variants.append(CPPythonGlobalConfiguration(**data))
-
-        return variants
-
     @pytest.fixture(
         name="cppython_global_configuration",
         scope="session",
-        params=_cppython_global_configuration_list(),
+        params=cppython_global_variants,
     )
     def fixture_cppython_global_configuration(self, request: pytest.FixtureRequest) -> CPPythonGlobalConfiguration:
         """Fixture defining all testable variations of CPPythonData
@@ -180,20 +146,6 @@ class CPPythonFixtures:
 
         return resolve_cppython(cppython_local_configuration, cppython_global_configuration, project_data)
 
-    @staticmethod
-    def _project_configuration_list() -> list[ProjectConfiguration]:
-        """Mocked list of project configuration data
-
-        Returns:
-            A list of variants to test
-        """
-        variants = []
-
-        # Use this plugins pyproject file for setup
-        variants.append(ProjectConfiguration(pyproject_file=Path("pyproject.toml"), version="0.1.0"))
-
-        return variants
-
     @pytest.fixture(
         name="core_data",
     )
@@ -213,7 +165,7 @@ class CPPythonFixtures:
 
         return CoreData(cppython_data=cppython_data, project_data=project_data, pep621_data=pep621_data)
 
-    @pytest.fixture(name="project_configuration", params=_project_configuration_list())
+    @pytest.fixture(name="project_configuration", params=project_variants)
     def fixture_project_configuration(
         self, request: pytest.FixtureRequest, tmp_path_factory: pytest.TempPathFactory
     ) -> ProjectConfiguration:
