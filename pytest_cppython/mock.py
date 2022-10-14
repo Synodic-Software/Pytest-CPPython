@@ -2,6 +2,7 @@
 """
 
 from pathlib import Path
+from typing import Any
 
 from cppython_core.plugin_schema.generator import Generator
 from cppython_core.plugin_schema.interface import Interface
@@ -29,6 +30,9 @@ class MockProvider(Provider):
     """A mock provider class for behavior testing"""
 
     downloaded: Path | None = None
+
+    def activate(self, data: dict[str, Any]) -> None:
+        pass
 
     @staticmethod
     def name() -> str:
@@ -73,6 +77,9 @@ class MockGenerator(Generator):
             The name
         """
         return "mock"
+
+    def activate(self, data: dict[str, Any]) -> None:
+        pass
 
 
 class MockVersionControl(VersionControl):
