@@ -43,6 +43,20 @@ class MockProvider(Provider):
         """
         return "mock"
 
+    def supports_generator(self, name: str) -> bool:
+        """Generator support
+
+        Args:
+            name: Input token
+
+        Returns:
+            The mock provider supports any generator
+        """
+        return True
+
+    def gather_input(self, name: str) -> Any:
+        return None
+
     @classmethod
     def tooling_downloaded(cls, path: Path) -> bool:
         """Returns whether the provider tooling needs to be downloaded
@@ -79,6 +93,9 @@ class MockGenerator(Generator):
         return "mock"
 
     def activate(self, data: dict[str, Any]) -> None:
+        pass
+
+    def sync(self, results: list[Any]) -> None:
         pass
 
 
