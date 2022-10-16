@@ -3,6 +3,7 @@
 from pathlib import Path
 
 from cppython_core.schema import (
+    PEP508,
     CPPythonGlobalConfiguration,
     CPPythonLocalConfiguration,
     PEP621Configuration,
@@ -34,6 +35,11 @@ def _cppython_local_configuration_list() -> list[CPPythonLocalConfiguration]:
 
     # Default
     variants.append(CPPythonLocalConfiguration())
+
+    # Basic dependencies
+    units = PEP508("units")
+    imgui = PEP508("imgui")
+    variants.append(CPPythonLocalConfiguration(dependencies=[units, imgui]))
 
     return variants
 
