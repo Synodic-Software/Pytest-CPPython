@@ -8,6 +8,7 @@ from cppython_core.plugin_schema.generator import Generator
 from cppython_core.plugin_schema.interface import Interface
 from cppython_core.plugin_schema.provider import Provider
 from cppython_core.plugin_schema.vcs import VersionControl
+from cppython_core.schema import SyncData
 
 
 class MockInterface(Interface):
@@ -54,8 +55,16 @@ class MockProvider(Provider):
         """
         return True
 
-    def gather_input(self, name: str) -> Any:
-        return None
+    def sync_data(self, name: str) -> SyncData:
+        """Gathers synchronization data
+
+        Args:
+            name: The input generator name. An implicit token
+
+        Returns:
+            The sync data object
+        """
+        return SyncData(data=None, name=self.name())
 
     @classmethod
     def tooling_downloaded(cls, path: Path) -> bool:
@@ -95,7 +104,7 @@ class MockGenerator(Generator):
     def activate(self, data: dict[str, Any]) -> None:
         pass
 
-    def sync(self, results: list[Any]) -> None:
+    def sync(self, results: list[SyncData]) -> None:
         pass
 
 
