@@ -104,6 +104,18 @@ class MockGenerator(Generator):
     def activate(self, data: dict[str, Any]) -> None:
         pass
 
+    @staticmethod
+    def is_supported(path: Path) -> bool:
+        """Queries generator support of the given path
+
+        Args:
+            path: Input path
+
+        Returns:
+            True if supported
+        """
+        return True
+
     def sync(self, results: list[SyncData]) -> None:
         pass
 
