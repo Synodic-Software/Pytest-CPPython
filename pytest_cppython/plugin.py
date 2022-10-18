@@ -149,6 +149,16 @@ class DataPluginUnitTests(
         plugin_entries = entry_points(group=f"cppython.{plugin.group()}")
         assert len(plugin_entries) > 0
 
+    def test_empty_activation(self, plugin: DataPluginT) -> None:
+        """Data plugins should be able to be defaulted. Sending in empty data is as close to enforcing that behavior
+        that we can get
+
+        Args:
+            plugin: The data plugin
+        """
+
+        plugin.activate({})
+
 
 class InterfaceTests(PluginTests[InterfaceT]):
     """Shared functionality between the different Interface testing categories"""
