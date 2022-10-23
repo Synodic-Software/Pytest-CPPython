@@ -5,20 +5,7 @@ from pathlib import Path
 from typing import Any
 
 from cppython_core.plugin_schema.generator import Generator
-from cppython_core.schema import CPPythonModel, SyncData
-from pydantic import Field, FilePath
-
-
-class MockGeneratorData(CPPythonModel):
-    """Tests a variety of data conditions"""
-
-    test_file_requirement: FilePath
-
-
-class MockGeneratorConfiguration(CPPythonModel):
-    """Fulfills the defaulting of the FilePath"""
-
-    test_file_requirement: FilePath = Field(default=Path("requirement.txt"))
+from cppython_core.schema import SyncData
 
 
 class MockGenerator(Generator):
@@ -34,16 +21,7 @@ class MockGenerator(Generator):
         return "mock"
 
     def activate(self, data: dict[str, Any]) -> None:
-        configuration = MockGeneratorConfiguration(**data)
-
-        root = self.core_data.project_data.pyproject_file.parent
-
-        modified_file = configuration.test_file_requirement
-
-        if not modified_file.is_absolute():
-            modified_file = root / modified_file
-
-        MockGeneratorData(test_file_requirement=modified_file)
+        pass
 
     @staticmethod
     def is_supported(path: Path) -> bool:
