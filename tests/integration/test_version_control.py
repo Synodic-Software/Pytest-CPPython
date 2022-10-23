@@ -5,7 +5,7 @@ from typing import Any
 
 import pytest
 
-from pytest_cppython.mock import MockVersionControl
+from pytest_cppython.mock.vcs import MockVersionControl
 from pytest_cppython.plugin import VersionControlIntegrationTests
 
 

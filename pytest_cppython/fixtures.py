@@ -1,6 +1,7 @@
 """Direct Fixtures
 """
 
+import shutil
 from pathlib import Path
 from typing import Any, cast
 
@@ -23,13 +24,14 @@ from cppython_core.schema import (
     ToolData,
 )
 
-from pytest_cppython.data import (
+from pytest_cppython.mock.generator import MockGenerator
+from pytest_cppython.mock.provider import MockProvider
+from pytest_cppython.variants import (
     cppython_global_variants,
     cppython_local_variants,
     pep621_variants,
     project_variants,
 )
-from pytest_cppython.mock import MockGenerator, MockProvider
 
 
 class CPPythonFixtures:
@@ -168,31 +170,94 @@ class CPPythonFixtures:
 
         return CoreData(cppython_data=cppython_data, project_data=project_data, pep621_data=pep621_data)
 
+    def pytest_generate_tests(self, metafunc: pytest.Metafunc) -> None:
+        """Called for each test function
+
+        Args:
+            metafunc: Pytest hook data
+        """
+
+        for fixture in metafunc.fixturenames:
+            match fixture:
+                case "internal_plugin_data_path":
+                    # There should only ever be one fixture named 'internal_plugin_data_path' for value caching
+                    data_path = metafunc.config.rootpath / "tests" / "data"
+
+                    test_paths: list[Path | None] = []
+
+                    for path in data_path.glob("*"):
+                        if path.is_dir():
+                            test_paths.append(path)
+
+                    if not test_paths:
+                        test_paths = [None]
+                    metafunc.parametrize(fixture, test_paths, scope="session")
+
+                case "internal_data_path":
+                    # There should only ever be one fixture named 'internal_data_path' for value caching
+                    data_path = Path(__file__).parent / "data"
+                    metafunc.parametrize(fixture, list(data_path.glob("*")), scope="session")
+
+    @pytest.fixture(name="plugin_data_path", scope="session")
+    def fixture_plugin_data_path(self, internal_plugin_data_path: list[Path | None]) -> list[Path | None]:
+        """Fixture cache of internal_plugin_data_path
+
+        Args:
+            internal_plugin_data_path: The input meta data
+
+        Returns:
+            The session scoped data
+        """
+
+        return internal_plugin_data_path
+
+    @pytest.fixture(name="data_path", scope="session")
+    def fixture_data_path(self, internal_data_path: list[Path]) -> list[Path]:
+        """Fixture cache of internal_data_path
+
+        Args:
+            internal_data_path: The input meta data
+
+        Returns:
+            The session scoped data
+        """
+
+        return internal_data_path
+
     @pytest.fixture(name="project_configuration", params=project_variants)
     def fixture_project_configuration(
-        self, request: pytest.FixtureRequest, tmp_path_factory: pytest.TempPathFactory
+        self,
+        request: pytest.FixtureRequest,
+        tmp_path_factory: pytest.TempPathFactory,
+        data_path: Path,
+        plugin_data_path: Path | None,
     ) -> ProjectConfiguration:
         """Project configuration fixture
 
         Args:
             request: Parameterized configuration data
             tmp_path_factory: Factory for centralized temporary directories
-
+            data_path: Project file requirements
+            plugin_data_path: Parameterized path to a data directory
 
         Returns:
             Configuration with temporary directory capabilities
         """
 
         tmp_path = tmp_path_factory.mktemp("workspace-")
-        pyproject_path = tmp_path / "test_project"
-        pyproject_path.mkdir(parents=True)
-        pyproject_file = pyproject_path / "pyproject.toml"
-        pyproject_file.write_text("Test Project File", encoding="utf-8")
+
+        shutil.copytree(data_path, tmp_path, dirs_exist_ok=True)
+
+        if plugin_data_path is not None:
+            shutil.copytree(plugin_data_path, tmp_path, dirs_exist_ok=True)
 
         configuration = cast(ProjectConfiguration, request.param)
 
         # Pin the project location
-        configuration.pyproject_file = pyproject_file
+        paths = list(tmp_path.rglob("pyproject.toml"))
+
+        # 'paths' length guaranteed to be 1
+        configuration.pyproject_file = paths[0].resolve()
 
         return configuration
 
