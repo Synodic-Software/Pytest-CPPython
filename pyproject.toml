@@ -45,11 +45,6 @@ test = [
 [tool.entry-points.pytest11]
 pytest_cppython = "pytest_cppython.plugin"
 
-[tool.pdm.build]
-includes = [
-  "pytest_cppython/data/**",
-]
-
 [tool.pdm.scripts]
 analyze = {shell = "pylint --verbose pytest_cppython tests"}
 format = {shell = "black --check --verbose ."}
