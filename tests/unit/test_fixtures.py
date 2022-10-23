@@ -12,9 +12,22 @@ class TestFixtures(CPPythonFixtures):
         """Verifies that the directory data provided by pytest_cppython contains a pyproject.toml file
 
         Args:
-            data_path: The [project's] tests/data directory
+            data_path: The project's tests/data directory
         """
 
         paths = list(data_path.rglob("pyproject.toml"))
 
         assert len(paths) == 1
+
+    def test_data_directory(self, plugin_data_path: Path | None) -> None:
+        """Verifies that the directory data provided by pytest_cppython contains a pyproject.toml file
+
+        Args:
+            plugin_data_path: The plugins tests/data directory
+        """
+
+        assert plugin_data_path is not None
+
+        requirement = plugin_data_path / "requirement.txt"
+
+        assert requirement.exists()
