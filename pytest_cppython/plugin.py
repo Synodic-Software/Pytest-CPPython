@@ -159,6 +159,28 @@ class DataPluginUnitTests(
 
         plugin.activate({})
 
+    def test_activation(self, plugin: DataPluginT, plugin_data: dict[str, Any]) -> None:
+        """Tests activation
+
+        Args:
+            plugin: The data plugin
+            plugin_data: Data to validate
+        """
+
+        plugin.activate(plugin_data)
+
+    def test_pyproject_undefined(self, plugin_data_path: Path | None) -> None:
+        """Verifies that the directory data provided by plugins does not contain a pyproject.toml file
+
+        Args:
+            plugin_data_path: The plugin's tests/data directory
+        """
+
+        if plugin_data_path is not None:
+            paths = list(plugin_data_path.rglob("pyproject.toml"))
+
+            assert not paths
+
 
 class InterfaceTests(PluginTests[InterfaceT]):
     """Shared functionality between the different Interface testing categories"""
