@@ -2,7 +2,7 @@
 description = "A pytest plugin that imports CPPython testing types"
 name = "pytest-cppython"
 
-license-expression = "MIT"
+license = "MIT"
 
 authors = [
   {name = "Synodic Software", email = "contact@synodic.software"},
