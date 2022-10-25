@@ -59,8 +59,8 @@ dependencies = [
 
 [[package]]
 name = "cppython-core"
-version = "0.6.1.dev21"
-requires_python = ">=3.10"
+version = "0.6.1.dev22"
+requires_python = ">=3.11"
 summary = "Data definitions for CPPython"
 dependencies = [
     "packaging>=21.3",
@@ -314,9 +314,9 @@ content_hash = "sha256:22daf654cc888eea4e88a19e8f88205a9455b406eb9cb0076ceec8ac4
     {url = "https://files.pythonhosted.org/packages/ea/52/c08080405329326a7ff16c0dfdb4feefaa8edd7446413df67386fe1bbfe0/coverage-6.5.0-cp39-cp39-macosx_10_9_x86_64.whl", hash = "sha256:633713d70ad6bfc49b34ead4060531658dc6dfc9b3eb7d8a716d5873377ab745"},
     {url = "https://files.pythonhosted.org/packages/ff/27/339089b558672f04e62d0cd2d49b9280270bad3bc95de24e7eb03deb4638/coverage-6.5.0-cp311-cp311-win32.whl", hash = "sha256:98e8a10b7a314f454d9eff4216a9a94d143a7ee65018dd12442e898ee2310578"},
 ]
-"cppython-core 0.6.1.dev21" = [
-    {url = "https://files.pythonhosted.org/packages/76/32/583c4ea26988a826b487e3e09ab2c4c1f2351d2b204dde737e0249fd75aa/cppython_core-0.6.1.dev21-py3-none-any.whl", hash = "sha256:65697e84f3d07338067a3954e1e3cd699265452edb7a781bdf2d46822e332770"},
-    {url = "https://files.pythonhosted.org/packages/ac/07/15e4ff083c51b8ee6e37f84dce8fcf3a8b03dfaeeac931d61ed233605c7b/cppython-core-0.6.1.dev21.tar.gz", hash = "sha256:87e6e27f05a3cf8ef5273e4460d5fdc6d90e14afad07f4d25e74774d5d990ce2"},
+"cppython-core 0.6.1.dev22" = [
+    {url = "https://files.pythonhosted.org/packages/61/6b/c65fe86ddb5bfef4f129707814fbaae2a7c6897902dfae05aa9d2742cb52/cppython-core-0.6.1.dev22.tar.gz", hash = "sha256:475abf857232ad07fb4d5c2ae3325dae0f76289ab305496c5995b90afec9bea8"},
+    {url = "https://files.pythonhosted.org/packages/e2/53/947dabb2332f050aa7dd078f75eee37e264d2fd639f93934280763197417/cppython_core-0.6.1.dev22-py3-none-any.whl", hash = "sha256:8d9753bf6c6fcb6b25a63f78d2290e4d437be993ad2a0bafe7417d8b7442dcf4"},
 ]
 "dill 0.3.6" = [
     {url = "https://files.pythonhosted.org/packages/7c/e7/364a09134e1062d4d5ff69b853a56cf61c223e0afcc6906b6832bcd51ea8/dill-0.3.6.tar.gz", hash = "sha256:e5db55f3687856d8fbdab002ed78544e1c4559a130302693d839dfe8f93f2373"},
