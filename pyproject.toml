@@ -2,7 +2,7 @@
 description = "A pytest plugin that imports CPPython testing types"
 name = "pytest-cppython"
 
-license-expression = "MIT"
+license = "MIT"
 
 authors = [
   {name = "Synodic Software", email = "contact@synodic.software"},
@@ -12,7 +12,7 @@ readme = "README.md"
 
 dynamic = ["version"]
 
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 
 dependencies = [
   "cppython-core>=0.4.1.dev13",
@@ -37,7 +37,7 @@ lint = [
   "mypy>=0.971",
 ]
 test = [
-  "pytest >=7.1.2",
+  "pytest >=7.2.0",
   "pytest-cov>=3.0.0",
   "pytest-mock>=3.8.2",
 ]
