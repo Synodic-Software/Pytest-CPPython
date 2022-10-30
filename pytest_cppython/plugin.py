@@ -33,7 +33,9 @@ from pytest_cppython.fixtures import CPPythonFixtures
 
 
 class PluginTests(CPPythonFixtures, ABC, Generic[PluginT]):
-    """Shared testing information for all plugin test classes"""
+    """Shared testing information for all plugin test classes.
+    Not subclassed by DataPluginTests to reduce ancestor count
+    """
 
     @abstractmethod
     @pytest.fixture(name="plugin_type", scope="session")
@@ -60,8 +62,17 @@ class PluginUnitTests(PluginTests[PluginT]):
         assert plugin_type.name() == canonicalize_name(plugin_type.name())
 
 
-class DataPluginTests(PluginTests[DataPluginT], Generic[PluginGroupDataT, DataPluginT]):
-    """Shared testing information for all data plugin test classes"""
+class DataPluginTests(CPPythonFixtures, ABC, Generic[PluginGroupDataT, DataPluginT]):
+    """Shared testing information for all data plugin test classes.
+    Not inheriting PluginTests to reduce ancestor count
+    """
+
+    @abstractmethod
+    @pytest.fixture(name="plugin_type", scope="session")
+    def fixture_plugin_type(self) -> type[DataPluginT]:
+        """A required testing hook that allows type generation"""
+
+        raise NotImplementedError("Subclasses should override this fixture")
 
     @pytest.fixture(name="cppython_plugin_data")
     def fixture_cppython_plugin_data(
@@ -126,7 +137,6 @@ class DataPluginTests(PluginTests[DataPluginT], Generic[PluginGroupDataT, DataPl
 
 
 class DataPluginIntegrationTests(
-    PluginIntegrationTests[DataPluginT],
     DataPluginTests[PluginGroupDataT, DataPluginT],
     Generic[PluginGroupDataT, DataPluginT],
 ):
@@ -134,11 +144,19 @@ class DataPluginIntegrationTests(
 
 
 class DataPluginUnitTests(
-    PluginUnitTests[DataPluginT],
     DataPluginTests[PluginGroupDataT, DataPluginT],
     Generic[PluginGroupDataT, DataPluginT],
 ):
     """Unit testing information for all data plugin test classes"""
+
+    def test_name(self, plugin_type: DataPluginT) -> None:
+        """Validates the name
+
+        Args:
+            plugin_type: The input plugin type
+        """
+
+        assert plugin_type.name() == canonicalize_name(plugin_type.name())
 
     def test_plugin_registration(self, plugin: DataPluginT) -> None:
         """Test the registration with setuptools entry_points
