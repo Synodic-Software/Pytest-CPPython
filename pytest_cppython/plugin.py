@@ -276,16 +276,6 @@ class ProviderIntegrationTests(
 
         assert plugin.tooling_downloaded(plugin.core_data.cppython_data.install_path)
 
-    def test_not_downloaded(self, plugin_type: type[ProviderT], tmp_path: Path) -> None:
-        """Verify the provider can identify an empty tool
-
-        Args:
-            plugin_type: An input provider type
-            tmp_path: A temporary path for the lifetime of the function
-        """
-
-        assert not plugin_type.tooling_downloaded(tmp_path)
-
     def test_install(self, plugin: ProviderT) -> None:
         """Ensure that the vanilla install command functions
 
