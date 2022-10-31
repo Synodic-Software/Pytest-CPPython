@@ -48,18 +48,6 @@ class MockProvider(Provider):
         return SyncData(data=None, name=self.name())
 
     @classmethod
-    def tooling_downloaded(cls, path: Path) -> bool:
-        """Returns whether the provider tooling needs to be downloaded
-
-        Args:
-            path: The directory to check for downloaded tooling
-
-        Returns:
-            Whether the tooling has been downloaded or not
-        """
-        return cls.downloaded == path
-
-    @classmethod
     async def download_tooling(cls, path: Path) -> None:
         cls.downloaded = path
 

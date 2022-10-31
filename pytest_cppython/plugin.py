@@ -267,15 +267,6 @@ class ProviderIntegrationTests(
 
         asyncio.run(plugin_type.download_tooling(path))
 
-    def test_is_downloaded(self, plugin: ProviderT) -> None:
-        """Verify the plugin is downloaded from fixture
-
-        Args:
-            plugin: A newly constructed provider
-        """
-
-        assert plugin.tooling_downloaded(plugin.core_data.cppython_data.install_path)
-
     def test_install(self, plugin: ProviderT) -> None:
         """Ensure that the vanilla install command functions
 
