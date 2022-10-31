@@ -25,22 +25,14 @@ class MockProvider(Provider):
         """
         return "mock"
 
-    def supports_generator(self, name: str) -> bool:
-        """Generator support
-
-        Args:
-            name: Input token
-
-        Returns:
-            The mock provider supports any generator
-        """
-        return True
-
-    def sync_data(self, name: str) -> SyncData:
+    def sync_data(self, generator_name: str) -> SyncData:
         """Gathers synchronization data
 
         Args:
-            name: The input generator name. An implicit token
+            generator_name: The input generator name. An implicit token
+
+        Raises:
+            NotSupportedError: If not supported
 
         Returns:
             The sync data object
