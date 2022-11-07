@@ -178,8 +178,8 @@ class CPPythonFixtures:
         """
 
         for fixture in metafunc.fixturenames:
-            match fixture:
-                case "internal_plugin_data_path":
+            match fixture.split("_", 1):
+                case ["internal", "plugin_data_path"]:
                     # There should only ever be one fixture named 'internal_plugin_data_path' for value caching
                     data_path = metafunc.config.rootpath / "tests" / "data"
 
@@ -193,10 +193,14 @@ class CPPythonFixtures:
                         test_paths = [None]
                     metafunc.parametrize(fixture, test_paths, scope="session")
 
-                case "internal_data_path":
+                case ["internal", "data_path"]:
                     # There should only ever be one fixture named 'internal_data_path' for value caching
                     data_path = Path(__file__).parent / "data"
                     metafunc.parametrize(fixture, list(data_path.glob("*")), scope="session")
+
+                case ["build", directory]:
+                    data_path = metafunc.config.rootpath / "tests" / "build" / directory
+                    metafunc.parametrize(fixture, [data_path], scope="session")
 
     @pytest.fixture(name="plugin_data_path", scope="session")
     def fixture_plugin_data_path(self, internal_plugin_data_path: list[Path | None]) -> list[Path | None]:

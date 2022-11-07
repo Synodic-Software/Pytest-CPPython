@@ -31,3 +31,14 @@ class TestFixtures(CPPythonFixtures):
         requirement = plugin_data_path / "requirement.txt"
 
         assert requirement.exists()
+
+    def test_build_directory(self, build_test_build: Path) -> None:
+        """Verifies that the build data provided is the expected path
+
+        Args:
+            build_test_build: The plugins build folder directory
+        """
+
+        requirement = build_test_build / "build.txt"
+
+        assert requirement.exists()
