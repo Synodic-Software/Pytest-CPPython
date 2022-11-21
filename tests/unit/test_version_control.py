@@ -31,9 +31,9 @@ class TestCPPythonVersionControl(VersionControlUnitTests[MockVersionControl]):
         """
         return MockVersionControl
 
-    def test_plugin_registration(self, plugin: MockVersionControl) -> None:
+    def test_plugin_registration(self, plugin_type: type[MockVersionControl]) -> None:
         """Override the base class 'ProviderIntegrationTests' preventing a registration check for the Mock
 
         Args:
-            plugin: Required to override base function
+            plugin_type: Required to override base function
         """

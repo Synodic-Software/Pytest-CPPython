@@ -8,15 +8,6 @@ from cppython_core.plugin_schema.vcs import VersionControl
 class MockVersionControl(VersionControl):
     """A mock generator class for behavior testing"""
 
-    @staticmethod
-    def name() -> str:
-        """The plugin name
-
-        Returns:
-            The name
-        """
-        return "mock"
-
     def extract_version(self, path: Path) -> str:
         """Extracts the system's version metadata
 

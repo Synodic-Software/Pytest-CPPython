@@ -18,3 +18,10 @@ class TestCPPythonInterface(InterfaceUnitTests[MockInterface]):
             An overridden interface type
         """
         return MockInterface
+
+    def test_plugin_registration(self, plugin_type: type[MockInterface]) -> None:
+        """Override the base class 'ProviderIntegrationTests' preventing a registration check for the Mock
+
+        Args:
+            plugin_type: Required to override base function
+        """

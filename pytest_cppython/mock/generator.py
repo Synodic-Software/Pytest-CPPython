@@ -1,39 +1,37 @@
 """Shared definitions for testing.
 """
 
-from pathlib import Path
 from typing import Any
 
 from cppython_core.plugin_schema.generator import Generator
 from cppython_core.schema import SyncData
 
 
-class MockGenerator(Generator):
+class MockSyncData(SyncData):
+    """A Mock data type"""
+
+
+class MockGenerator(Generator[MockSyncData]):
     """A mock generator class for behavior testing"""
-
-    @staticmethod
-    def name() -> str:
-        """The plugin name
-
-        Returns:
-            The name
-        """
-        return "mock"
 
     def activate(self, data: dict[str, Any]) -> None:
         pass
 
     @staticmethod
-    def is_supported(path: Path) -> bool:
-        """Queries generator support of the given path
+    def sync_data_type() -> type[MockSyncData]:
+        """_summary_
 
-        Args:
-            path: Input path
+        Raises:
+            NotImplementedError: _description_
 
         Returns:
-            True if supported
+            _description_
         """
-        return True
+        return MockSyncData
 
-    def sync(self, results: list[SyncData]) -> None:
-        pass
+    def sync(self, sync_data: list[MockSyncData]) -> None:
+        """Synchronizes generator files and state with the providers input
+
+        Args:
+            sync_data: List of information gathered from providers
+        """

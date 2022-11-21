@@ -30,3 +30,10 @@ class TestCPPythonGenerator(GeneratorIntegrationTests[MockGenerator]):
             An overridden generator type
         """
         return MockGenerator
+
+    def test_plugin_registration(self, plugin_type: type[MockGenerator]) -> None:
+        """Override the base class 'ProviderIntegrationTests' preventing a registration check for the Mock
+
+        Args:
+            plugin_type: Required to override base function
+        """

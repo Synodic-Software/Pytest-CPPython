@@ -3,7 +3,7 @@
 
 import asyncio
 from abc import ABC, abstractmethod
-from importlib.metadata import entry_points
+from importlib.metadata import EntryPoint, entry_points
 from pathlib import Path
 from typing import Any, Generic
 
@@ -27,7 +27,6 @@ from cppython_core.schema import (
     PluginT,
     ProjectData,
 )
-from packaging.utils import canonicalize_name
 
 from pytest_cppython.fixtures import CPPythonFixtures
 
@@ -44,6 +43,19 @@ class PluginTests(CPPythonFixtures, ABC, Generic[PluginT]):
 
         raise NotImplementedError("Subclasses should override this fixture")
 
+    @pytest.fixture(name="entry_point", scope="session")
+    def fixture_entry_point(self, plugin_type: type[PluginT]) -> EntryPoint:
+        """Extracts the public entry point information. Guaranteed to exist, because the existence is tested elsewhere
+
+        Args:
+            plugin_type: A plugin type
+
+        Return:
+            The entry point definition
+        """
+        plugin_entries = entry_points(group=f"cppython.{plugin_type.cppython_group()}")
+        return plugin_entries[0]
+
 
 class PluginIntegrationTests(PluginTests[PluginT]):
     """Integration testing information for all plugin test classes"""
@@ -52,14 +64,14 @@ class PluginIntegrationTests(PluginTests[PluginT]):
 class PluginUnitTests(PluginTests[PluginT]):
     """Unit testing information for all plugin test classes"""
 
-    def test_name(self, plugin_type: PluginT) -> None:
-        """Validates the name
+    def test_plugin_registration(self, plugin_type: type[PluginT]) -> None:
+        """Test the registration with setuptools entry_points
 
         Args:
-            plugin_type: The input plugin type
+            plugin_type: A plugin type
         """
-
-        assert plugin_type.name() == canonicalize_name(plugin_type.name())
+        plugin_entries = entry_points(group=f"cppython.{plugin_type.cppython_group()}")
+        assert len(plugin_entries) == 1
 
 
 class DataPluginTests(CPPythonFixtures, ABC, Generic[PluginGroupDataT, DataPluginT]):
@@ -75,20 +87,18 @@ class DataPluginTests(CPPythonFixtures, ABC, Generic[PluginGroupDataT, DataPlugi
         raise NotImplementedError("Subclasses should override this fixture")
 
     @pytest.fixture(name="cppython_plugin_data")
-    def fixture_cppython_plugin_data(
-        self, cppython_data: CPPythonData, plugin_type: type[DataPluginT]
-    ) -> CPPythonPluginData:
+    def fixture_cppython_plugin_data(self, cppython_data: CPPythonData, plugin: DataPluginT) -> CPPythonPluginData:
         """Fixture for created the plugin CPPython table
 
         Args:
             cppython_data: The CPPython table to help the resolve
-            plugin_type: The data plugin type to resolve
+            plugin: The data plugin
 
         Returns:
             The plugin specific CPPython table information
         """
 
-        return resolve_cppython_plugin(cppython_data, plugin_type)
+        return resolve_cppython_plugin(cppython_data, plugin)
 
     @pytest.fixture(
         name="core_plugin_data",
@@ -113,6 +123,7 @@ class DataPluginTests(CPPythonFixtures, ABC, Generic[PluginGroupDataT, DataPlugi
     @pytest.fixture(name="plugin")
     def fixture_plugin(
         plugin_type: type[DataPluginT],
+        entry_point: EntryPoint,
         plugin_group_data: PluginGroupDataT,
         core_plugin_data: CorePluginData,
         plugin_data: dict[str, Any],
@@ -129,7 +140,7 @@ class DataPluginTests(CPPythonFixtures, ABC, Generic[PluginGroupDataT, DataPlugi
             A newly constructed provider
         """
 
-        plugin = plugin_type(plugin_group_data, core_plugin_data)
+        plugin = plugin_type(entry_point, plugin_group_data, core_plugin_data)
 
         plugin.activate(plugin_data)
 
@@ -148,24 +159,6 @@ class DataPluginUnitTests(
     Generic[PluginGroupDataT, DataPluginT],
 ):
     """Unit testing information for all data plugin test classes"""
-
-    def test_name(self, plugin_type: DataPluginT) -> None:
-        """Validates the name
-
-        Args:
-            plugin_type: The input plugin type
-        """
-
-        assert plugin_type.name() == canonicalize_name(plugin_type.name())
-
-    def test_plugin_registration(self, plugin: DataPluginT) -> None:
-        """Test the registration with setuptools entry_points
-
-        Args:
-            plugin: A newly constructed provider
-        """
-        plugin_entries = entry_points(group=f"cppython.{plugin.group()}")
-        assert len(plugin_entries) > 0
 
     def test_empty_activation(self, plugin: DataPluginT) -> None:
         """Data plugins should be able to be defaulted. Sending in empty data is as close to enforcing that behavior
@@ -204,14 +197,20 @@ class InterfaceTests(PluginTests[InterfaceT]):
     """Shared functionality between the different Interface testing categories"""
 
     @pytest.fixture(name="plugin")
-    def fixture_plugin(self, plugin_type: type[InterfaceT]) -> InterfaceT:
+    def fixture_plugin(
+        self,
+        plugin_type: type[InterfaceT],
+        entry_point: EntryPoint,
+    ) -> InterfaceT:
         """Fixture creating the interface.
         Args:
             plugin_type: An input interface type
+            entry_point: Setuptools entry information
+
         Returns:
             A newly constructed interface
         """
-        return plugin_type()
+        return plugin_type(entry_point)
 
 
 class InterfaceIntegrationTests(PluginIntegrationTests[InterfaceT], InterfaceTests[InterfaceT], Generic[InterfaceT]):
@@ -262,7 +261,7 @@ class ProviderIntegrationTests(
     def _fixture_install_dependency(self, plugin_type: type[ProviderT], install_path: Path) -> None:
         """Forces the download to only happen once per test session"""
 
-        path = install_path / plugin_type.name()
+        path = install_path / plugin_type.name
         path.mkdir(parents=True, exist_ok=True)
 
         asyncio.run(plugin_type.download_tooling(path))
@@ -345,14 +344,20 @@ class VersionControlTests(
     """Shared functionality between the different VersionControl testing categories"""
 
     @pytest.fixture(name="plugin")
-    def fixture_plugin(self, plugin_type: type[VersionControlT]) -> VersionControlT:
+    def fixture_plugin(
+        self,
+        plugin_type: type[VersionControlT],
+        entry_point: EntryPoint,
+    ) -> VersionControlT:
         """Fixture creating the plugin.
         Args:
             plugin_type: An input plugin type
+            entry_point: Setuptools entry information
+
         Returns:
             A newly constructed plugin
         """
-        return plugin_type()
+        return plugin_type(entry_point)
 
 
 class VersionControlIntegrationTests(

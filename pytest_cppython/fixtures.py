@@ -24,8 +24,6 @@ from cppython_core.schema import (
     ToolData,
 )
 
-from pytest_cppython.mock.generator import MockGenerator
-from pytest_cppython.mock.provider import MockProvider
 from pytest_cppython.variants import (
     cppython_global_variants,
     cppython_local_variants,
@@ -300,6 +298,7 @@ class CPPythonFixtures:
             All the data as a dictionary
         """
         mocked_pyproject = project.dict(by_alias=True)
-        mocked_pyproject["tool"]["cppython"]["provider"][MockProvider.name()] = {}
-        mocked_pyproject["tool"]["cppython"]["generator"][MockGenerator.name()] = {}
+        mocked_pyproject["tool"]["cppython"]["generator-name"] = "mock"
+        mocked_pyproject["tool"]["cppython"]["provider"]["mock"] = {}
+        mocked_pyproject["tool"]["cppython"]["generator"]["mock"] = {}
         return mocked_pyproject
