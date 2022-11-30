@@ -1,6 +1,8 @@
 """Tests the integration test plugin
 """
 
+from importlib.metadata import EntryPoint
+
 import pytest
 
 from pytest_cppython.mock.interface import MockInterface
@@ -19,9 +21,19 @@ class TestCPPythonInterface(InterfaceIntegrationTests[MockInterface]):
         """
         return MockInterface
 
-    def test_plugin_registration(self, plugin_type: type[MockInterface]) -> None:
-        """Override the base class 'ProviderIntegrationTests' preventing a registration check for the Mock
+    @pytest.fixture(name="entry_point", scope="session")
+    def fixture_entry_point(self, plugin_type: type[MockInterface]) -> EntryPoint:
+        """Override the entry point for the mock object
 
         Args:
-            plugin_type: Required to override base function
+            plugin_type: A plugin type
+
+        Return:
+            The entry point definition
         """
+
+        return EntryPoint(
+            name="mock_vcs",
+            value="pytest_cppython.mock.interface:MockInterface",
+            group=f"cppython.{plugin_type.cppython_group()}",
+        )

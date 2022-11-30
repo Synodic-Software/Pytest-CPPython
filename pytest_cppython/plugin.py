@@ -53,8 +53,9 @@ class PluginTests(CPPythonFixtures, ABC, Generic[PluginT]):
         Return:
             The entry point definition
         """
-        plugin_entries = entry_points(group=f"cppython.{plugin_type.cppython_group()}")
-        return plugin_entries[0]
+        (plugin_entry,) = entry_points(group=f"cppython.{plugin_type.cppython_group()}")
+
+        return plugin_entry
 
 
 class PluginIntegrationTests(PluginTests[PluginT]):
@@ -63,15 +64,6 @@ class PluginIntegrationTests(PluginTests[PluginT]):
 
 class PluginUnitTests(PluginTests[PluginT]):
     """Unit testing information for all plugin test classes"""
-
-    def test_plugin_registration(self, plugin_type: type[PluginT]) -> None:
-        """Test the registration with setuptools entry_points
-
-        Args:
-            plugin_type: A plugin type
-        """
-        plugin_entries = entry_points(group=f"cppython.{plugin_type.cppython_group()}")
-        assert len(plugin_entries) == 1
 
 
 class DataPluginTests(CPPythonFixtures, ABC, Generic[PluginGroupDataT, DataPluginT]):
@@ -237,17 +229,18 @@ class ProviderTests(DataPluginTests[ProviderData, ProviderT], Generic[ProviderT]
         return ProviderData
 
     @pytest.fixture(name="plugin_group_data")
-    def fixture_plugin_group_data(self, project_data: ProjectData) -> ProviderData:
+    def fixture_plugin_group_data(self, project_data: ProjectData, cppython_data: CPPythonData) -> ProviderData:
         """Generates plugin configuration data generation from environment configuration
 
         Args:
             project_data: The workspace configuration
+            cppython_data: CPPython data
 
         Returns:
             The plugin configuration
         """
 
-        return resolve_provider(project_data)
+        return resolve_provider(project_data, cppython_data)
 
 
 class ProviderIntegrationTests(
@@ -258,13 +251,13 @@ class ProviderIntegrationTests(
     """Base class for all provider integration tests that test plugin agnostic behavior"""
 
     @pytest.fixture(autouse=True, scope="session")
-    def _fixture_install_dependency(self, plugin_type: type[ProviderT], install_path: Path) -> None:
+    def _fixture_install_dependency(self, plugin: ProviderT, install_path: Path) -> None:
         """Forces the download to only happen once per test session"""
 
-        path = install_path / plugin_type.name
+        path = install_path / plugin.name
         path.mkdir(parents=True, exist_ok=True)
 
-        asyncio.run(plugin_type.download_tooling(path))
+        asyncio.run(plugin.download_tooling(path))
 
     def test_install(self, plugin: ProviderT) -> None:
         """Ensure that the vanilla install command functions

@@ -1,6 +1,7 @@
 """Tests the integration test plugin
 """
 
+from importlib.metadata import EntryPoint
 from typing import Any
 
 import pytest
@@ -31,9 +32,19 @@ class TestCPPythonGenerator(GeneratorIntegrationTests[MockGenerator]):
         """
         return MockGenerator
 
-    def test_plugin_registration(self, plugin_type: type[MockGenerator]) -> None:
-        """Override the base class 'ProviderIntegrationTests' preventing a registration check for the Mock
+    @pytest.fixture(name="entry_point", scope="session")
+    def fixture_entry_point(self, plugin_type: type[MockGenerator]) -> EntryPoint:
+        """Override the entry point for the mock object
 
         Args:
-            plugin_type: Required to override base function
+            plugin_type: A plugin type
+
+        Return:
+            The entry point definition
         """
+
+        return EntryPoint(
+            name="mock_generator",
+            value="pytest_cppython.mock.generator:MockGenerator",
+            group=f"cppython.{plugin_type.cppython_group()}",
+        )
