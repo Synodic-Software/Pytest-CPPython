@@ -44,7 +44,7 @@ class TestCPPythonVersionControl(VersionControlIntegrationTests[MockVersionContr
         """
 
         return EntryPoint(
-            name="mock_vcs",
+            name="mock",
             value="pytest_cppython.mock.vcs:MockVersionControl",
             group=f"cppython.{plugin_type.cppython_group()}",
         )

@@ -107,6 +107,9 @@ class CPPythonFixtures:
         # Pin the install location to the base temporary directory
         data["install-path"] = install_path
 
+        # Fill the generator name with a fake name
+        data["generator-name"] = "mock"
+
         return CPPythonLocalConfiguration(**data)
 
     @pytest.fixture(
