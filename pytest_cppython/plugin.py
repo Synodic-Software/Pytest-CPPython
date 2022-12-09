@@ -124,6 +124,7 @@ class DataPluginTests(CPPythonFixtures, ABC, Generic[PluginGroupDataT, DataPlugi
 
         Args:
             plugin_type: Plugin type
+            entry_point: Info
             plugin_group_data: The data group configuration
             core_plugin_data: The core metadata
             plugin_data: The data table
