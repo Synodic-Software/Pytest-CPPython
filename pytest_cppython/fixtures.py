@@ -67,7 +67,10 @@ class CPPythonFixtures:
 
         return cast(PEP621Configuration, request.param)
 
-    @pytest.fixture(name="pep621_data")
+    @pytest.fixture(
+        name="pep621_data",
+        scope="session",
+    )
     def fixture_pep621_data(
         self, pep621_configuration: PEP621Configuration, project_configuration: ProjectConfiguration
     ) -> PEP621Data:

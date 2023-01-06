@@ -72,13 +72,19 @@ class DataPluginTests(CPPythonFixtures, ABC, Generic[PluginGroupDataT, DataPlugi
     """
 
     @abstractmethod
-    @pytest.fixture(name="plugin_type", scope="session")
+    @pytest.fixture(
+        name="plugin_type",
+        scope="session",
+    )
     def fixture_plugin_type(self) -> type[DataPluginT]:
         """A required testing hook that allows type generation"""
 
         raise NotImplementedError("Subclasses should override this fixture")
 
-    @pytest.fixture(name="cppython_plugin_data")
+    @pytest.fixture(
+        name="cppython_plugin_data",
+        scope="session",
+    )
     def fixture_cppython_plugin_data(
         self, cppython_data: CPPythonData, plugin_type: type[DataPluginT]
     ) -> CPPythonPluginData:
@@ -96,6 +102,7 @@ class DataPluginTests(CPPythonFixtures, ABC, Generic[PluginGroupDataT, DataPlugi
 
     @pytest.fixture(
         name="core_plugin_data",
+        scope="session",
     )
     def fixture_core_plugin_data(
         self, cppython_plugin_data: CPPythonPluginData, project_data: ProjectData, pep621_data: PEP621Data
@@ -234,7 +241,7 @@ class ProviderTests(DataPluginTests[ProviderGroupData, ProviderT], Generic[Provi
 
         return ProviderGroupData
 
-    @pytest.fixture(name="plugin_group_data")
+    @pytest.fixture(name="plugin_group_data", scope="session")
     def fixture_plugin_group_data(self, project_data: ProjectData, cppython_data: CPPythonData) -> ProviderGroupData:
         """Generates plugin configuration data generation from environment configuration
 
@@ -305,7 +312,7 @@ class GeneratorTests(DataPluginTests[GeneratorGroupData, GeneratorT], Generic[Ge
 
         return GeneratorGroupData
 
-    @pytest.fixture(name="plugin_group_data")
+    @pytest.fixture(name="plugin_group_data", scope="session")
     def fixture_plugin_group_data(self, project_data: ProjectData) -> GeneratorGroupData:
         """Generates plugin configuration data generation from environment configuration
 
