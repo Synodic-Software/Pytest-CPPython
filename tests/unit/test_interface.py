@@ -35,5 +35,5 @@ class TestCPPythonInterface(InterfaceUnitTests[MockInterface]):
         return EntryPoint(
             name="mock",
             value="pytest_cppython.mock.interface:MockInterface",
-            group=f"cppython.{plugin_type.cppython_group()}",
+            group=f"cppython.{plugin_type.group()}",
         )

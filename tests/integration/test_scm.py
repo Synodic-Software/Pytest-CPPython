@@ -6,11 +6,11 @@ from typing import Any
 
 import pytest
 
-from pytest_cppython.mock.vcs import MockVersionControl
-from pytest_cppython.plugin import VersionControlIntegrationTests
+from pytest_cppython.mock.scm import MockSCM
+from pytest_cppython.plugin import SCMIntegrationTests
 
 
-class TestCPPythonVersionControl(VersionControlIntegrationTests[MockVersionControl]):
+class TestCPPythonSCM(SCMIntegrationTests[MockSCM]):
     """The tests for the Mock version control"""
 
     @pytest.fixture(name="plugin_data", scope="session")
@@ -24,16 +24,16 @@ class TestCPPythonVersionControl(VersionControlIntegrationTests[MockVersionContr
         return {}
 
     @pytest.fixture(name="plugin_type", scope="session")
-    def fixture_plugin_type(self) -> type[MockVersionControl]:
+    def fixture_plugin_type(self) -> type[MockSCM]:
         """A required testing hook that allows type generation
 
         Returns:
             An overridden version control type
         """
-        return MockVersionControl
+        return MockSCM
 
     @pytest.fixture(name="entry_point", scope="session")
-    def fixture_entry_point(self, plugin_type: type[MockVersionControl]) -> EntryPoint:
+    def fixture_entry_point(self, plugin_type: type[MockSCM]) -> EntryPoint:
         """Override the entry point for the mock object
 
         Args:
@@ -45,6 +45,6 @@ class TestCPPythonVersionControl(VersionControlIntegrationTests[MockVersionContr
 
         return EntryPoint(
             name="mock",
-            value="pytest_cppython.mock.vcs:MockVersionControl",
-            group=f"cppython.{plugin_type.cppython_group()}",
+            value="pytest_cppython.mock.vcs:MockSCM",
+            group=f"cppython.{plugin_type.group()}",
         )

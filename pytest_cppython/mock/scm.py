@@ -2,10 +2,10 @@
 
 from pathlib import Path
 
-from cppython_core.plugin_schema.vcs import VersionControl
+from cppython_core.plugin_schema.scm import SCM
 
 
-class MockVersionControl(VersionControl):
+class MockSCM(SCM):
     """A mock generator class for behavior testing"""
 
     def extract_version(self, path: Path) -> str:

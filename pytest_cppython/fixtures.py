@@ -132,6 +132,7 @@ class CPPythonFixtures:
 
     @pytest.fixture(
         name="cppython_data",
+        scope="session",
     )
     def fixture_cppython_data(
         self,
@@ -229,7 +230,11 @@ class CPPythonFixtures:
 
         return internal_data_path
 
-    @pytest.fixture(name="project_configuration", params=project_variants)
+    @pytest.fixture(
+        name="project_configuration",
+        scope="session",
+        params=project_variants,
+    )
     def fixture_project_configuration(
         self,
         request: pytest.FixtureRequest,
@@ -266,7 +271,10 @@ class CPPythonFixtures:
 
         return configuration
 
-    @pytest.fixture(name="project_data")
+    @pytest.fixture(
+        name="project_data",
+        scope="session",
+    )
     def fixture_project_data(self, project_configuration: ProjectConfiguration) -> ProjectData:
         """Fixture that creates a project space at 'workspace/test_project/pyproject.toml'
         Args:

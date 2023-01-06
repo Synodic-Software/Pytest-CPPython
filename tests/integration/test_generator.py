@@ -46,5 +46,5 @@ class TestCPPythonGenerator(GeneratorIntegrationTests[MockGenerator]):
         return EntryPoint(
             name="mock",
             value="pytest_cppython.mock.generator:MockGenerator",
-            group=f"cppython.{plugin_type.cppython_group()}",
+            group=f"cppython.{plugin_type.group()}",
         )
