@@ -331,7 +331,7 @@ class GeneratorIntegrationTests(
     GeneratorTests[GeneratorT],
     Generic[GeneratorT],
 ):
-    """Base class for all vcs integration tests that test plugin agnostic behavior"""
+    """Base class for all scm integration tests that test plugin agnostic behavior"""
 
 
 class GeneratorUnitTests(
@@ -387,7 +387,7 @@ class SCMUnitTests(
         """Tests that the temporary directory path will not be registered as a repository
 
         Args:
-            plugin: The VCS constructed type
+            plugin: The SCM constructed type
             tmp_path: Temporary directory
         """
 

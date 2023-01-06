@@ -44,7 +44,7 @@ class TestCPPythonSCM(SCMIntegrationTests[MockSCM]):
         """
 
         return EntryPoint(
-            name="mock",
-            value="pytest_cppython.mock.vcs:MockSCM",
+            name=f"{plugin_type.name()}",
+            value="pytest_cppython.mock.scm:MockSCM",
             group=f"cppython.{plugin_type.group()}",
         )

@@ -1,4 +1,4 @@
-"""Mock VCS definitions"""
+"""Mock SCM definitions"""
 
 from pathlib import Path
 

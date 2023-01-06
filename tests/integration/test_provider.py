@@ -44,7 +44,7 @@ class TestMockProvider(ProviderIntegrationTests[MockProvider]):
         """
 
         return EntryPoint(
-            name="mock",
+            name=f"{plugin_type.name()}",
             value="pytest_cppython.mock.provider:MockProvider",
             group=f"cppython.{plugin_type.group()}",
         )
