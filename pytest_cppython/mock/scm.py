@@ -4,8 +4,10 @@ from pathlib import Path
 
 from cppython_core.plugin_schema.scm import SCM
 
+from pytest_cppython.mock.base import MockBase
 
-class MockSCM(SCM):
+
+class MockSCM(SCM, MockBase):
     """A mock generator class for behavior testing"""
 
     def extract_version(self, path: Path) -> str:

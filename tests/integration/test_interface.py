@@ -32,8 +32,4 @@ class TestCPPythonInterface(InterfaceIntegrationTests[MockInterface]):
             The entry point definition
         """
 
-        return EntryPoint(
-            name=f"{plugin_type.name()}",
-            value="pytest_cppython.mock.interface:MockInterface",
-            group=f"cppython.{plugin_type.group()}",
-        )
+        return plugin_type.generate_entry_point()

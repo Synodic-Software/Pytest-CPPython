@@ -6,12 +6,14 @@ from typing import Any
 from cppython_core.plugin_schema.generator import Generator
 from cppython_core.schema import SyncData
 
+from pytest_cppython.mock.base import MockBase
+
 
 class MockSyncData(SyncData):
     """A Mock data type"""
 
 
-class MockGenerator(Generator[MockSyncData]):
+class MockGenerator(Generator[MockSyncData], MockBase):
     """A mock generator class for behavior testing"""
 
     def activate(self, data: dict[str, Any]) -> None:

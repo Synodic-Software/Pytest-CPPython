@@ -43,8 +43,4 @@ class TestCPPythonGenerator(GeneratorUnitTests[MockGenerator]):
             The entry point definition
         """
 
-        return EntryPoint(
-            name=f"{plugin_type.name()}",
-            value="pytest_cppython.mock.generator:MockGenerator",
-            group=f"cppython.{plugin_type.group()}",
-        )
+        return plugin_type.generate_entry_point()
