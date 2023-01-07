@@ -1,6 +1,8 @@
 """Tests the integration test plugin
 """
 
+from importlib.metadata import EntryPoint
+
 import pytest
 
 from pytest_cppython.mock.interface import MockInterface
@@ -18,3 +20,16 @@ class TestCPPythonInterface(InterfaceIntegrationTests[MockInterface]):
             An overridden interface type
         """
         return MockInterface
+
+    @pytest.fixture(name="entry_point", scope="session")
+    def fixture_entry_point(self, plugin_type: type[MockInterface]) -> EntryPoint:
+        """Override the entry point for the mock object
+
+        Args:
+            plugin_type: A plugin type
+
+        Return:
+            The entry point definition
+        """
+
+        return plugin_type.generate_entry_point()

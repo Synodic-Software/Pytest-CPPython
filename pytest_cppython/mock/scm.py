@@ -1,21 +1,14 @@
-"""Mock VCS definitions"""
+"""Mock SCM definitions"""
 
 from pathlib import Path
 
-from cppython_core.plugin_schema.vcs import VersionControl
+from cppython_core.plugin_schema.scm import SCM
+
+from pytest_cppython.mock.base import MockBase
 
 
-class MockVersionControl(VersionControl):
+class MockSCM(SCM, MockBase):
     """A mock generator class for behavior testing"""
-
-    @staticmethod
-    def name() -> str:
-        """The plugin name
-
-        Returns:
-            The name
-        """
-        return "mock"
 
     def extract_version(self, path: Path) -> str:
         """Extracts the system's version metadata

@@ -1,4 +1,4 @@
-"""Test the integrations related to the internal provider implementation and the 'Provider' interface itself
+"""Tests the unit test plugin
 """
 
 from importlib.metadata import EntryPoint
@@ -6,12 +6,12 @@ from typing import Any
 
 import pytest
 
-from pytest_cppython.mock.provider import MockProvider
-from pytest_cppython.plugin import ProviderIntegrationTests
+from pytest_cppython.mock.scm import MockSCM
+from pytest_cppython.plugin import SCMUnitTests
 
 
-class TestMockProvider(ProviderIntegrationTests[MockProvider]):
-    """The tests for our Mock provider"""
+class TestCPPythonSCM(SCMUnitTests[MockSCM]):
+    """The tests for the Mock version control"""
 
     @pytest.fixture(name="plugin_data", scope="session")
     def fixture_plugin_data(self) -> dict[str, Any]:
@@ -24,16 +24,16 @@ class TestMockProvider(ProviderIntegrationTests[MockProvider]):
         return {}
 
     @pytest.fixture(name="plugin_type", scope="session")
-    def fixture_plugin_type(self) -> type[MockProvider]:
+    def fixture_plugin_type(self) -> type[MockSCM]:
         """A required testing hook that allows type generation
 
         Returns:
-            The overridden provider type
+            An overridden version control type
         """
-        return MockProvider
+        return MockSCM
 
     @pytest.fixture(name="entry_point", scope="session")
-    def fixture_entry_point(self, plugin_type: type[MockProvider]) -> EntryPoint:
+    def fixture_entry_point(self, plugin_type: type[MockSCM]) -> EntryPoint:
         """Override the entry point for the mock object
 
         Args:
