@@ -1,6 +1,7 @@
 """Shared definitions for testing.
 """
 
+from pathlib import Path
 from typing import Any
 
 from cppython_core.plugin_schema.generator import Generator
@@ -20,14 +21,23 @@ class MockGenerator(Generator[MockSyncData], MockBase):
         pass
 
     @staticmethod
-    def sync_data_type() -> type[MockSyncData]:
-        """_summary_
+    def supported(directory: Path) -> bool:
+        """Mocks support
 
-        Raises:
-            NotImplementedError: _description_
+        Args:
+            directory: The input directory
 
         Returns:
-            _description_
+            True, always.
+        """
+        return True
+
+    @staticmethod
+    def sync_data_type() -> type[MockSyncData]:
+        """Mock Data Type for Syncing
+
+        Returns:
+            The MockSyncData type
         """
         return MockSyncData
 

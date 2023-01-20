@@ -5,7 +5,7 @@ from cppython_core.schema import Plugin
 
 
 class MockBase(Plugin):
-    """_summary_"""
+    """Base mixin for Mocking utilities"""
 
     @classmethod
     def generate_entry_point(cls) -> EntryPoint:
