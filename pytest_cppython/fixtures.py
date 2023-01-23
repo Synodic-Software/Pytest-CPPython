@@ -110,7 +110,8 @@ class CPPythonFixtures:
         # Pin the install location to the base temporary directory
         data["install-path"] = install_path
 
-        # Fill the generator name with a fake name
+        # Fill the plugin names with mocked values
+        data["provider-name"] = "mock"
         data["generator-name"] = "mock"
 
         return CPPythonLocalConfiguration(**data)
@@ -312,6 +313,7 @@ class CPPythonFixtures:
             All the data as a dictionary
         """
         mocked_pyproject = project.dict(by_alias=True)
+        mocked_pyproject["tool"]["cppython"]["provider-name"] = "mock"
         mocked_pyproject["tool"]["cppython"]["generator-name"] = "mock"
         mocked_pyproject["tool"]["cppython"]["provider"]["mock"] = {}
         mocked_pyproject["tool"]["cppython"]["generator"]["mock"] = {}
