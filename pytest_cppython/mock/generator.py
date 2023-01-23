@@ -14,7 +14,7 @@ class MockSyncData(SyncData):
     """A Mock data type"""
 
 
-class MockGenerator(Generator[MockSyncData], MockBase):
+class MockGenerator(Generator, MockBase):
     """A mock generator class for behavior testing"""
 
     def activate(self, data: dict[str, Any]) -> None:
@@ -32,16 +32,7 @@ class MockGenerator(Generator[MockSyncData], MockBase):
         """
         return True
 
-    @staticmethod
-    def sync_data_type() -> type[MockSyncData]:
-        """Mock Data Type for Syncing
-
-        Returns:
-            The MockSyncData type
-        """
-        return MockSyncData
-
-    def sync(self, sync_data: list[MockSyncData]) -> None:
+    def sync(self, sync_data: SyncData) -> None:
         """Synchronizes generator files and state with the providers input
 
         Args:
