@@ -9,7 +9,6 @@ from typing import Any, Generic
 
 import pytest
 from cppython_core.plugin_schema.generator import GeneratorGroupData, GeneratorT
-from cppython_core.plugin_schema.interface import InterfaceT
 from cppython_core.plugin_schema.provider import ProviderGroupData, ProviderT
 from cppython_core.plugin_schema.scm import SCMT
 from cppython_core.resolution import (
@@ -22,8 +21,9 @@ from cppython_core.schema import (
     CPPythonData,
     CPPythonPluginData,
     DataPluginT,
+    InterfaceT,
     PEP621Data,
-    PluginGroupDataT,
+    PluginGroupDataT_contra,
     PluginT,
     ProjectData,
 )
@@ -66,7 +66,7 @@ class PluginUnitTests(PluginTests[PluginT]):
     """Unit testing information for all plugin test classes"""
 
 
-class DataPluginTests(CPPythonFixtures, ABC, Generic[PluginGroupDataT, DataPluginT]):
+class DataPluginTests(CPPythonFixtures, ABC, Generic[PluginGroupDataT_contra, DataPluginT]):
     """Shared testing information for all data plugin test classes.
     Not inheriting PluginTests to reduce ancestor count
     """
@@ -128,7 +128,7 @@ class DataPluginTests(CPPythonFixtures, ABC, Generic[PluginGroupDataT, DataPlugi
     def fixture_plugin(
         plugin_type: type[DataPluginT],
         entry_point: EntryPoint,
-        plugin_group_data: PluginGroupDataT,
+        plugin_group_data: PluginGroupDataT_contra,
         core_plugin_data: CorePluginData,
         plugin_data: dict[str, Any],
     ) -> DataPluginT:
@@ -153,15 +153,15 @@ class DataPluginTests(CPPythonFixtures, ABC, Generic[PluginGroupDataT, DataPlugi
 
 
 class DataPluginIntegrationTests(
-    DataPluginTests[PluginGroupDataT, DataPluginT],
-    Generic[PluginGroupDataT, DataPluginT],
+    DataPluginTests[PluginGroupDataT_contra, DataPluginT],
+    Generic[PluginGroupDataT_contra, DataPluginT],
 ):
     """Integration testing information for all data plugin test classes"""
 
 
 class DataPluginUnitTests(
-    DataPluginTests[PluginGroupDataT, DataPluginT],
-    Generic[PluginGroupDataT, DataPluginT],
+    DataPluginTests[PluginGroupDataT_contra, DataPluginT],
+    Generic[PluginGroupDataT_contra, DataPluginT],
 ):
     """Unit testing information for all data plugin test classes"""
 
