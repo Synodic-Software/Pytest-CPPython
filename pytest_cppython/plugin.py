@@ -14,6 +14,7 @@ from cppython_core.plugin_schema.scm import SCMT
 from cppython_core.resolution import (
     resolve_cppython_plugin,
     resolve_generator,
+    resolve_group,
     resolve_provider,
 )
 from cppython_core.schema import (
@@ -53,7 +54,7 @@ class PluginTests(CPPythonFixtures, ABC, Generic[PluginT]):
         Return:
             The entry point definition
         """
-        (plugin_entry,) = entry_points(group=f"cppython.{plugin_type.group()}")
+        (plugin_entry,) = entry_points(group=f"cppython.{resolve_group(plugin_type)}")
 
         return plugin_entry
 
@@ -127,7 +128,6 @@ class DataPluginTests(CPPythonFixtures, ABC, Generic[PluginGroupDataT_contra, Da
     )
     def fixture_plugin(
         plugin_type: type[DataPluginT],
-        entry_point: EntryPoint,
         plugin_group_data: PluginGroupDataT_contra,
         core_plugin_data: CorePluginData,
         plugin_data: dict[str, Any],
@@ -136,7 +136,6 @@ class DataPluginTests(CPPythonFixtures, ABC, Generic[PluginGroupDataT_contra, Da
 
         Args:
             plugin_type: Plugin type
-            entry_point: Info
             plugin_group_data: The data group configuration
             core_plugin_data: The core metadata
             plugin_data: The data table
@@ -145,8 +144,8 @@ class DataPluginTests(CPPythonFixtures, ABC, Generic[PluginGroupDataT_contra, Da
             A newly constructed provider
         """
 
-        plugin = plugin_type(entry_point, plugin_group_data, core_plugin_data)
-
+        plugin = plugin_type()
+        plugin.configure(plugin_group_data, core_plugin_data)
         plugin.activate(plugin_data)
 
         return plugin
@@ -205,17 +204,15 @@ class InterfaceTests(PluginTests[InterfaceT]):
     def fixture_plugin(
         self,
         plugin_type: type[InterfaceT],
-        entry_point: EntryPoint,
     ) -> InterfaceT:
         """Fixture creating the interface.
         Args:
             plugin_type: An input interface type
-            entry_point: Setuptools entry information
 
         Returns:
             A newly constructed interface
         """
-        return plugin_type(entry_point)
+        return plugin_type()
 
 
 class InterfaceIntegrationTests(PluginIntegrationTests[InterfaceT], InterfaceTests[InterfaceT], Generic[InterfaceT]):
