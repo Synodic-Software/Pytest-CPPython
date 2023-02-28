@@ -5,19 +5,17 @@ from pathlib import Path
 from typing import Any
 
 from cppython_core.plugin_schema.generator import Generator
-from cppython_core.schema import SyncData
-
-from pytest_cppython.mock.base import MockBase
+from cppython_core.schema import Information, SyncData
 
 
 class MockSyncData(SyncData):
     """A Mock data type"""
 
 
-class MockGenerator(Generator, MockBase):
+class MockGenerator(Generator):
     """A mock generator class for behavior testing"""
 
-    def activate(self, data: dict[str, Any]) -> None:
+    def activate(self, configuration_data: dict[str, Any]) -> None:
         pass
 
     @staticmethod
@@ -31,6 +29,15 @@ class MockGenerator(Generator, MockBase):
             True, always.
         """
         return True
+
+    @staticmethod
+    def information() -> Information:
+        """Returns plugin information
+
+        Returns:
+            The plugin information
+        """
+        return Information()
 
     def sync(self, sync_data: SyncData) -> None:
         """Synchronizes generator files and state with the providers input

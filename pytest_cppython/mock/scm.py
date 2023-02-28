@@ -3,14 +3,34 @@
 from pathlib import Path
 
 from cppython_core.plugin_schema.scm import SCM
+from cppython_core.schema import Information
 
-from pytest_cppython.mock.base import MockBase
 
-
-class MockSCM(SCM, MockBase):
+class MockSCM(SCM):
     """A mock generator class for behavior testing"""
 
-    def extract_version(self, path: Path) -> str:
+    @staticmethod
+    def supported(directory: Path) -> bool:
+        """_summary_
+
+        Args:
+            directory: _description_
+
+        Returns:
+            _description_
+        """
+        return True
+
+    @staticmethod
+    def information() -> Information:
+        """Returns plugin information
+
+        Returns:
+            The plugin information
+        """
+        return Information()
+
+    def version(self, path: Path) -> str:
         """Extracts the system's version metadata
 
         Args:
@@ -20,14 +40,3 @@ class MockSCM(SCM, MockBase):
             A version
         """
         return "1.0.0"
-
-    def is_repository(self, path: Path) -> bool:
-        """Queries repository status of a path
-
-        Args:
-            path: The input path to query
-
-        Returns:
-            Whether the given path is a repository root
-        """
-        return False
