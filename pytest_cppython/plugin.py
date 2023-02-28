@@ -3,7 +3,6 @@
 
 import asyncio
 from abc import ABC, abstractmethod
-from importlib.metadata import EntryPoint, entry_points
 from pathlib import Path
 from typing import Any, Generic
 
@@ -14,7 +13,6 @@ from cppython_core.plugin_schema.scm import SCMT
 from cppython_core.resolution import (
     resolve_cppython_plugin,
     resolve_generator,
-    resolve_group,
     resolve_name,
     resolve_provider,
 )
@@ -43,20 +41,6 @@ class PluginTests(CPPythonFixtures, ABC, Generic[PluginT]):
         """A required testing hook that allows type generation"""
 
         raise NotImplementedError("Subclasses should override this fixture")
-
-    @pytest.fixture(name="entry_point", scope="session")
-    def fixture_entry_point(self, plugin_type: type[PluginT]) -> EntryPoint:
-        """Extracts the public entry point information. Guaranteed to exist, because the existence is tested elsewhere
-
-        Args:
-            plugin_type: A plugin type
-
-        Return:
-            The entry point definition
-        """
-        (plugin_entry,) = entry_points(group=f"cppython.{resolve_group(plugin_type)}")
-
-        return plugin_entry
 
 
 class PluginIntegrationTests(PluginTests[PluginT]):

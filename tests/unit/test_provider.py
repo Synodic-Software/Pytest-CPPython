@@ -1,7 +1,6 @@
 """Test the functions related to the internal provider implementation and the 'Provider' interface itself
 """
 
-from importlib.metadata import EntryPoint
 from typing import Any
 
 import pytest
@@ -31,16 +30,3 @@ class TestMockProvider(ProviderUnitTests[MockProvider]):
             An overridden provider type
         """
         return MockProvider
-
-    @pytest.fixture(name="entry_point", scope="session")
-    def fixture_entry_point(self, plugin_type: type[MockProvider]) -> EntryPoint:
-        """Override the entry point for the mock object
-
-        Args:
-            plugin_type: A plugin type
-
-        Return:
-            The entry point definition
-        """
-
-        return plugin_type.generate_entry_point()

@@ -1,7 +1,6 @@
 """Tests the integration test plugin
 """
 
-from importlib.metadata import EntryPoint
 from typing import Any
 
 import pytest
@@ -31,16 +30,3 @@ class TestCPPythonGenerator(GeneratorIntegrationTests[MockGenerator]):
             An overridden generator type
         """
         return MockGenerator
-
-    @pytest.fixture(name="entry_point", scope="session")
-    def fixture_entry_point(self, plugin_type: type[MockGenerator]) -> EntryPoint:
-        """Override the entry point for the mock object
-
-        Args:
-            plugin_type: A plugin type
-
-        Return:
-            The entry point definition
-        """
-
-        return plugin_type.generate_entry_point()
