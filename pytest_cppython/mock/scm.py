@@ -19,7 +19,7 @@ class MockSCM(SCM):
         Returns:
             _description_
         """
-        return True
+        return False
 
     @staticmethod
     def information() -> Information:
