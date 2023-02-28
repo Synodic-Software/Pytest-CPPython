@@ -15,6 +15,7 @@ from cppython_core.resolution import (
     resolve_cppython_plugin,
     resolve_generator,
     resolve_group,
+    resolve_name,
     resolve_provider,
 )
 from cppython_core.schema import (
@@ -22,7 +23,6 @@ from cppython_core.schema import (
     CPPythonData,
     CPPythonPluginData,
     DataPluginT,
-    InterfaceT,
     PEP621Data,
     PluginGroupDataT_contra,
     PluginT,
@@ -197,34 +197,6 @@ class DataPluginUnitTests(
             assert not paths
 
 
-class InterfaceTests(PluginTests[InterfaceT]):
-    """Shared functionality between the different Interface testing categories"""
-
-    @pytest.fixture(name="plugin")
-    def fixture_plugin(
-        self,
-        plugin_type: type[InterfaceT],
-    ) -> InterfaceT:
-        """Fixture creating the interface.
-        Args:
-            plugin_type: An input interface type
-
-        Returns:
-            A newly constructed interface
-        """
-        return plugin_type()
-
-
-class InterfaceIntegrationTests(PluginIntegrationTests[InterfaceT], InterfaceTests[InterfaceT], Generic[InterfaceT]):
-    """Base class for all interface integration tests that test plugin agnostic behavior"""
-
-
-class InterfaceUnitTests(PluginUnitTests[InterfaceT], InterfaceTests[InterfaceT], Generic[InterfaceT]):
-    """Custom implementations of the Interface class should inherit from this class for its tests.
-    Base class for all interface unit tests that test plugin agnostic behavior
-    """
-
-
 class ProviderTests(DataPluginTests[ProviderGroupData, ProviderT], Generic[ProviderT]):
     """Shared functionality between the different Provider testing categories"""
 
@@ -264,7 +236,7 @@ class ProviderIntegrationTests(
     def _fixture_install_dependency(self, plugin: ProviderT, install_path: Path) -> None:
         """Forces the download to only happen once per test session"""
 
-        path = install_path / plugin.name()
+        path = install_path / resolve_name(type(plugin))
         path.mkdir(parents=True, exist_ok=True)
 
         asyncio.run(plugin.download_tooling(path))
@@ -350,17 +322,15 @@ class SCMTests(
     def fixture_plugin(
         self,
         plugin_type: type[SCMT],
-        entry_point: EntryPoint,
     ) -> SCMT:
         """Fixture creating the plugin.
         Args:
             plugin_type: An input plugin type
-            entry_point: Setuptools entry information
 
         Returns:
             A newly constructed plugin
         """
-        return plugin_type(entry_point)
+        return plugin_type()
 
 
 class SCMIntegrationTests(
@@ -388,4 +358,4 @@ class SCMUnitTests(
             tmp_path: Temporary directory
         """
 
-        assert not plugin.is_repository(tmp_path)
+        assert not plugin.supported(tmp_path)
