@@ -1,12 +1,13 @@
 """Mock interface definitions"""
 
-from cppython_core.plugin_schema.interface import Interface
-
-from pytest_cppython.mock.base import MockBase
+from cppython_core.schema import Interface
 
 
-class MockInterface(Interface, MockBase):
+class MockInterface(Interface):
     """A mock interface class for behavior testing"""
 
     def write_pyproject(self) -> None:
+        """Implementation of Interface function"""
+
+    def write_configuration(self) -> None:
         """Implementation of Interface function"""

@@ -3,18 +3,17 @@
 
 import asyncio
 from abc import ABC, abstractmethod
-from importlib.metadata import EntryPoint, entry_points
 from pathlib import Path
 from typing import Any, Generic
 
 import pytest
 from cppython_core.plugin_schema.generator import GeneratorGroupData, GeneratorT
-from cppython_core.plugin_schema.interface import InterfaceT
 from cppython_core.plugin_schema.provider import ProviderGroupData, ProviderT
 from cppython_core.plugin_schema.scm import SCMT
 from cppython_core.resolution import (
     resolve_cppython_plugin,
     resolve_generator,
+    resolve_name,
     resolve_provider,
 )
 from cppython_core.schema import (
@@ -23,7 +22,7 @@ from cppython_core.schema import (
     CPPythonPluginData,
     DataPluginT,
     PEP621Data,
-    PluginGroupDataT,
+    PluginGroupDataT_contra,
     PluginT,
     ProjectData,
 )
@@ -43,20 +42,6 @@ class PluginTests(CPPythonFixtures, ABC, Generic[PluginT]):
 
         raise NotImplementedError("Subclasses should override this fixture")
 
-    @pytest.fixture(name="entry_point", scope="session")
-    def fixture_entry_point(self, plugin_type: type[PluginT]) -> EntryPoint:
-        """Extracts the public entry point information. Guaranteed to exist, because the existence is tested elsewhere
-
-        Args:
-            plugin_type: A plugin type
-
-        Return:
-            The entry point definition
-        """
-        (plugin_entry,) = entry_points(group=f"cppython.{plugin_type.group()}")
-
-        return plugin_entry
-
 
 class PluginIntegrationTests(PluginTests[PluginT]):
     """Integration testing information for all plugin test classes"""
@@ -66,7 +51,7 @@ class PluginUnitTests(PluginTests[PluginT]):
     """Unit testing information for all plugin test classes"""
 
 
-class DataPluginTests(CPPythonFixtures, ABC, Generic[PluginGroupDataT, DataPluginT]):
+class DataPluginTests(CPPythonFixtures, ABC, Generic[PluginGroupDataT_contra, DataPluginT]):
     """Shared testing information for all data plugin test classes.
     Not inheriting PluginTests to reduce ancestor count
     """
@@ -127,8 +112,7 @@ class DataPluginTests(CPPythonFixtures, ABC, Generic[PluginGroupDataT, DataPlugi
     )
     def fixture_plugin(
         plugin_type: type[DataPluginT],
-        entry_point: EntryPoint,
-        plugin_group_data: PluginGroupDataT,
+        plugin_group_data: PluginGroupDataT_contra,
         core_plugin_data: CorePluginData,
         plugin_data: dict[str, Any],
     ) -> DataPluginT:
@@ -136,7 +120,6 @@ class DataPluginTests(CPPythonFixtures, ABC, Generic[PluginGroupDataT, DataPlugi
 
         Args:
             plugin_type: Plugin type
-            entry_point: Info
             plugin_group_data: The data group configuration
             core_plugin_data: The core metadata
             plugin_data: The data table
@@ -145,23 +128,23 @@ class DataPluginTests(CPPythonFixtures, ABC, Generic[PluginGroupDataT, DataPlugi
             A newly constructed provider
         """
 
-        plugin = plugin_type(entry_point, plugin_group_data, core_plugin_data)
-
+        plugin = plugin_type()
+        plugin.configure(plugin_group_data, core_plugin_data)
         plugin.activate(plugin_data)
 
         return plugin
 
 
 class DataPluginIntegrationTests(
-    DataPluginTests[PluginGroupDataT, DataPluginT],
-    Generic[PluginGroupDataT, DataPluginT],
+    DataPluginTests[PluginGroupDataT_contra, DataPluginT],
+    Generic[PluginGroupDataT_contra, DataPluginT],
 ):
     """Integration testing information for all data plugin test classes"""
 
 
 class DataPluginUnitTests(
-    DataPluginTests[PluginGroupDataT, DataPluginT],
-    Generic[PluginGroupDataT, DataPluginT],
+    DataPluginTests[PluginGroupDataT_contra, DataPluginT],
+    Generic[PluginGroupDataT_contra, DataPluginT],
 ):
     """Unit testing information for all data plugin test classes"""
 
@@ -196,36 +179,6 @@ class DataPluginUnitTests(
             paths = list(plugin_data_path.rglob("pyproject.toml"))
 
             assert not paths
-
-
-class InterfaceTests(PluginTests[InterfaceT]):
-    """Shared functionality between the different Interface testing categories"""
-
-    @pytest.fixture(name="plugin")
-    def fixture_plugin(
-        self,
-        plugin_type: type[InterfaceT],
-        entry_point: EntryPoint,
-    ) -> InterfaceT:
-        """Fixture creating the interface.
-        Args:
-            plugin_type: An input interface type
-            entry_point: Setuptools entry information
-
-        Returns:
-            A newly constructed interface
-        """
-        return plugin_type(entry_point)
-
-
-class InterfaceIntegrationTests(PluginIntegrationTests[InterfaceT], InterfaceTests[InterfaceT], Generic[InterfaceT]):
-    """Base class for all interface integration tests that test plugin agnostic behavior"""
-
-
-class InterfaceUnitTests(PluginUnitTests[InterfaceT], InterfaceTests[InterfaceT], Generic[InterfaceT]):
-    """Custom implementations of the Interface class should inherit from this class for its tests.
-    Base class for all interface unit tests that test plugin agnostic behavior
-    """
 
 
 class ProviderTests(DataPluginTests[ProviderGroupData, ProviderT], Generic[ProviderT]):
@@ -267,7 +220,7 @@ class ProviderIntegrationTests(
     def _fixture_install_dependency(self, plugin: ProviderT, install_path: Path) -> None:
         """Forces the download to only happen once per test session"""
 
-        path = install_path / plugin.name()
+        path = install_path / resolve_name(type(plugin))
         path.mkdir(parents=True, exist_ok=True)
 
         asyncio.run(plugin.download_tooling(path))
@@ -353,17 +306,15 @@ class SCMTests(
     def fixture_plugin(
         self,
         plugin_type: type[SCMT],
-        entry_point: EntryPoint,
     ) -> SCMT:
         """Fixture creating the plugin.
         Args:
             plugin_type: An input plugin type
-            entry_point: Setuptools entry information
 
         Returns:
             A newly constructed plugin
         """
-        return plugin_type(entry_point)
+        return plugin_type()
 
 
 class SCMIntegrationTests(
@@ -391,4 +342,4 @@ class SCMUnitTests(
             tmp_path: Temporary directory
         """
 
-        assert not plugin.is_repository(tmp_path)
+        assert not plugin.supported(tmp_path)

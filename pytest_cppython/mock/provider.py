@@ -5,13 +5,13 @@ from pathlib import Path
 from typing import Any
 
 from cppython_core.plugin_schema.provider import Provider
-from cppython_core.schema import PluginName, SyncData
+from cppython_core.resolution import resolve_name
+from cppython_core.schema import Information, PluginName, SyncData
 
-from pytest_cppython.mock.base import MockBase
 from pytest_cppython.mock.generator import MockSyncData
 
 
-class MockProvider(Provider, MockBase):
+class MockProvider(Provider):
     """A mock provider class for behavior testing"""
 
     downloaded: Path | None = None
@@ -28,7 +28,16 @@ class MockProvider(Provider, MockBase):
         """
         return True
 
-    def activate(self, data: dict[str, Any]) -> None:
+    @staticmethod
+    def information() -> Information:
+        """Returns plugin information
+
+        Returns:
+            The plugin information
+        """
+        return Information()
+
+    def activate(self, configuration_data: dict[str, Any]) -> None:
         pass
 
     def sync_data(self, generator_name: PluginName) -> SyncData | None:
@@ -47,7 +56,7 @@ class MockProvider(Provider, MockBase):
         # This is a mock class, so any generator sync type is OK
         match generator_name:
             case True:
-                return MockSyncData(provider_name=self.name())
+                return MockSyncData(provider_name=resolve_name(type(self)))
             case _:
                 return None
 
