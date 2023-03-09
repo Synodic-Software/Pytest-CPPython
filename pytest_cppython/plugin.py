@@ -22,7 +22,7 @@ from cppython_core.schema import (
     CPPythonPluginData,
     DataPluginT,
     PEP621Data,
-    PluginGroupDataT_contra,
+    PluginGroupDataT,
     PluginT,
     ProjectData,
 )
@@ -51,7 +51,7 @@ class PluginUnitTests(PluginTests[PluginT]):
     """Unit testing information for all plugin test classes"""
 
 
-class DataPluginTests(CPPythonFixtures, ABC, Generic[PluginGroupDataT_contra, DataPluginT]):
+class DataPluginTests(CPPythonFixtures, ABC, Generic[PluginGroupDataT, DataPluginT]):
     """Shared testing information for all data plugin test classes.
     Not inheriting PluginTests to reduce ancestor count
     """
@@ -112,7 +112,7 @@ class DataPluginTests(CPPythonFixtures, ABC, Generic[PluginGroupDataT_contra, Da
     )
     def fixture_plugin(
         plugin_type: type[DataPluginT],
-        plugin_group_data: PluginGroupDataT_contra,
+        plugin_group_data: PluginGroupDataT,
         core_plugin_data: CorePluginData,
         plugin_data: dict[str, Any],
     ) -> DataPluginT:
@@ -128,45 +128,23 @@ class DataPluginTests(CPPythonFixtures, ABC, Generic[PluginGroupDataT_contra, Da
             A newly constructed provider
         """
 
-        plugin = plugin_type()
-        plugin.configure(plugin_group_data, core_plugin_data)
-        plugin.activate(plugin_data)
+        plugin = plugin_type(plugin_group_data, core_plugin_data, plugin_data)
 
         return plugin
 
 
 class DataPluginIntegrationTests(
-    DataPluginTests[PluginGroupDataT_contra, DataPluginT],
-    Generic[PluginGroupDataT_contra, DataPluginT],
+    DataPluginTests[PluginGroupDataT, DataPluginT],
+    Generic[PluginGroupDataT, DataPluginT],
 ):
     """Integration testing information for all data plugin test classes"""
 
 
 class DataPluginUnitTests(
-    DataPluginTests[PluginGroupDataT_contra, DataPluginT],
-    Generic[PluginGroupDataT_contra, DataPluginT],
+    DataPluginTests[PluginGroupDataT, DataPluginT],
+    Generic[PluginGroupDataT, DataPluginT],
 ):
     """Unit testing information for all data plugin test classes"""
-
-    def test_empty_activation(self, plugin: DataPluginT) -> None:
-        """Data plugins should be able to be defaulted. Sending in empty data is as close to enforcing that behavior
-        that we can get
-
-        Args:
-            plugin: The data plugin
-        """
-
-        plugin.activate({})
-
-    def test_activation(self, plugin: DataPluginT, plugin_data: dict[str, Any]) -> None:
-        """Tests activation
-
-        Args:
-            plugin: The data plugin
-            plugin_data: Data to validate
-        """
-
-        plugin.activate(plugin_data)
 
     def test_pyproject_undefined(self, plugin_data_path: Path | None) -> None:
         """Verifies that the directory data provided by plugins does not contain a pyproject.toml file
