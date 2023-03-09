@@ -4,19 +4,27 @@
 from pathlib import Path
 from typing import Any
 
-from cppython_core.plugin_schema.generator import Generator
-from cppython_core.schema import Information, SyncData
+from cppython_core.plugin_schema.generator import Generator, GeneratorGroupData
+from cppython_core.schema import CorePluginData, CPPythonModel, Information, SyncData
 
 
 class MockSyncData(SyncData):
     """A Mock data type"""
 
 
-class MockGenerator(Generator):
+class MockGeneratorData(CPPythonModel):
+    """Dummy data"""
+
+
+class MockGenerator(Generator[MockGeneratorData]):
     """A mock generator class for behavior testing"""
 
-    def activate(self, configuration_data: dict[str, Any]) -> None:
-        pass
+    def __init__(
+        self, group_data: GeneratorGroupData, core_data: CorePluginData, configuration_data: dict[str, Any]
+    ) -> None:
+        self.group_data = group_data
+        self.core_data = core_data
+        self.configuration_data = MockGeneratorData(**configuration_data)
 
     @staticmethod
     def supported(directory: Path) -> bool:
