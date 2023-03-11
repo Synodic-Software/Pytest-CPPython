@@ -23,7 +23,6 @@ from cppython_core.schema import (
     DataPluginT,
     PEP621Data,
     PluginGroupData,
-    PluginGroupDataT_co,
     PluginT,
     ProjectData,
 )
@@ -52,7 +51,7 @@ class PluginUnitTests(PluginTests[PluginT]):
     """Unit testing information for all plugin test classes"""
 
 
-class DataPluginTests(CPPythonFixtures, ABC, Generic[PluginGroupDataT_co, DataPluginT]):
+class DataPluginTests(CPPythonFixtures, ABC, Generic[DataPluginT]):
     """Shared testing information for all data plugin test classes.
     Not inheriting PluginTests to reduce ancestor count
     """
@@ -135,15 +134,15 @@ class DataPluginTests(CPPythonFixtures, ABC, Generic[PluginGroupDataT_co, DataPl
 
 
 class DataPluginIntegrationTests(
-    DataPluginTests[PluginGroupDataT_co, DataPluginT],
-    Generic[PluginGroupDataT_co, DataPluginT],
+    DataPluginTests[DataPluginT],
+    Generic[DataPluginT],
 ):
     """Integration testing information for all data plugin test classes"""
 
 
 class DataPluginUnitTests(
-    DataPluginTests[PluginGroupDataT_co, DataPluginT],
-    Generic[PluginGroupDataT_co, DataPluginT],
+    DataPluginTests[DataPluginT],
+    Generic[DataPluginT],
 ):
     """Unit testing information for all data plugin test classes"""
 
@@ -160,7 +159,7 @@ class DataPluginUnitTests(
             assert not paths
 
 
-class ProviderTests(DataPluginTests[ProviderGroupData, ProviderT], Generic[ProviderT]):
+class ProviderTests(DataPluginTests[ProviderT], Generic[ProviderT]):
     """Shared functionality between the different Provider testing categories"""
 
     @pytest.fixture(name="plugin_configuration_type", scope="session")
@@ -189,7 +188,7 @@ class ProviderTests(DataPluginTests[ProviderGroupData, ProviderT], Generic[Provi
 
 
 class ProviderIntegrationTests(
-    DataPluginIntegrationTests[ProviderGroupData, ProviderT],
+    DataPluginIntegrationTests[ProviderT],
     ProviderTests[ProviderT],
     Generic[ProviderT],
 ):
@@ -222,7 +221,7 @@ class ProviderIntegrationTests(
 
 
 class ProviderUnitTests(
-    DataPluginUnitTests[ProviderGroupData, ProviderT],
+    DataPluginUnitTests[ProviderT],
     ProviderTests[ProviderT],
     Generic[ProviderT],
 ):
@@ -231,7 +230,7 @@ class ProviderUnitTests(
     """
 
 
-class GeneratorTests(DataPluginTests[GeneratorGroupData, GeneratorT], Generic[GeneratorT]):
+class GeneratorTests(DataPluginTests[GeneratorT], Generic[GeneratorT]):
     """Shared functionality between the different Generator testing categories"""
 
     @pytest.fixture(name="plugin_configuration_type", scope="session")
@@ -259,7 +258,7 @@ class GeneratorTests(DataPluginTests[GeneratorGroupData, GeneratorT], Generic[Ge
 
 
 class GeneratorIntegrationTests(
-    DataPluginIntegrationTests[GeneratorGroupData, GeneratorT],
+    DataPluginIntegrationTests[GeneratorT],
     GeneratorTests[GeneratorT],
     Generic[GeneratorT],
 ):
@@ -267,7 +266,7 @@ class GeneratorIntegrationTests(
 
 
 class GeneratorUnitTests(
-    DataPluginUnitTests[GeneratorGroupData, GeneratorT],
+    DataPluginUnitTests[GeneratorT],
     GeneratorTests[GeneratorT],
     Generic[GeneratorT],
 ):

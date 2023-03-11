@@ -6,13 +6,7 @@ from typing import Any
 
 from cppython_core.plugin_schema.provider import Provider, ProviderGroupData
 from cppython_core.resolution import resolve_name
-from cppython_core.schema import (
-    CorePluginData,
-    CPPythonModel,
-    Information,
-    PluginName,
-    SyncData,
-)
+from cppython_core.schema import CorePluginData, CPPythonModel, Information, SyncData
 
 from pytest_cppython.mock.generator import MockSyncData
 
@@ -54,22 +48,31 @@ class MockProvider(Provider):
         """
         return Information()
 
-    def sync_data(self, generator_name: PluginName) -> SyncData | None:
+    def supported_sync_type(self, sync_type: type[SyncData]) -> bool:
+        """Broadcasts supported types
+
+        Args:
+            sync_type: The input type
+
+        Returns:
+            Support
+        """
+
+        return sync_type == MockSyncData
+
+    def sync_data(self, sync_type: type[SyncData]) -> SyncData | None:
         """Gathers synchronization data
 
         Args:
-            generator_name: The input generator name
-
-        Raises:
-            NotSupportedError: If not supported
+            sync_type: The input sync type
 
         Returns:
             The sync data object
         """
 
         # This is a mock class, so any generator sync type is OK
-        match generator_name:
-            case True:
+        match sync_type:
+            case MockSyncData(sync_type):
                 return MockSyncData(provider_name=resolve_name(type(self)))
             case _:
                 return None
