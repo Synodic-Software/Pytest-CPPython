@@ -22,7 +22,8 @@ from cppython_core.schema import (
     CPPythonPluginData,
     DataPluginT,
     PEP621Data,
-    PluginGroupDataT,
+    PluginGroupData,
+    PluginGroupDataT_co,
     PluginT,
     ProjectData,
 )
@@ -51,7 +52,7 @@ class PluginUnitTests(PluginTests[PluginT]):
     """Unit testing information for all plugin test classes"""
 
 
-class DataPluginTests(CPPythonFixtures, ABC, Generic[PluginGroupDataT, DataPluginT]):
+class DataPluginTests(CPPythonFixtures, ABC, Generic[PluginGroupDataT_co, DataPluginT]):
     """Shared testing information for all data plugin test classes.
     Not inheriting PluginTests to reduce ancestor count
     """
@@ -112,7 +113,7 @@ class DataPluginTests(CPPythonFixtures, ABC, Generic[PluginGroupDataT, DataPlugi
     )
     def fixture_plugin(
         plugin_type: type[DataPluginT],
-        plugin_group_data: PluginGroupDataT,
+        plugin_group_data: PluginGroupData,
         core_plugin_data: CorePluginData,
         plugin_data: dict[str, Any],
     ) -> DataPluginT:
@@ -134,15 +135,15 @@ class DataPluginTests(CPPythonFixtures, ABC, Generic[PluginGroupDataT, DataPlugi
 
 
 class DataPluginIntegrationTests(
-    DataPluginTests[PluginGroupDataT, DataPluginT],
-    Generic[PluginGroupDataT, DataPluginT],
+    DataPluginTests[PluginGroupDataT_co, DataPluginT],
+    Generic[PluginGroupDataT_co, DataPluginT],
 ):
     """Integration testing information for all data plugin test classes"""
 
 
 class DataPluginUnitTests(
-    DataPluginTests[PluginGroupDataT, DataPluginT],
-    Generic[PluginGroupDataT, DataPluginT],
+    DataPluginTests[PluginGroupDataT_co, DataPluginT],
+    Generic[PluginGroupDataT_co, DataPluginT],
 ):
     """Unit testing information for all data plugin test classes"""
 
