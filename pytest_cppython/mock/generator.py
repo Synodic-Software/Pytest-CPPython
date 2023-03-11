@@ -47,6 +47,16 @@ class MockGenerator(Generator):
         """
         return Information()
 
+    @staticmethod
+    def sync_types() -> list[type[SyncData]]:
+        """_summary_
+
+        Returns:
+            _description_
+        """
+
+        return [MockSyncData]
+
     def sync(self, sync_data: SyncData) -> None:
         """Synchronizes generator files and state with the providers input
 
