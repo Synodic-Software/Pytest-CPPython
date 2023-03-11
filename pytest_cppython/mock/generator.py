@@ -16,7 +16,7 @@ class MockGeneratorData(CPPythonModel):
     """Dummy data"""
 
 
-class MockGenerator(Generator[MockGeneratorData]):
+class MockGenerator(Generator):
     """A mock generator class for behavior testing"""
 
     def __init__(

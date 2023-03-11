@@ -21,7 +21,7 @@ class MockProviderData(CPPythonModel):
     """Dummy data"""
 
 
-class MockProvider(Provider[MockProviderData]):
+class MockProvider(Provider):
     """A mock provider class for behavior testing"""
 
     downloaded: Path | None = None
