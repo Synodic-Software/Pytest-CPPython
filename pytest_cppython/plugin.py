@@ -3,6 +3,7 @@
 
 import asyncio
 from abc import ABC, abstractmethod
+from importlib.metadata import entry_points
 from pathlib import Path
 from typing import Any, Generic
 
@@ -13,6 +14,7 @@ from cppython_core.plugin_schema.scm import SCMT
 from cppython_core.resolution import (
     resolve_cppython_plugin,
     resolve_generator,
+    resolve_group,
     resolve_name,
     resolve_provider,
 )
@@ -49,6 +51,14 @@ class PluginIntegrationTests(PluginTests[PluginT]):
 
 class PluginUnitTests(PluginTests[PluginT]):
     """Unit testing information for all plugin test classes"""
+
+    def entry_point(self, plugin_type: type[PluginT]) -> None:
+        """Verify that the plugin was registered
+
+        Args:
+            plugin_type: The type to register
+        """
+        assert list(entry_points(group=f"cppython.{resolve_group(plugin_type)}"))
 
 
 class DataPluginTests(CPPythonFixtures, ABC, Generic[DataPluginT]):
@@ -157,6 +167,14 @@ class DataPluginUnitTests(
             paths = list(plugin_data_path.rglob("pyproject.toml"))
 
             assert not paths
+
+    def entry_point(self, plugin_type: type[PluginT]) -> None:
+        """Verify that the plugin was registered
+
+        Args:
+            plugin_type: The type to register
+        """
+        assert list(entry_points(group=f"cppython.{resolve_group(plugin_type)}"))
 
 
 class ProviderTests(DataPluginTests[ProviderT], Generic[ProviderT]):
