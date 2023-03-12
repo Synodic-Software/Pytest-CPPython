@@ -178,7 +178,6 @@ class ProviderTests(DataPluginTests[ProviderT], Generic[ProviderT]):
 
         Args:
             project_data: The workspace configuration
-            cppython_data: CPPython data
 
         Returns:
             The plugin configuration
