@@ -1,340 +1,326 @@
-"""Helper fixtures and plugin definitions for pytest
+"""Direct Fixtures
 """
 
-import asyncio
-from abc import ABC, abstractmethod
-from importlib.metadata import entry_points
+import shutil
 from pathlib import Path
-from typing import Any, Generic
+from typing import Any, cast
 
 import pytest
-from cppython_core.plugin_schema.generator import GeneratorGroupData, GeneratorT
-from cppython_core.plugin_schema.provider import ProviderGroupData, ProviderT
-from cppython_core.plugin_schema.scm import SCMT
 from cppython_core.resolution import (
-    resolve_cppython_plugin,
-    resolve_generator,
-    resolve_group,
-    resolve_name,
-    resolve_provider,
+    resolve_cppython,
+    resolve_pep621,
+    resolve_project_configuration,
 )
 from cppython_core.schema import (
-    CorePluginData,
+    CoreData,
     CPPythonData,
-    CPPythonPluginData,
-    DataPluginT,
+    CPPythonGlobalConfiguration,
+    CPPythonLocalConfiguration,
+    PEP621Configuration,
     PEP621Data,
-    PluginGroupData,
-    PluginT,
+    ProjectConfiguration,
     ProjectData,
+    PyProject,
+    ToolData,
 )
 
-from pytest_cppython.fixtures import CPPythonFixtures
+from pytest_cppython.variants import (
+    cppython_global_variants,
+    cppython_local_variants,
+    pep621_variants,
+    project_variants,
+)
 
 
-class PluginTests(CPPythonFixtures, ABC, Generic[PluginT]):
-    """Shared testing information for all plugin test classes.
-    Not subclassed by DataPluginTests to reduce ancestor count
+@pytest.fixture(
+    name="install_path",
+    scope="session",
+)
+def fixture_install_path(tmp_path_factory: pytest.TempPathFactory) -> Path:
+    """Creates temporary install location
+    Args:
+        tmp_path_factory: Factory for centralized temporary directories
+    Returns:
+        A temporary directory
+    """
+    path = tmp_path_factory.getbasetemp()
+    path.mkdir(parents=True, exist_ok=True)
+    return path
+
+
+@pytest.fixture(
+    name="pep621_configuration",
+    scope="session",
+    params=pep621_variants,
+)
+def fixture_pep621_configuration(request: pytest.FixtureRequest) -> PEP621Configuration:
+    """Fixture defining all testable variations of PEP621
+
+    Args:
+        request: Parameterization list
+
+    Returns:
+        PEP621 variant
     """
 
-    @abstractmethod
-    @pytest.fixture(name="plugin_type", scope="session")
-    def fixture_plugin_type(self) -> type[PluginT]:
-        """A required testing hook that allows type generation"""
-
-        raise NotImplementedError("Subclasses should override this fixture")
+    return cast(PEP621Configuration, request.param)
 
 
-class PluginIntegrationTests(PluginTests[PluginT]):
-    """Integration testing information for all plugin test classes"""
+@pytest.fixture(
+    name="pep621_data",
+    scope="session",
+)
+def fixture_pep621_data(
+    pep621_configuration: PEP621Configuration, project_configuration: ProjectConfiguration
+) -> PEP621Data:
+    """Resolved project table fixture
 
+    Args:
+        pep621_configuration: The input configuration to resolve
+        project_configuration: The project configuration to help with the resolve
 
-class PluginUnitTests(PluginTests[PluginT]):
-    """Unit testing information for all plugin test classes"""
-
-    def entry_point(self, plugin_type: type[PluginT]) -> None:
-        """Verify that the plugin was registered
-
-        Args:
-            plugin_type: The type to register
-        """
-        assert list(entry_points(group=f"cppython.{resolve_group(plugin_type)}"))
-
-
-class DataPluginTests(CPPythonFixtures, ABC, Generic[DataPluginT]):
-    """Shared testing information for all data plugin test classes.
-    Not inheriting PluginTests to reduce ancestor count
+    Returns:
+        The resolved project table
     """
 
-    @abstractmethod
-    @pytest.fixture(
-        name="plugin_type",
-        scope="session",
-    )
-    def fixture_plugin_type(self) -> type[DataPluginT]:
-        """A required testing hook that allows type generation"""
-
-        raise NotImplementedError("Subclasses should override this fixture")
-
-    @pytest.fixture(
-        name="cppython_plugin_data",
-        scope="session",
-    )
-    def fixture_cppython_plugin_data(
-        self, cppython_data: CPPythonData, plugin_type: type[DataPluginT]
-    ) -> CPPythonPluginData:
-        """Fixture for created the plugin CPPython table
-
-        Args:
-            cppython_data: The CPPython table to help the resolve
-            plugin_type: The data plugin type
-
-        Returns:
-            The plugin specific CPPython table information
-        """
-
-        return resolve_cppython_plugin(cppython_data, plugin_type)
-
-    @pytest.fixture(
-        name="core_plugin_data",
-        scope="session",
-    )
-    def fixture_core_plugin_data(
-        self, cppython_plugin_data: CPPythonPluginData, project_data: ProjectData, pep621_data: PEP621Data
-    ) -> CorePluginData:
-        """Fixture for creating the wrapper CoreData type
-
-        Args:
-            cppython_plugin_data: CPPython data
-            project_data: The project data
-            pep621_data: Project table data
-
-        Returns:
-            Wrapper Core Type
-        """
-
-        return CorePluginData(cppython_data=cppython_plugin_data, project_data=project_data, pep621_data=pep621_data)
-
-    @staticmethod
-    @pytest.fixture(
-        name="plugin",
-        scope="session",
-    )
-    def fixture_plugin(
-        plugin_type: type[DataPluginT],
-        plugin_group_data: PluginGroupData,
-        core_plugin_data: CorePluginData,
-        plugin_data: dict[str, Any],
-    ) -> DataPluginT:
-        """Overridden plugin generator for creating a populated data plugin type
-
-        Args:
-            plugin_type: Plugin type
-            plugin_group_data: The data group configuration
-            core_plugin_data: The core metadata
-            plugin_data: The data table
-
-        Returns:
-            A newly constructed provider
-        """
-
-        plugin = plugin_type(plugin_group_data, core_plugin_data, plugin_data)
-
-        return plugin
+    return resolve_pep621(pep621_configuration, project_configuration)
 
 
-class DataPluginIntegrationTests(
-    DataPluginTests[DataPluginT],
-    Generic[DataPluginT],
-):
-    """Integration testing information for all data plugin test classes"""
+@pytest.fixture(
+    name="cppython_local_configuration",
+    scope="session",
+    params=cppython_local_variants,
+)
+def fixture_cppython_local_configuration(
+    request: pytest.FixtureRequest, install_path: Path
+) -> CPPythonLocalConfiguration:
+    """Fixture defining all testable variations of CPPythonData
+
+    Args:
+        request: Parameterization list
+        install_path: The temporary install directory
+
+    Returns:
+        Variation of CPPython data
+    """
+    cppython_local_configuration = cast(CPPythonLocalConfiguration, request.param)
+
+    data = cppython_local_configuration.dict(by_alias=True)
+
+    # Pin the install location to the base temporary directory
+    data["install-path"] = install_path
+
+    # Fill the plugin names with mocked values
+    data["provider-name"] = "mock"
+    data["generator-name"] = "mock"
+
+    return CPPythonLocalConfiguration(**data)
 
 
-class DataPluginUnitTests(
-    DataPluginTests[DataPluginT],
-    Generic[DataPluginT],
-):
-    """Unit testing information for all data plugin test classes"""
+@pytest.fixture(
+    name="cppython_global_configuration",
+    scope="session",
+    params=cppython_global_variants,
+)
+def fixture_cppython_global_configuration(request: pytest.FixtureRequest) -> CPPythonGlobalConfiguration:
+    """Fixture defining all testable variations of CPPythonData
 
-    def test_pyproject_undefined(self, plugin_data_path: Path | None) -> None:
-        """Verifies that the directory data provided by plugins does not contain a pyproject.toml file
+    Args:
+        request: Parameterization list
 
-        Args:
-            plugin_data_path: The plugin's tests/data directory
-        """
+    Returns:
+        Variation of CPPython data
+    """
+    cppython_global_configuration = cast(CPPythonGlobalConfiguration, request.param)
 
-        if plugin_data_path is not None:
-            paths = list(plugin_data_path.rglob("pyproject.toml"))
-
-            assert not paths
-
-    def entry_point(self, plugin_type: type[PluginT]) -> None:
-        """Verify that the plugin was registered
-
-        Args:
-            plugin_type: The type to register
-        """
-        assert list(entry_points(group=f"cppython.{resolve_group(plugin_type)}"))
+    return cppython_global_configuration
 
 
-class ProviderTests(DataPluginTests[ProviderT], Generic[ProviderT]):
-    """Shared functionality between the different Provider testing categories"""
+@pytest.fixture(
+    name="cppython_data",
+    scope="session",
+)
+def fixture_cppython_data(
+    cppython_local_configuration: CPPythonLocalConfiguration,
+    cppython_global_configuration: CPPythonGlobalConfiguration,
+    project_data: ProjectData,
+) -> CPPythonData:
+    """Fixture for constructing resolved CPPython table data
 
-    @pytest.fixture(name="plugin_configuration_type", scope="session")
-    def fixture_plugin_configuration_type(self) -> type[ProviderGroupData]:
-        """A required testing hook that allows plugin configuration data generation
+    Args:
+        cppython_local_configuration: The local configuration to resolve
+        cppython_global_configuration: The global configuration to resolve
+        project_data: The project data to help with the resolve
 
-        Returns:
-            The configuration type
-        """
-
-        return ProviderGroupData
-
-    @pytest.fixture(name="plugin_group_data", scope="session")
-    def fixture_plugin_group_data(self, project_data: ProjectData) -> ProviderGroupData:
-        """Generates plugin configuration data generation from environment configuration
-
-        Args:
-            project_data: The workspace configuration
-
-        Returns:
-            The plugin configuration
-        """
-
-        return resolve_provider(project_data)
-
-
-class ProviderIntegrationTests(
-    DataPluginIntegrationTests[ProviderT],
-    ProviderTests[ProviderT],
-    Generic[ProviderT],
-):
-    """Base class for all provider integration tests that test plugin agnostic behavior"""
-
-    @pytest.fixture(autouse=True, scope="session")
-    def _fixture_install_dependency(self, plugin: ProviderT, install_path: Path) -> None:
-        """Forces the download to only happen once per test session"""
-
-        path = install_path / resolve_name(type(plugin))
-        path.mkdir(parents=True, exist_ok=True)
-
-        asyncio.run(plugin.download_tooling(path))
-
-    def test_install(self, plugin: ProviderT) -> None:
-        """Ensure that the vanilla install command functions
-
-        Args:
-            plugin: A newly constructed provider
-        """
-        plugin.install()
-
-    def test_update(self, plugin: ProviderT) -> None:
-        """Ensure that the vanilla update command functions
-
-        Args:
-            plugin: A newly constructed provider
-        """
-        plugin.update()
-
-
-class ProviderUnitTests(
-    DataPluginUnitTests[ProviderT],
-    ProviderTests[ProviderT],
-    Generic[ProviderT],
-):
-    """Custom implementations of the Provider class should inherit from this class for its tests.
-    Base class for all provider unit tests that test plugin agnostic behavior
+    Returns:
+        The resolved CPPython table
     """
 
-
-class GeneratorTests(DataPluginTests[GeneratorT], Generic[GeneratorT]):
-    """Shared functionality between the different Generator testing categories"""
-
-    @pytest.fixture(name="plugin_configuration_type", scope="session")
-    def fixture_plugin_configuration_type(self) -> type[GeneratorGroupData]:
-        """A required testing hook that allows plugin configuration data generation
-
-        Returns:
-            The configuration type
-        """
-
-        return GeneratorGroupData
-
-    @pytest.fixture(name="plugin_group_data", scope="session")
-    def fixture_plugin_group_data(self, project_data: ProjectData) -> GeneratorGroupData:
-        """Generates plugin configuration data generation from environment configuration
-
-        Args:
-            project_data: The workspace configuration
-
-        Returns:
-            The plugin configuration
-        """
-
-        return resolve_generator(project_data)
+    return resolve_cppython(cppython_local_configuration, cppython_global_configuration, project_data)
 
 
-class GeneratorIntegrationTests(
-    DataPluginIntegrationTests[GeneratorT],
-    GeneratorTests[GeneratorT],
-    Generic[GeneratorT],
-):
-    """Base class for all scm integration tests that test plugin agnostic behavior"""
+@pytest.fixture(
+    name="core_data",
+)
+def fixture_core_data(cppython_data: CPPythonData, project_data: ProjectData, pep621_data: PEP621Data) -> CoreData:
+    """Fixture for creating the wrapper CoreData type
 
+    Args:
+        cppython_data: CPPython data
+        project_data: The project data
+        pep621_data: Project table data
 
-class GeneratorUnitTests(
-    DataPluginUnitTests[GeneratorT],
-    GeneratorTests[GeneratorT],
-    Generic[GeneratorT],
-):
-    """Custom implementations of the Generator class should inherit from this class for its tests.
-    Base class for all Generator unit tests that test plugin agnostic behavior"""
-
-
-class SCMTests(
-    PluginTests[SCMT],
-    Generic[SCMT],
-):
-    """Shared functionality between the different SCM testing categories"""
-
-    @pytest.fixture(name="plugin")
-    def fixture_plugin(
-        self,
-        plugin_type: type[SCMT],
-    ) -> SCMT:
-        """Fixture creating the plugin.
-        Args:
-            plugin_type: An input plugin type
-
-        Returns:
-            A newly constructed plugin
-        """
-        return plugin_type()
-
-
-class SCMIntegrationTests(
-    PluginIntegrationTests[SCMT],
-    SCMTests[SCMT],
-    Generic[SCMT],
-):
-    """Base class for all generator integration tests that test plugin agnostic behavior"""
-
-
-class SCMUnitTests(
-    PluginUnitTests[SCMT],
-    SCMTests[SCMT],
-    Generic[SCMT],
-):
-    """Custom implementations of the Generator class should inherit from this class for its tests.
-    Base class for all Generator unit tests that test plugin agnostic behavior
+    Returns:
+        Wrapper Core Type
     """
 
-    def test_not_repository(self, plugin: SCMT, tmp_path: Path) -> None:
-        """Tests that the temporary directory path will not be registered as a repository
+    return CoreData(cppython_data=cppython_data, project_data=project_data, pep621_data=pep621_data)
 
-        Args:
-            plugin: The SCM constructed type
-            tmp_path: Temporary directory
-        """
 
-        assert not plugin.supported(tmp_path)
+def pytest_generate_tests(metafunc: pytest.Metafunc) -> None:
+    """Called for each test function
+
+    Args:
+        metafunc: Pytest hook data
+    """
+
+    for fixture in metafunc.fixturenames:
+        match fixture.split("_", 1):
+            case ["internal", "plugin_data_path"]:
+                # There should only ever be one fixture named 'internal_plugin_data_path' for value caching
+                data_path = metafunc.config.rootpath / "tests" / "data"
+
+                test_paths: list[Path | None] = []
+
+                for path in data_path.glob("*"):
+                    if path.is_dir():
+                        test_paths.append(path)
+
+                if not test_paths:
+                    test_paths = [None]
+                metafunc.parametrize(fixture, test_paths, scope="session")
+
+            case ["internal", "data_path"]:
+                # There should only ever be one fixture named 'internal_data_path' for value caching
+                data_path = Path(__file__).parent / "data"
+                metafunc.parametrize(fixture, list(data_path.glob("*")), scope="session")
+
+            case ["build", directory]:
+                data_path = metafunc.config.rootpath / "tests" / "build" / directory
+                metafunc.parametrize(fixture, [data_path], scope="session")
+
+
+@pytest.fixture(name="plugin_data_path", scope="session")
+def fixture_plugin_data_path(internal_plugin_data_path: list[Path | None]) -> list[Path | None]:
+    """Fixture cache of internal_plugin_data_path
+
+    Args:
+        internal_plugin_data_path: The input meta data
+
+    Returns:
+        The session scoped data
+    """
+
+    return internal_plugin_data_path
+
+
+@pytest.fixture(name="data_path", scope="session")
+def fixture_data_path(internal_data_path: list[Path]) -> list[Path]:
+    """Fixture cache of internal_data_path
+
+    Args:
+        internal_data_path: The input meta data
+
+    Returns:
+        The session scoped data
+    """
+
+    return internal_data_path
+
+
+@pytest.fixture(
+    name="project_configuration",
+    scope="session",
+    params=project_variants,
+)
+def fixture_project_configuration(
+    request: pytest.FixtureRequest,
+    tmp_path_factory: pytest.TempPathFactory,
+    data_path: Path,
+    plugin_data_path: Path | None,
+) -> ProjectConfiguration:
+    """Project configuration fixture
+
+    Args:
+        request: Parameterized configuration data
+        tmp_path_factory: Factory for centralized temporary directories
+        data_path: Project file requirements
+        plugin_data_path: Parameterized path to a data directory
+
+    Returns:
+        Configuration with temporary directory capabilities
+    """
+
+    tmp_path = tmp_path_factory.mktemp("workspace-")
+
+    shutil.copytree(data_path, tmp_path, dirs_exist_ok=True)
+
+    if plugin_data_path is not None:
+        shutil.copytree(plugin_data_path, tmp_path, dirs_exist_ok=True)
+
+    configuration = cast(ProjectConfiguration, request.param)
+
+    # Pin the project location
+    paths = list(tmp_path.rglob("pyproject.toml"))
+
+    # 'paths' length guaranteed to be 1
+    configuration.pyproject_file = paths[0].resolve()
+
+    return configuration
+
+
+@pytest.fixture(
+    name="project_data",
+    scope="session",
+)
+def fixture_project_data(project_configuration: ProjectConfiguration) -> ProjectData:
+    """Fixture that creates a project space at 'workspace/test_project/pyproject.toml'
+    Args:
+        project_configuration: Project data
+    Returns:
+        A project data object that has populated a function level temporary directory
+    """
+
+    return resolve_project_configuration(project_configuration)
+
+
+@pytest.fixture(name="project")
+def fixture_project(
+    cppython_local_configuration: CPPythonLocalConfiguration, pep621_configuration: PEP621Configuration
+) -> PyProject:
+    """Parameterized construction of PyProject data
+    Args:
+        cppython_local_configuration: The parameterized cppython table
+        pep621_configuration: The project table
+    Returns:
+        All the data as one object
+    """
+
+    tool = ToolData(cppython=cppython_local_configuration)
+    return PyProject(project=pep621_configuration, tool=tool)
+
+
+@pytest.fixture(name="project_with_mocks")
+def fixture_project_with_mocks(project: PyProject) -> dict[str, Any]:
+    """Extension of the 'project' fixture with mock data attached
+    Args:
+        project: The input project
+    Returns:
+        All the data as a dictionary
+    """
+    mocked_pyproject = project.dict(by_alias=True)
+    mocked_pyproject["tool"]["cppython"]["provider-name"] = "mock"
+    mocked_pyproject["tool"]["cppython"]["generator-name"] = "mock"
+    mocked_pyproject["tool"]["cppython"]["provider"]["mock"] = {}
+    mocked_pyproject["tool"]["cppython"]["generator"]["mock"] = {}
+    return mocked_pyproject

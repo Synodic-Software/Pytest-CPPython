@@ -2,10 +2,8 @@
 
 from pathlib import Path
 
-from pytest_cppython.fixtures import CPPythonFixtures
 
-
-class TestFixtures(CPPythonFixtures):
+class TestFixtures:
     """Tests for fixtures"""
 
     def test_pyproject_undefined(self, data_path: Path) -> None:

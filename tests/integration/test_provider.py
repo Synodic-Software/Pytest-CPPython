@@ -6,7 +6,7 @@ from typing import Any
 import pytest
 
 from pytest_cppython.mock.provider import MockProvider
-from pytest_cppython.plugin import ProviderIntegrationTests
+from pytest_cppython.tests import ProviderIntegrationTests
 
 
 class TestMockProvider(ProviderIntegrationTests[MockProvider]):

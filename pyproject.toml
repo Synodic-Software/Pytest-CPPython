@@ -26,6 +26,16 @@ paths = ["LICENSE.md"]
 homepage = "https://github.com/Synodic-Software/Pytest-CPPython"
 repository = "https://github.com/Synodic-Software/Pytest-CPPython"
 
+# Plugin registration
+[project.entry-points."cppython.scm"]
+mock = "pytest_cppython.mock.scm:MockSCM"
+
+[project.entry-points."cppython.generator"]
+mock = "pytest_cppython.mock.generator:MockGenerator"
+
+[project.entry-points."cppython.provider"]
+mock = "pytest_cppython.mock.provider:MockProvider"
+
 [tool.pdm]
 version = {use_scm = true}
 
