@@ -173,7 +173,7 @@ class ProviderTests(DataPluginTests[ProviderT], Generic[ProviderT]):
         return ProviderGroupData
 
     @pytest.fixture(name="plugin_group_data", scope="session")
-    def fixture_plugin_group_data(self, project_data: ProjectData, cppython_data: CPPythonData) -> ProviderGroupData:
+    def fixture_plugin_group_data(self, project_data: ProjectData) -> ProviderGroupData:
         """Generates plugin configuration data generation from environment configuration
 
         Args:
@@ -184,7 +184,7 @@ class ProviderTests(DataPluginTests[ProviderT], Generic[ProviderT]):
             The plugin configuration
         """
 
-        return resolve_provider(project_data, cppython_data)
+        return resolve_provider(project_data)
 
 
 class ProviderIntegrationTests(
