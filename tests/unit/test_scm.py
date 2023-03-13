@@ -6,7 +6,7 @@ from typing import Any
 import pytest
 
 from pytest_cppython.mock.scm import MockSCM
-from pytest_cppython.plugin import SCMUnitTests
+from pytest_cppython.tests import SCMUnitTests
 
 
 class TestCPPythonSCM(SCMUnitTests[MockSCM]):

@@ -26,6 +26,19 @@ paths = ["LICENSE.md"]
 homepage = "https://github.com/Synodic-Software/Pytest-CPPython"
 repository = "https://github.com/Synodic-Software/Pytest-CPPython"
 
+# Plugin registration
+[project.entry-points."cppython.scm"]
+mock = "pytest_cppython.mock.scm:MockSCM"
+
+[project.entry-points."cppython.generator"]
+mock = "pytest_cppython.mock.generator:MockGenerator"
+
+[project.entry-points."cppython.provider"]
+mock = "pytest_cppython.mock.provider:MockProvider"
+
+[project.entry-points.pytest11]
+pytest_cppython = "pytest_cppython.plugin"
+
 [tool.pdm]
 version = {use_scm = true}
 
@@ -41,9 +54,6 @@ test = [
   "pytest-cov>=3.0.0",
   "pytest-mock>=3.8.2",
 ]
-
-[tool.entry-points.pytest11]
-pytest_cppython = "pytest_cppython.plugin"
 
 [tool.pdm.scripts]
 analyze = {shell = "pylint --verbose pytest_cppython tests"}
