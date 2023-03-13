@@ -35,7 +35,7 @@ class PluginTests(Generic[PluginT], metaclass=ABCMeta):
     def fixture_plugin_type(self) -> type[PluginT]:
         """A required testing hook that allows type generation"""
 
-        raise NotImplementedError("Subclasses should override this fixture")
+        raise NotImplementedError("Override this fixture")
 
 
 class PluginIntegrationTests(Generic[PluginT], metaclass=ABCMeta):
@@ -77,7 +77,7 @@ class PluginIntegrationTests(Generic[PluginT], metaclass=ABCMeta):
         Args:
             plugin_type: The type to register
         """
-        raise NotImplementedError("Subclasses should override this fixture")
+        raise NotImplementedError("Plugin types should override this fixture")
 
 
 class PluginUnitTests(Generic[PluginT], metaclass=ABCMeta):
@@ -88,15 +88,6 @@ class DataPluginTests(PluginTests[DataPluginT], Generic[DataPluginT], metaclass=
     """Shared testing information for all data plugin test classes.
     Not inheriting PluginTests to reduce ancestor count
     """
-
-    @pytest.fixture(
-        name="plugin_type",
-        scope="session",
-    )
-    def fixture_plugin_type(self) -> type[DataPluginT]:
-        """A required testing hook that allows type generation"""
-
-        raise NotImplementedError("Subclasses should override this fixture")
 
     @pytest.fixture(
         name="cppython_plugin_data",
