@@ -34,9 +34,9 @@ class MockGenerator(Generator):
             directory: The input directory
 
         Returns:
-            True, always.
+            False, always.
         """
-        return True
+        return False
 
     @staticmethod
     def information() -> Information:

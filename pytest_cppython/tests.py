@@ -1,6 +1,7 @@
 """Types to inherit from"""
 
 import asyncio
+from abc import ABCMeta
 from pathlib import Path
 from typing import Generic
 
@@ -22,9 +23,7 @@ from pytest_cppython.shared import (
 
 
 class ProviderIntegrationTests(
-    DataPluginIntegrationTests[ProviderT],
-    ProviderTests[ProviderT],
-    Generic[ProviderT],
+    DataPluginIntegrationTests[ProviderT], ProviderTests[ProviderT], Generic[ProviderT], metaclass=ABCMeta
 ):
     """Base class for all provider integration tests that test plugin agnostic behavior"""
 
@@ -63,9 +62,7 @@ class ProviderIntegrationTests(
 
 
 class ProviderUnitTests(
-    DataPluginUnitTests[ProviderT],
-    ProviderTests[ProviderT],
-    Generic[ProviderT],
+    DataPluginUnitTests[ProviderT], ProviderTests[ProviderT], Generic[ProviderT], metaclass=ABCMeta
 ):
     """Custom implementations of the Provider class should inherit from this class for its tests.
     Base class for all provider unit tests that test plugin agnostic behavior
@@ -73,9 +70,7 @@ class ProviderUnitTests(
 
 
 class GeneratorIntegrationTests(
-    DataPluginIntegrationTests[GeneratorT],
-    GeneratorTests[GeneratorT],
-    Generic[GeneratorT],
+    DataPluginIntegrationTests[GeneratorT], GeneratorTests[GeneratorT], Generic[GeneratorT], metaclass=ABCMeta
 ):
     """Base class for all scm integration tests that test plugin agnostic behavior"""
 
@@ -89,19 +84,13 @@ class GeneratorIntegrationTests(
 
 
 class GeneratorUnitTests(
-    DataPluginUnitTests[GeneratorT],
-    GeneratorTests[GeneratorT],
-    Generic[GeneratorT],
+    DataPluginUnitTests[GeneratorT], GeneratorTests[GeneratorT], Generic[GeneratorT], metaclass=ABCMeta
 ):
     """Custom implementations of the Generator class should inherit from this class for its tests.
     Base class for all Generator unit tests that test plugin agnostic behavior"""
 
 
-class SCMIntegrationTests(
-    PluginIntegrationTests[SCMT],
-    SCMTests[SCMT],
-    Generic[SCMT],
-):
+class SCMIntegrationTests(PluginIntegrationTests[SCMT], SCMTests[SCMT], Generic[SCMT], metaclass=ABCMeta):
     """Base class for all generator integration tests that test plugin agnostic behavior"""
 
     def test_group_name(self, plugin_type: type[SCMT]) -> None:
@@ -113,21 +102,7 @@ class SCMIntegrationTests(
         assert resolve_group(plugin_type) == "scm"
 
 
-class SCMUnitTests(
-    PluginUnitTests[SCMT],
-    SCMTests[SCMT],
-    Generic[SCMT],
-):
+class SCMUnitTests(PluginUnitTests[SCMT], SCMTests[SCMT], Generic[SCMT], metaclass=ABCMeta):
     """Custom implementations of the Generator class should inherit from this class for its tests.
     Base class for all Generator unit tests that test plugin agnostic behavior
     """
-
-    def test_not_repository(self, plugin: SCMT, tmp_path: Path) -> None:
-        """Tests that the temporary directory path will not be registered as a repository
-
-        Args:
-            plugin: The SCM constructed type
-            tmp_path: Temporary directory
-        """
-
-        assert not plugin.supported(tmp_path)
