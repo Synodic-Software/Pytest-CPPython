@@ -1,11 +1,14 @@
-"""Direct Fixtures
-"""
+"""Direct Fixtures"""
+
 import shutil
 from pathlib import Path
-from typing import Any, cast
+from typing import cast
 
 import pytest
+from cppython_core.plugin_schema.generator import Generator
+from cppython_core.plugin_schema.provider import Provider
 from cppython_core.resolution import (
+    PluginBuildData,
     resolve_cppython,
     resolve_pep621,
     resolve_project_configuration,
@@ -136,6 +139,27 @@ def fixture_cppython_global_configuration(request: pytest.FixtureRequest) -> CPP
 
 
 @pytest.fixture(
+    name="plugin_build_data",
+    scope="session",
+)
+def fixture_plugin_build_data(
+    provider_type: type[Provider],
+    generator_type: type[Generator],
+) -> PluginBuildData:
+    """Fixture for constructing resolved CPPython table data
+
+    Args:
+        provider_type: The local configuration to resolve
+        generator_type: The global configuration to resolve
+
+    Returns:
+        The plugin build data
+    """
+
+    return PluginBuildData(generator_type=generator_type, provider_type=provider_type)
+
+
+@pytest.fixture(
     name="cppython_data",
     scope="session",
 )
@@ -143,6 +167,7 @@ def fixture_cppython_data(
     cppython_local_configuration: CPPythonLocalConfiguration,
     cppython_global_configuration: CPPythonGlobalConfiguration,
     project_data: ProjectData,
+    plugin_build_data: PluginBuildData,
 ) -> CPPythonData:
     """Fixture for constructing resolved CPPython table data
 
@@ -150,12 +175,15 @@ def fixture_cppython_data(
         cppython_local_configuration: The local configuration to resolve
         cppython_global_configuration: The global configuration to resolve
         project_data: The project data to help with the resolve
+        plugin_build_data: Plugin build data
 
     Returns:
         The resolved CPPython table
     """
 
-    return resolve_cppython(cppython_local_configuration, cppython_global_configuration, project_data)
+    return resolve_cppython(
+        cppython_local_configuration, cppython_global_configuration, project_data, plugin_build_data
+    )
 
 
 @pytest.fixture(
@@ -307,19 +335,3 @@ def fixture_project(
 
     tool = ToolData(cppython=cppython_local_configuration)
     return PyProject(project=pep621_configuration, tool=tool)
-
-
-@pytest.fixture(name="project_with_mocks")
-def fixture_project_with_mocks(project: PyProject) -> dict[str, Any]:
-    """Extension of the 'project' fixture with mock data attached
-    Args:
-        project: The input project
-    Returns:
-        All the data as a dictionary
-    """
-    mocked_pyproject = project.dict(by_alias=True)
-    mocked_pyproject["tool"]["cppython"]["provider-name"] = "mock"
-    mocked_pyproject["tool"]["cppython"]["generator-name"] = "mock"
-    mocked_pyproject["tool"]["cppython"]["provider"]["mock"] = {}
-    mocked_pyproject["tool"]["cppython"]["generator"]["mock"] = {}
-    return mocked_pyproject
