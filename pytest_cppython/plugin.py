@@ -156,7 +156,7 @@ def fixture_plugin_build_data(
         The plugin build data
     """
 
-    return PluginBuildData(generator_type = generator_type, provider_type = provider_type)
+    return PluginBuildData(generator_type=generator_type, provider_type=provider_type)
 
 
 @pytest.fixture(
