@@ -1,13 +1,19 @@
 """Data definitions"""
 
+from collections.abc import Sequence
 from pathlib import Path
 
+from cppython_core.plugin_schema.generator import Generator
+from cppython_core.plugin_schema.provider import Provider
 from cppython_core.schema import (
     CPPythonGlobalConfiguration,
     CPPythonLocalConfiguration,
     PEP621Configuration,
     ProjectConfiguration,
 )
+
+from pytest_cppython.mock.generator import MockGenerator
+from pytest_cppython.mock.provider import MockProvider
 
 
 def _pep621_configuration_list() -> list[PEP621Configuration]:
@@ -73,7 +79,37 @@ def _project_configuration_list() -> list[ProjectConfiguration]:
     return variants
 
 
+def _mock_provider_list() -> Sequence[type[Provider]]:
+    """Mocked list of providers
+
+    Returns:
+        A list of mock providers
+    """
+    variants = []
+
+    # Default
+    variants.append(MockProvider)
+
+    return variants
+
+
+def _mock_generator_list() -> Sequence[type[Generator]]:
+    """Mocked list of generators
+
+    Returns:
+        List of mock generators
+    """
+    variants = []
+
+    # Default
+    variants.append(MockGenerator)
+
+    return variants
+
+
 pep621_variants = _pep621_configuration_list()
 cppython_local_variants = _cppython_local_configuration_list()
 cppython_global_variants = _cppython_global_configuration_list()
 project_variants = _project_configuration_list()
+provider_variants = _mock_provider_list()
+generator_variants = _mock_generator_list()

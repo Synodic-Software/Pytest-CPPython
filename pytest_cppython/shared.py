@@ -3,11 +3,15 @@
 from abc import ABCMeta
 from importlib.metadata import entry_points
 from pathlib import Path
-from typing import Any, Generic
+from typing import Any, Generic, cast
 
 import pytest
-from cppython_core.plugin_schema.generator import GeneratorGroupData, GeneratorT
-from cppython_core.plugin_schema.provider import ProviderGroupData, ProviderT
+from cppython_core.plugin_schema.generator import (
+    Generator,
+    GeneratorGroupData,
+    GeneratorT,
+)
+from cppython_core.plugin_schema.provider import Provider, ProviderGroupData, ProviderT
 from cppython_core.plugin_schema.scm import SCMT
 from cppython_core.resolution import (
     resolve_cppython_plugin,
@@ -27,6 +31,8 @@ from cppython_core.schema import (
     PluginT,
     ProjectData,
 )
+
+from pytest_cppython.variants import generator_variants, provider_variants
 
 
 class PluginTests(Generic[PluginT], metaclass=ABCMeta):
@@ -84,14 +90,6 @@ class PluginIntegrationTests(Generic[PluginT], metaclass=ABCMeta):
             "The plugin class name must only consist of two elements in PascalCase - the plugin name and the plugin"
             " group"
         )
-
-    def test_group_name(self, plugin_type: type[PluginT]) -> None:
-        """Verifies that the group name is the same as the plugin type
-
-        Args:
-            plugin_type: The type to register
-        """
-        raise NotImplementedError("Plugin types should override this fixture")
 
 
 class PluginUnitTests(Generic[PluginT], metaclass=ABCMeta):
@@ -235,6 +233,40 @@ class ProviderTests(DataPluginTests[ProviderT], Generic[ProviderT], metaclass=AB
 
         return resolve_provider(project_data)
 
+    @pytest.fixture(
+        name="provider_type",
+        scope="session",
+        params=provider_variants,
+    )
+    def fixture_provider_type(self, plugin_type: type[ProviderT]) -> type[ProviderT]:
+        """Fixture defining all testable variations mock Providers
+
+        Args:
+            plugin_type: Plugin type
+
+        Returns:
+            Variation of a Provider
+        """
+        return plugin_type
+
+    @pytest.fixture(
+        name="generator_type",
+        scope="session",
+        params=generator_variants,
+    )
+    def fixture_generator_type(self, request: pytest.FixtureRequest) -> type[Generator]:
+        """Fixture defining all testable variations mock Generator
+
+        Args:
+            request: Parameterization list
+
+        Returns:
+            Variation of a Generator
+        """
+        generator_type = cast(type[Generator], request.param)
+
+        return generator_type
+
 
 class GeneratorTests(DataPluginTests[GeneratorT], Generic[GeneratorT], metaclass=ABCMeta):
     """Shared functionality between the different Generator testing categories"""
@@ -261,6 +293,40 @@ class GeneratorTests(DataPluginTests[GeneratorT], Generic[GeneratorT], metaclass
         """
 
         return resolve_generator(project_data)
+
+    @pytest.fixture(
+        name="provider_type",
+        scope="session",
+        params=provider_variants,
+    )
+    def fixture_provider_type(self, request: pytest.FixtureRequest) -> type[Provider]:
+        """Fixture defining all testable variations mock Providers
+
+        Args:
+            request: Parameterization list
+
+        Returns:
+            Variation of a Provider
+        """
+        provider_type = cast(type[Provider], request.param)
+
+        return provider_type
+
+    @pytest.fixture(
+        name="generator_type",
+        scope="session",
+    )
+    def fixture_generator_type(self, plugin_type: type[GeneratorT]) -> type[GeneratorT]:
+        """Override
+
+        Args:
+            plugin_type: Plugin type
+
+        Returns:
+            Plugin type
+        """
+
+        return plugin_type
 
 
 class SCMTests(PluginTests[SCMT], Generic[SCMT], metaclass=ABCMeta):

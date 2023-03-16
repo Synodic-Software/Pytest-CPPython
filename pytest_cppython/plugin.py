@@ -1,10 +1,12 @@
-"""Direct Fixtures
-"""
+"""Direct Fixtures"""
+
 import shutil
 from pathlib import Path
 from typing import cast
 
 import pytest
+from cppython_core.plugin_schema.generator import Generator
+from cppython_core.plugin_schema.provider import Provider
 from cppython_core.resolution import (
     PluginBuildData,
     resolve_cppython,
@@ -134,6 +136,27 @@ def fixture_cppython_global_configuration(request: pytest.FixtureRequest) -> CPP
     cppython_global_configuration = cast(CPPythonGlobalConfiguration, request.param)
 
     return cppython_global_configuration
+
+
+@pytest.fixture(
+    name="plugin_build_data",
+    scope="session",
+)
+def fixture_plugin_build_data(
+    provider_type: type[Provider],
+    generator_type: type[Generator],
+) -> PluginBuildData:
+    """Fixture for constructing resolved CPPython table data
+
+    Args:
+        provider_type: The local configuration to resolve
+        generator_type: The global configuration to resolve
+
+    Returns:
+        The plugin build data
+    """
+
+    return PluginBuildData(generator_type = generator_type, provider_type = provider_type)
 
 
 @pytest.fixture(
