@@ -63,7 +63,7 @@ dependencies = [
 
 [[package]]
 name = "cppython-core"
-version = "0.6.1.dev59"
+version = "0.6.1.dev60"
 requires_python = ">=3.11"
 summary = "Data definitions for CPPython"
 dependencies = [
@@ -315,9 +315,9 @@ content_hash = "sha256:fcef5a31cc74f5dc279e5572246af17d2ca1cae6c753c32343f4e7923
     {url = "https://files.pythonhosted.org/packages/e5/d4/d8ee18c995b806b3d0d38dc17ab5888de148244da5be8d3dfbd7cea6cd7e/coverage-7.2.2-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:299bc75cb2a41e6741b5e470b8c9fb78d931edbd0cd009c58e5c84de57c06731"},
     {url = "https://files.pythonhosted.org/packages/f5/6f/7811ed60d4088b6a54bb48d57b48f647e55c876ee9088e3fa123eb879673/coverage-7.2.2-cp311-cp311-win_amd64.whl", hash = "sha256:92ebc1619650409da324d001b3a36f14f63644c7f0a588e331f3b0f67491f512"},
 ]
-"cppython-core 0.6.1.dev59" = [
-    {url = "https://files.pythonhosted.org/packages/44/ae/f0ee75098d54ba9c72832b594b89b03122b55ef6763a277bed4da5fac005/cppython-core-0.6.1.dev59.tar.gz", hash = "sha256:de1f6faaa97c03f3781c53f9e444caa857389310077657a900e8f8b3aab7cde8"},
-    {url = "https://files.pythonhosted.org/packages/9f/32/1a8f5b95be0736eb55104575d52aba5290919928abb9a39c6faec2a0ff3d/cppython_core-0.6.1.dev59-py3-none-any.whl", hash = "sha256:5750636218efefcf530fd058a5d9af1cd22b017c9fe3d48f631a912ba8d71095"},
+"cppython-core 0.6.1.dev60" = [
+    {url = "https://files.pythonhosted.org/packages/80/69/b937f7e6292588c336663c1c83dbf5ae76a3840aa72c8e3f84fcfe8dbd27/cppython-core-0.6.1.dev60.tar.gz", hash = "sha256:9c16d125ac09c15ecde2361a66448b9111f30dff472d390284da3b6cd36268fb"},
+    {url = "https://files.pythonhosted.org/packages/9e/ce/4f511b18fb0d442352bd08876065b5847045560b6fb100643a679f60a0c6/cppython_core-0.6.1.dev60-py3-none-any.whl", hash = "sha256:fc8a355409928cb551dc83ffc5b20f3e93ef09c13e8d5e34c86bbd318fa00bf7"},
 ]
 "dill 0.3.6" = [
     {url = "https://files.pythonhosted.org/packages/7c/e7/364a09134e1062d4d5ff69b853a56cf61c223e0afcc6906b6832bcd51ea8/dill-0.3.6.tar.gz", hash = "sha256:e5db55f3687856d8fbdab002ed78544e1c4559a130302693d839dfe8f93f2373"},

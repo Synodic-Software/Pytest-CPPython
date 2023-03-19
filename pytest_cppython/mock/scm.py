@@ -1,12 +1,19 @@
 """Mock SCM definitions"""
 
-from cppython_core.plugin_schema.scm import SCM, SupportedSCMFeatures
+from cppython_core.plugin_schema.scm import (
+    SCM,
+    SCMPluginGroupData,
+    SupportedSCMFeatures,
+)
 from cppython_core.schema import Information
 from pydantic import DirectoryPath
 
 
 class MockSCM(SCM):
     """A mock generator class for behavior testing"""
+
+    def __init__(self, group_data: SCMPluginGroupData) -> None:
+        self.group_data = group_data
 
     @staticmethod
     def features(directory: DirectoryPath) -> SupportedSCMFeatures:

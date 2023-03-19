@@ -12,7 +12,7 @@ from cppython_core.plugin_schema.generator import (
     GeneratorT,
 )
 from cppython_core.plugin_schema.provider import Provider, ProviderGroupData, ProviderT
-from cppython_core.plugin_schema.scm import SCMT
+from cppython_core.plugin_schema.scm import SCMT, SCMPluginGroupData
 from cppython_core.resolution import (
     resolve_cppython_plugin,
     resolve_generator,
@@ -23,6 +23,7 @@ from cppython_core.schema import (
     CorePluginData,
     CPPythonData,
     CPPythonPluginData,
+    DataPluginGroupData,
     DataPluginT,
     PEP621Data,
     PluginGroupData,
@@ -41,6 +42,29 @@ class PluginTests(Generic[PluginT], metaclass=ABCMeta):
         """A required testing hook that allows type generation"""
 
         raise NotImplementedError("Override this fixture")
+
+    @staticmethod
+    @pytest.fixture(
+        name="plugin",
+        scope="session",
+    )
+    def fixture_plugin(
+        plugin_type: type[PluginT],
+        plugin_group_data: PluginGroupData,
+    ) -> PluginT:
+        """Overridden plugin generator for creating a populated data plugin type
+
+        Args:
+            plugin_type: Plugin type
+            plugin_group_data: The data group configuration
+
+        Returns:
+            A newly constructed provider
+        """
+
+        plugin = plugin_type(plugin_group_data)
+
+        return plugin
 
 
 class PluginIntegrationTests(Generic[PluginT], metaclass=ABCMeta):
@@ -116,7 +140,7 @@ class DataPluginTests(PluginTests[DataPluginT], Generic[DataPluginT], metaclass=
     )
     def fixture_plugin(
         plugin_type: type[DataPluginT],
-        plugin_group_data: PluginGroupData,
+        plugin_group_data: DataPluginGroupData,
         core_plugin_data: CorePluginData,
         plugin_data: dict[str, Any],
     ) -> DataPluginT:
@@ -295,3 +319,16 @@ class SCMTests(PluginTests[SCMT], Generic[SCMT], metaclass=ABCMeta):
             A newly constructed plugin
         """
         return plugin_type()
+
+    @pytest.fixture(name="plugin_group_data", scope="session")
+    def fixture_plugin_group_data(self, project_data: ProjectData) -> SCMPluginGroupData:
+        """Generates plugin configuration data generation from environment configuration
+
+        Args:
+            project_data: The workspace configuration
+
+        Returns:
+            The plugin configuration
+        """
+
+        return resolve_generator(project_data)
