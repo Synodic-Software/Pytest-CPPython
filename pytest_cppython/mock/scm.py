@@ -1,25 +1,25 @@
 """Mock SCM definitions"""
 
-from pathlib import Path
-
-from cppython_core.plugin_schema.scm import SCM
+from cppython_core.plugin_schema.scm import SCM, SupportedSCMFeatures
 from cppython_core.schema import Information
+from pydantic import DirectoryPath
 
 
 class MockSCM(SCM):
     """A mock generator class for behavior testing"""
 
     @staticmethod
-    def supported(directory: Path) -> bool:
-        """_summary_
+    def features(directory: DirectoryPath) -> SupportedSCMFeatures:
+        """Broadcasts the shared features of the SCM plugin to CPPython
 
         Args:
-            directory: _description_
+            directory: The root directory where features are evaluated
 
         Returns:
-            _description_
+            The supported features
         """
-        return False
+
+        return SupportedSCMFeatures()
 
     @staticmethod
     def information() -> Information:
@@ -30,11 +30,11 @@ class MockSCM(SCM):
         """
         return Information()
 
-    def version(self, path: Path) -> str:
+    def version(self, directory: DirectoryPath) -> str:
         """Extracts the system's version metadata
 
         Args:
-            path: The repository path
+            directory: The repository path
 
         Returns:
             A version

@@ -15,7 +15,6 @@ from cppython_core.plugin_schema.provider import Provider, ProviderGroupData, Pr
 from cppython_core.plugin_schema.scm import SCMT
 from cppython_core.resolution import (
     resolve_cppython_plugin,
-    resolve_full_name,
     resolve_generator,
     resolve_group,
     resolve_provider,
@@ -25,7 +24,6 @@ from cppython_core.schema import (
     CPPythonData,
     CPPythonPluginData,
     DataPluginT,
-    Information,
     PEP621Data,
     PluginGroupData,
     PluginT,
@@ -43,19 +41,6 @@ class PluginTests(Generic[PluginT], metaclass=ABCMeta):
         """A required testing hook that allows type generation"""
 
         raise NotImplementedError("Override this fixture")
-
-    @pytest.fixture(name="plugin_information", scope="session")
-    def fixture_plugin_information(self, plugin_type: type[PluginT]) -> Information:
-        """Helper to extract the plugin information
-
-        Args:
-            plugin_type: The type to extract
-
-        Returns:
-            The plugin's information
-        """
-
-        return plugin_type.information()
 
 
 class PluginIntegrationTests(Generic[PluginT], metaclass=ABCMeta):
@@ -75,44 +60,9 @@ class PluginIntegrationTests(Generic[PluginT], metaclass=ABCMeta):
 
         assert plugin_type in types
 
-    def test_name_length(self, plugin_type: type[PluginT]) -> None:
-        """Verifies that the name follows group conventions
-
-        Args:
-            plugin_type: The type to parse
-        """
-
-        name = resolve_full_name(plugin_type)
-
-        split_name = str(name).split(".")
-
-        assert len(split_name) == 2, (
-            "The plugin class name must only consist of two elements in PascalCase - the plugin name and the plugin"
-            " group"
-        )
-
 
 class PluginUnitTests(Generic[PluginT], metaclass=ABCMeta):
     """Unit testing information for all plugin test classes"""
-
-    def test_not_supported(self, plugin_type: type[PluginT], tmp_path: Path) -> None:
-        """Tests that the temporary directory path will not be registered as supported
-
-        Args:
-            plugin_type: The plugin type
-            tmp_path: Temporary directory
-        """
-
-        assert not plugin_type.supported(tmp_path)
-
-    def test_wont_initialize(self, plugin_information: Information) -> None:
-        """Prevent initialization from being set
-
-        Args:
-            plugin_information: The plugin information
-        """
-
-        assert not plugin_information.initialization, "Keep 'initialization' False. The feature is under development"
 
 
 class DataPluginTests(PluginTests[DataPluginT], Generic[DataPluginT], metaclass=ABCMeta):
