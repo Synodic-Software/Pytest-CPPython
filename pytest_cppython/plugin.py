@@ -85,7 +85,7 @@ def fixture_pep621_data(
         The resolved project table
     """
 
-    return resolve_pep621(pep621_configuration, project_configuration)
+    return resolve_pep621(pep621_configuration, project_configuration, None)
 
 
 @pytest.fixture(
