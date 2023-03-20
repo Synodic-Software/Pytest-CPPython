@@ -28,29 +28,29 @@ class ProviderIntegrationTests(
     """Base class for all provider integration tests that test plugin agnostic behavior"""
 
     @pytest.fixture(autouse=True, scope="session")
-    def _fixture_install_dependency(self, plugin: ProviderT, install_path: Path) -> None:
+    def _fixture_install_dependency(self, data_plugin: ProviderT, install_path: Path) -> None:
         """Forces the download to only happen once per test session"""
 
-        path = install_path / resolve_name(type(plugin))
+        path = install_path / resolve_name(type(data_plugin))
         path.mkdir(parents=True, exist_ok=True)
 
-        asyncio.run(plugin.download_tooling(path))
+        asyncio.run(data_plugin.download_tooling(path))
 
-    def test_install(self, plugin: ProviderT) -> None:
+    def test_install(self, data_plugin: ProviderT) -> None:
         """Ensure that the vanilla install command functions
 
         Args:
-            plugin: A newly constructed provider
+            data_plugin: A newly constructed provider
         """
-        plugin.install()
+        data_plugin.install()
 
-    def test_update(self, plugin: ProviderT) -> None:
+    def test_update(self, data_plugin: ProviderT) -> None:
         """Ensure that the vanilla update command functions
 
         Args:
-            plugin: A newly constructed provider
+            data_plugin: A newly constructed provider
         """
-        plugin.update()
+        data_plugin.update()
 
     def test_group_name(self, plugin_type: type[ProviderT]) -> None:
         """Verifies that the group name is the same as the plugin type

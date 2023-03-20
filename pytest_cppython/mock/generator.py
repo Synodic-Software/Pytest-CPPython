@@ -5,7 +5,7 @@ from typing import Any
 
 from cppython_core.plugin_schema.generator import (
     Generator,
-    GeneratorGroupData,
+    GeneratorPluginGroupData,
     SupportedGeneratorFeatures,
 )
 from cppython_core.schema import CorePluginData, CPPythonModel, Information, SyncData
@@ -24,7 +24,7 @@ class MockGenerator(Generator):
     """A mock generator class for behavior testing"""
 
     def __init__(
-        self, group_data: GeneratorGroupData, core_data: CorePluginData, configuration_data: dict[str, Any]
+        self, group_data: GeneratorPluginGroupData, core_data: CorePluginData, configuration_data: dict[str, Any]
     ) -> None:
         self.group_data = group_data
         self.core_data = core_data

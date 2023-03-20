@@ -6,7 +6,7 @@ from typing import Any
 from cppython_core.plugin_schema.generator import SyncConsumer
 from cppython_core.plugin_schema.provider import (
     Provider,
-    ProviderGroupData,
+    ProviderPluginGroupData,
     SupportedProviderFeatures,
 )
 from cppython_core.resolution import resolve_name
@@ -26,7 +26,7 @@ class MockProvider(Provider):
     downloaded: DirectoryPath | None = None
 
     def __init__(
-        self, group_data: ProviderGroupData, core_data: CorePluginData, configuration_data: dict[str, Any]
+        self, group_data: ProviderPluginGroupData, core_data: CorePluginData, configuration_data: dict[str, Any]
     ) -> None:
         self.group_data = group_data
         self.core_data = core_data
