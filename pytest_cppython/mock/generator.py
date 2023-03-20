@@ -1,11 +1,15 @@
 """Shared definitions for testing.
 """
 
-from pathlib import Path
 from typing import Any
 
-from cppython_core.plugin_schema.generator import Generator, GeneratorGroupData
+from cppython_core.plugin_schema.generator import (
+    Generator,
+    GeneratorPluginGroupData,
+    SupportedGeneratorFeatures,
+)
 from cppython_core.schema import CorePluginData, CPPythonModel, Information, SyncData
+from pydantic import DirectoryPath
 
 
 class MockSyncData(SyncData):
@@ -20,23 +24,23 @@ class MockGenerator(Generator):
     """A mock generator class for behavior testing"""
 
     def __init__(
-        self, group_data: GeneratorGroupData, core_data: CorePluginData, configuration_data: dict[str, Any]
+        self, group_data: GeneratorPluginGroupData, core_data: CorePluginData, configuration_data: dict[str, Any]
     ) -> None:
         self.group_data = group_data
         self.core_data = core_data
         self.configuration_data = MockGeneratorData(**configuration_data)
 
     @staticmethod
-    def supported(directory: Path) -> bool:
-        """Mocks support
+    def features(directory: DirectoryPath) -> SupportedGeneratorFeatures:
+        """Broadcasts the shared features of the generator plugin to CPPython
 
         Args:
-            directory: The input directory
+            directory: The root directory where features are evaluated
 
         Returns:
-            False, always.
+            The supported features
         """
-        return False
+        return SupportedGeneratorFeatures()
 
     @staticmethod
     def information() -> Information:

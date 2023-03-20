@@ -1,13 +1,17 @@
 """Mock provider definitions"""
 
 
-from pathlib import Path
 from typing import Any
 
 from cppython_core.plugin_schema.generator import SyncConsumer
-from cppython_core.plugin_schema.provider import Provider, ProviderGroupData
+from cppython_core.plugin_schema.provider import (
+    Provider,
+    ProviderPluginGroupData,
+    SupportedProviderFeatures,
+)
 from cppython_core.resolution import resolve_name
 from cppython_core.schema import CorePluginData, CPPythonModel, Information, SyncData
+from pydantic import DirectoryPath
 
 from pytest_cppython.mock.generator import MockSyncData
 
@@ -19,26 +23,27 @@ class MockProviderData(CPPythonModel):
 class MockProvider(Provider):
     """A mock provider class for behavior testing"""
 
-    downloaded: Path | None = None
+    downloaded: DirectoryPath | None = None
 
     def __init__(
-        self, group_data: ProviderGroupData, core_data: CorePluginData, configuration_data: dict[str, Any]
+        self, group_data: ProviderPluginGroupData, core_data: CorePluginData, configuration_data: dict[str, Any]
     ) -> None:
         self.group_data = group_data
         self.core_data = core_data
         self.configuration_data = MockProviderData(**configuration_data)
 
     @staticmethod
-    def supported(directory: Path) -> bool:
-        """Mocks support
+    def features(directory: DirectoryPath) -> SupportedProviderFeatures:
+        """Broadcasts the shared features of the Provider plugin to CPPython
 
         Args:
-            directory: The input directory
+            directory: The root directory where features are evaluated
 
         Returns:
-            False, always.
+            The supported features
         """
-        return False
+
+        return SupportedProviderFeatures()
 
     @staticmethod
     def information() -> Information:
@@ -81,8 +86,8 @@ class MockProvider(Provider):
         return None
 
     @classmethod
-    async def download_tooling(cls, path: Path) -> None:
-        cls.downloaded = path
+    async def download_tooling(cls, directory: DirectoryPath) -> None:
+        cls.downloaded = directory
 
     def install(self) -> None:
         pass

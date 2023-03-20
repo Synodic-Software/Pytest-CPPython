@@ -8,27 +8,32 @@ from typing import Any, Generic, cast
 import pytest
 from cppython_core.plugin_schema.generator import (
     Generator,
-    GeneratorGroupData,
+    GeneratorPluginGroupData,
     GeneratorT,
 )
-from cppython_core.plugin_schema.provider import Provider, ProviderGroupData, ProviderT
-from cppython_core.plugin_schema.scm import SCMT
+from cppython_core.plugin_schema.provider import (
+    Provider,
+    ProviderPluginGroupData,
+    ProviderT,
+)
+from cppython_core.plugin_schema.scm import SCMT, SCMPluginGroupData
 from cppython_core.resolution import (
     resolve_cppython_plugin,
-    resolve_full_name,
     resolve_generator,
     resolve_group,
     resolve_provider,
+    resolve_scm,
 )
 from cppython_core.schema import (
     CorePluginData,
     CPPythonData,
     CPPythonPluginData,
+    DataPluginGroupData,
     DataPluginT,
-    Information,
     PEP621Data,
     PluginGroupData,
     PluginT,
+    ProjectConfiguration,
     ProjectData,
 )
 
@@ -44,18 +49,28 @@ class PluginTests(Generic[PluginT], metaclass=ABCMeta):
 
         raise NotImplementedError("Override this fixture")
 
-    @pytest.fixture(name="plugin_information", scope="session")
-    def fixture_plugin_information(self, plugin_type: type[PluginT]) -> Information:
-        """Helper to extract the plugin information
+    @staticmethod
+    @pytest.fixture(
+        name="plugin",
+        scope="session",
+    )
+    def fixture_plugin(
+        plugin_type: type[PluginT],
+        plugin_group_data: PluginGroupData,
+    ) -> PluginT:
+        """Overridden plugin generator for creating a populated data plugin type
 
         Args:
-            plugin_type: The type to extract
+            plugin_type: Plugin type
+            plugin_group_data: The data group configuration
 
         Returns:
-            The plugin's information
+            A newly constructed provider
         """
 
-        return plugin_type.information()
+        plugin = plugin_type(plugin_group_data)
+
+        return plugin
 
 
 class PluginIntegrationTests(Generic[PluginT], metaclass=ABCMeta):
@@ -75,44 +90,37 @@ class PluginIntegrationTests(Generic[PluginT], metaclass=ABCMeta):
 
         assert plugin_type in types
 
-    def test_name_length(self, plugin_type: type[PluginT]) -> None:
-        """Verifies that the name follows group conventions
+    def test_information(self, plugin_type: type[PluginT]) -> None:
+        """_summary_
 
         Args:
-            plugin_type: The type to parse
+            plugin_type: _description_
         """
 
-        name = resolve_full_name(plugin_type)
-
-        split_name = str(name).split(".")
-
-        assert len(split_name) == 2, (
-            "The plugin class name must only consist of two elements in PascalCase - the plugin name and the plugin"
-            " group"
-        )
+        assert plugin_type.information()
 
 
 class PluginUnitTests(Generic[PluginT], metaclass=ABCMeta):
     """Unit testing information for all plugin test classes"""
 
-    def test_not_supported(self, plugin_type: type[PluginT], tmp_path: Path) -> None:
-        """Tests that the temporary directory path will not be registered as supported
+    def test_feature_extraction(self, plugin_type: type[PluginT], project_configuration: ProjectConfiguration) -> None:
+        """_summary_
 
         Args:
-            plugin_type: The plugin type
-            tmp_path: Temporary directory
+            plugin_type: _description_
+            project_configuration: _description_
         """
 
-        assert not plugin_type.supported(tmp_path)
+        assert plugin_type.features(project_configuration.pyproject_file.parent)
 
-    def test_wont_initialize(self, plugin_information: Information) -> None:
-        """Prevent initialization from being set
+    def test_information(self, plugin_type: type[PluginT]) -> None:
+        """_summary_
 
         Args:
-            plugin_information: The plugin information
+            plugin_type: _description_
         """
 
-        assert not plugin_information.initialization, "Keep 'initialization' False. The feature is under development"
+        assert plugin_type.information()
 
 
 class DataPluginTests(PluginTests[DataPluginT], Generic[DataPluginT], metaclass=ABCMeta):
@@ -161,12 +169,12 @@ class DataPluginTests(PluginTests[DataPluginT], Generic[DataPluginT], metaclass=
 
     @staticmethod
     @pytest.fixture(
-        name="plugin",
+        name="data_plugin",
         scope="session",
     )
-    def fixture_plugin(
+    def fixture_data_plugin(
         plugin_type: type[DataPluginT],
-        plugin_group_data: PluginGroupData,
+        plugin_group_data: DataPluginGroupData,
         core_plugin_data: CorePluginData,
         plugin_data: dict[str, Any],
     ) -> DataPluginT:
@@ -211,17 +219,17 @@ class ProviderTests(DataPluginTests[ProviderT], Generic[ProviderT], metaclass=AB
     """Shared functionality between the different Provider testing categories"""
 
     @pytest.fixture(name="plugin_configuration_type", scope="session")
-    def fixture_plugin_configuration_type(self) -> type[ProviderGroupData]:
+    def fixture_plugin_configuration_type(self) -> type[ProviderPluginGroupData]:
         """A required testing hook that allows plugin configuration data generation
 
         Returns:
             The configuration type
         """
 
-        return ProviderGroupData
+        return ProviderPluginGroupData
 
     @pytest.fixture(name="plugin_group_data", scope="session")
-    def fixture_plugin_group_data(self, project_data: ProjectData) -> ProviderGroupData:
+    def fixture_plugin_group_data(self, project_data: ProjectData) -> ProviderPluginGroupData:
         """Generates plugin configuration data generation from environment configuration
 
         Args:
@@ -272,17 +280,17 @@ class GeneratorTests(DataPluginTests[GeneratorT], Generic[GeneratorT], metaclass
     """Shared functionality between the different Generator testing categories"""
 
     @pytest.fixture(name="plugin_configuration_type", scope="session")
-    def fixture_plugin_configuration_type(self) -> type[GeneratorGroupData]:
+    def fixture_plugin_configuration_type(self) -> type[GeneratorPluginGroupData]:
         """A required testing hook that allows plugin configuration data generation
 
         Returns:
             The configuration type
         """
 
-        return GeneratorGroupData
+        return GeneratorPluginGroupData
 
     @pytest.fixture(name="plugin_group_data", scope="session")
-    def fixture_plugin_group_data(self, project_data: ProjectData) -> GeneratorGroupData:
+    def fixture_plugin_group_data(self, project_data: ProjectData) -> GeneratorPluginGroupData:
         """Generates plugin configuration data generation from environment configuration
 
         Args:
@@ -332,16 +340,25 @@ class GeneratorTests(DataPluginTests[GeneratorT], Generic[GeneratorT], metaclass
 class SCMTests(PluginTests[SCMT], Generic[SCMT], metaclass=ABCMeta):
     """Shared functionality between the different SCM testing categories"""
 
-    @pytest.fixture(name="plugin")
-    def fixture_plugin(
-        self,
-        plugin_type: type[SCMT],
-    ) -> SCMT:
-        """Fixture creating the plugin.
-        Args:
-            plugin_type: An input plugin type
+    @pytest.fixture(name="plugin_configuration_type", scope="session")
+    def fixture_plugin_configuration_type(self) -> type[SCMPluginGroupData]:
+        """A required testing hook that allows plugin configuration data generation
 
         Returns:
-            A newly constructed plugin
+            The configuration type
         """
-        return plugin_type()
+
+        return SCMPluginGroupData
+
+    @pytest.fixture(name="plugin_group_data", scope="session")
+    def fixture_plugin_group_data(self, project_data: ProjectData) -> SCMPluginGroupData:
+        """Generates plugin configuration data generation from environment configuration
+
+        Args:
+            project_data: The workspace configuration
+
+        Returns:
+            The plugin configuration
+        """
+
+        return resolve_scm(project_data)
