@@ -26,7 +26,7 @@ class MockSCM(SCM):
             The supported features
         """
 
-        return SupportedSCMFeatures()
+        return SupportedSCMFeatures(repository=True)
 
     @staticmethod
     def information() -> Information:
