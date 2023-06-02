@@ -107,7 +107,7 @@ def fixture_cppython_local_configuration(
     """
     cppython_local_configuration = cast(CPPythonLocalConfiguration, request.param)
 
-    data = cppython_local_configuration.dict(by_alias=True)
+    data = cppython_local_configuration.model_dump(by_alias=True)
 
     # Pin the install location to the base temporary directory
     data["install-path"] = install_path
