@@ -54,7 +54,7 @@ class BaseTests(Generic[PluginT], metaclass=ABCMeta):
     def fixture_something(self) -> Any:
         """A required testing hook for something"""
 
-        raise NotImplementedError("Override this fixture")
+        return None
 
 
 class BaseIntegrationTests(Generic[PluginT], metaclass=ABCMeta):
