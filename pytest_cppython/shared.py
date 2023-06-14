@@ -36,6 +36,7 @@ from cppython_core.schema import (
     ProjectConfiguration,
     ProjectData,
 )
+from cppython_core.utility import canonicalize_name
 
 from pytest_cppython.variants import generator_variants, provider_variants
 
@@ -66,6 +67,17 @@ class BaseIntegrationTests(Generic[PluginT], metaclass=ABCMeta):
             types.append(entry.load())
 
         assert plugin_type in types
+
+    def test_name(self, plugin_type: type[PluginT]) -> None:
+        """Verifies the the class name allows name extraction
+
+        Args:
+            plugin_type: The type to register
+        """
+        normalized = canonicalize_name(plugin_type.__name__)
+
+        assert normalized.group != ""
+        assert normalized.name != ""
 
 
 class BaseUnitTests(Generic[PluginT], metaclass=ABCMeta):
