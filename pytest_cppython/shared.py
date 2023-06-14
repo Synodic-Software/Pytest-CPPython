@@ -50,6 +50,12 @@ class BaseTests(Generic[PluginT], metaclass=ABCMeta):
 
         raise NotImplementedError("Override this fixture")
 
+    @pytest.fixture(name="something", scope="session")
+    def fixture_something(self) -> Any:
+        """A required testing hook for something"""
+
+        raise NotImplementedError("Override this fixture")
+
 
 class BaseIntegrationTests(Generic[PluginT], metaclass=ABCMeta):
     """Integration testing information for all plugin test classes"""
