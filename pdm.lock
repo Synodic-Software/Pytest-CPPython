@@ -63,7 +63,7 @@ dependencies = [
 
 [[package]]
 name = "cppython-core"
-version = "0.6.1.dev69"
+version = "0.6.1.dev70"
 requires_python = ">=3.11"
 summary = "Data definitions for CPPython"
 dependencies = [
@@ -333,9 +333,9 @@ content_hash = "sha256:d3a7e03395b26fab1acbf8ab1b204d0a138b304e12a89c7abeb050ec1
     {url = "https://files.pythonhosted.org/packages/fe/57/e4f8ad64d84ca9e759d783a052795f62a9f9111585e46068845b1cb52c2b/coverage-7.2.7-cp39-cp39-manylinux_2_5_x86_64.manylinux1_x86_64.manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:6f48351d66575f535669306aa7d6d6f71bc43372473b54a832222803eb956fd1"},
     {url = "https://files.pythonhosted.org/packages/ff/d5/52fa1891d1802ab2e1b346d37d349cb41cdd4fd03f724ebbf94e80577687/coverage-7.2.7-cp312-cp312-macosx_10_9_x86_64.whl", hash = "sha256:f2f67fe12b22cd130d34d0ef79206061bfb5eda52feb6ce0dba0644e20a03cf4"},
 ]
-"cppython-core 0.6.1.dev69" = [
-    {url = "https://files.pythonhosted.org/packages/d4/4d/c40935ac8659dac1f4299f06fe6ed8c6765e6899c56a648c324fb1213020/cppython-core-0.6.1.dev69.tar.gz", hash = "sha256:4d6e74dd3814e331266f9ddcd05b1740ff981454591781d722131f808d2a0a9c"},
-    {url = "https://files.pythonhosted.org/packages/ff/6f/588420a7e7b16e7af68870bc4541e56a052acd5f93cbff568fd030c5b7e7/cppython_core-0.6.1.dev69-py3-none-any.whl", hash = "sha256:5fd777dddafdda45cc6c38005a92009576e902c69a461080dfb87fe8c27e9560"},
+"cppython-core 0.6.1.dev70" = [
+    {url = "https://files.pythonhosted.org/packages/82/44/6b22f00a9590ac4edba724f891f05ac4936b441456ab26bf90dbf80e6d07/cppython_core-0.6.1.dev70-py3-none-any.whl", hash = "sha256:c2761c1b9f20d5da53f52d2273be9dced812f56d2f8186786ccd662505da14fc"},
+    {url = "https://files.pythonhosted.org/packages/b9/a7/cdad28d35ac41701ebf868f238abd9ac8eecb89283bfafdedbcbe644d4aa/cppython-core-0.6.1.dev70.tar.gz", hash = "sha256:55dc44f3570c67a63ca9d88848a543d71eff476fe13f77948f11ea5f579822b9"},
 ]
 "dill 0.3.6" = [
     {url = "https://files.pythonhosted.org/packages/7c/e7/364a09134e1062d4d5ff69b853a56cf61c223e0afcc6906b6832bcd51ea8/dill-0.3.6.tar.gz", hash = "sha256:e5db55f3687856d8fbdab002ed78544e1c4559a130302693d839dfe8f93f2373"},
