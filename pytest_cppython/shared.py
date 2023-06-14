@@ -36,11 +36,12 @@ from cppython_core.schema import (
     ProjectConfiguration,
     ProjectData,
 )
+from cppython_core.utility import canonicalize_name
 
 from pytest_cppython.variants import generator_variants, provider_variants
 
 
-class PluginTests(Generic[PluginT], metaclass=ABCMeta):
+class BaseTests(Generic[PluginT], metaclass=ABCMeta):
     """Shared testing information for all plugin test classes."""
 
     @pytest.fixture(name="plugin_type", scope="session")
@@ -48,6 +49,76 @@ class PluginTests(Generic[PluginT], metaclass=ABCMeta):
         """A required testing hook that allows type generation"""
 
         raise NotImplementedError("Override this fixture")
+
+    @pytest.fixture(name="something", scope="session")
+    def fixture_something(self) -> Any:
+        """A required testing hook for something"""
+
+        return None
+
+
+class BaseIntegrationTests(Generic[PluginT], metaclass=ABCMeta):
+    """Integration testing information for all plugin test classes"""
+
+    def test_entry_point(self, plugin_type: type[PluginT]) -> None:
+        """Verify that the plugin was registered
+
+        Args:
+            plugin_type: The type to register
+        """
+        group = resolve_group(plugin_type)
+
+        types = []
+        for entry in list(entry_points(group=f"cppython.{group}")):
+            types.append(entry.load())
+
+        assert plugin_type in types
+
+    def test_name(self, plugin_type: type[PluginT]) -> None:
+        """Verifies the the class name allows name extraction
+
+        Args:
+            plugin_type: The type to register
+        """
+        normalized = canonicalize_name(plugin_type.__name__)
+
+        assert normalized.group != ""
+        assert normalized.name != ""
+
+
+class BaseUnitTests(Generic[PluginT], metaclass=ABCMeta):
+    """Unit testing information for all plugin test classes"""
+
+    def test_feature_extraction(self, plugin_type: type[PluginT], project_configuration: ProjectConfiguration) -> None:
+        """_summary_
+
+        Args:
+            plugin_type: _description_
+            project_configuration: _description_
+        """
+
+        assert plugin_type.features(project_configuration.pyproject_file.parent)
+
+    def test_information(self, plugin_type: type[PluginT]) -> None:
+        """_summary_
+
+        Args:
+            plugin_type: _description_
+        """
+
+        assert plugin_type.information()
+
+    def test_plugin_construction(self, plugin: PluginT) -> None:
+        """Verifies that the plugin being tested can be constructed
+
+        Args:
+            plugin: The data plugin fixture
+        """
+        assert plugin
+
+
+class PluginTests(BaseTests[PluginT], Generic[PluginT], metaclass=ABCMeta):
+    """Testing information for basic plugin test classes."""
 
     @staticmethod
     @pytest.fixture(
@@ -73,57 +144,15 @@ class PluginTests(Generic[PluginT], metaclass=ABCMeta):
         return plugin
 
 
-class PluginIntegrationTests(Generic[PluginT], metaclass=ABCMeta):
-    """Integration testing information for all plugin test classes"""
-
-    def test_entry_point(self, plugin_type: type[PluginT]) -> None:
-        """Verify that the plugin was registered
-
-        Args:
-            plugin_type: The type to register
-        """
-        group = resolve_group(plugin_type)
-
-        types = []
-        for entry in list(entry_points(group=f"cppython.{group}")):
-            types.append(entry.load())
-
-        assert plugin_type in types
-
-    def test_information(self, plugin_type: type[PluginT]) -> None:
-        """_summary_
-
-        Args:
-            plugin_type: _description_
-        """
-
-        assert plugin_type.information()
+class PluginIntegrationTests(BaseIntegrationTests[PluginT], Generic[PluginT], metaclass=ABCMeta):
+    """Integration testing information for basic plugin test classes"""
 
 
-class PluginUnitTests(Generic[PluginT], metaclass=ABCMeta):
-    """Unit testing information for all plugin test classes"""
-
-    def test_feature_extraction(self, plugin_type: type[PluginT], project_configuration: ProjectConfiguration) -> None:
-        """_summary_
-
-        Args:
-            plugin_type: _description_
-            project_configuration: _description_
-        """
-
-        assert plugin_type.features(project_configuration.pyproject_file.parent)
-
-    def test_information(self, plugin_type: type[PluginT]) -> None:
-        """_summary_
-
-        Args:
-            plugin_type: _description_
-        """
-
-        assert plugin_type.information()
+class PluginUnitTests(BaseUnitTests[PluginT], Generic[PluginT], metaclass=ABCMeta):
+    """Unit testing information for basic plugin test classes"""
 
 
-class DataPluginTests(PluginTests[DataPluginT], Generic[DataPluginT], metaclass=ABCMeta):
+class DataPluginTests(BaseTests[DataPluginT], Generic[DataPluginT], metaclass=ABCMeta):
     """Shared testing information for all data plugin test classes.
     Not inheriting PluginTests to reduce ancestor count
     """
@@ -169,10 +198,10 @@ class DataPluginTests(PluginTests[DataPluginT], Generic[DataPluginT], metaclass=
 
     @staticmethod
     @pytest.fixture(
-        name="data_plugin",
+        name="plugin",
         scope="session",
     )
-    def fixture_data_plugin(
+    def fixture_plugin(
         plugin_type: type[DataPluginT],
         plugin_group_data: DataPluginGroupData,
         core_plugin_data: CorePluginData,
@@ -195,11 +224,11 @@ class DataPluginTests(PluginTests[DataPluginT], Generic[DataPluginT], metaclass=
         return plugin
 
 
-class DataPluginIntegrationTests(PluginIntegrationTests[DataPluginT], Generic[DataPluginT], metaclass=ABCMeta):
+class DataPluginIntegrationTests(BaseIntegrationTests[DataPluginT], Generic[DataPluginT], metaclass=ABCMeta):
     """Integration testing information for all data plugin test classes"""
 
 
-class DataPluginUnitTests(PluginUnitTests[DataPluginT], Generic[DataPluginT], metaclass=ABCMeta):
+class DataPluginUnitTests(BaseUnitTests[DataPluginT], Generic[DataPluginT], metaclass=ABCMeta):
     """Unit testing information for all data plugin test classes"""
 
     def test_pyproject_undefined(self, plugin_data_path: Path | None) -> None:
