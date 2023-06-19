@@ -7,6 +7,7 @@ from typing import cast
 import pytest
 from cppython_core.plugin_schema.generator import Generator
 from cppython_core.plugin_schema.provider import Provider
+from cppython_core.plugin_schema.scm import SCM
 from cppython_core.resolution import (
     PluginBuildData,
     resolve_cppython,
@@ -145,18 +146,20 @@ def fixture_cppython_global_configuration(request: pytest.FixtureRequest) -> CPP
 def fixture_plugin_build_data(
     provider_type: type[Provider],
     generator_type: type[Generator],
+    scm_type: type[SCM],
 ) -> PluginBuildData:
     """Fixture for constructing resolved CPPython table data
 
     Args:
-        provider_type: The local configuration to resolve
-        generator_type: The global configuration to resolve
+        provider_type: The provider type
+        generator_type: The generator type
+        scm_type: The scm type
 
     Returns:
         The plugin build data
     """
 
-    return PluginBuildData(generator_type=generator_type, provider_type=provider_type)
+    return PluginBuildData(generator_type=generator_type, provider_type=provider_type, scm_type=scm_type)
 
 
 @pytest.fixture(
@@ -189,19 +192,18 @@ def fixture_cppython_data(
 @pytest.fixture(
     name="core_data",
 )
-def fixture_core_data(cppython_data: CPPythonData, project_data: ProjectData, pep621_data: PEP621Data) -> CoreData:
+def fixture_core_data(cppython_data: CPPythonData, project_data: ProjectData) -> CoreData:
     """Fixture for creating the wrapper CoreData type
 
     Args:
         cppython_data: CPPython data
         project_data: The project data
-        pep621_data: Project table data
 
     Returns:
         Wrapper Core Type
     """
 
-    return CoreData(cppython_data=cppython_data, project_data=project_data, pep621_data=pep621_data)
+    return CoreData(cppython_data=cppython_data, project_data=project_data)
 
 
 def pytest_generate_tests(metafunc: pytest.Metafunc) -> None:

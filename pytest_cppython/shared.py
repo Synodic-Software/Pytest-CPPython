@@ -16,7 +16,7 @@ from cppython_core.plugin_schema.provider import (
     ProviderPluginGroupData,
     ProviderT,
 )
-from cppython_core.plugin_schema.scm import SCMT, SCMPluginGroupData
+from cppython_core.plugin_schema.scm import SCM, SCMT, SCMPluginGroupData
 from cppython_core.resolution import (
     resolve_cppython_plugin,
     resolve_generator,
@@ -38,7 +38,7 @@ from cppython_core.schema import (
 )
 from cppython_core.utility import canonicalize_name
 
-from pytest_cppython.variants import generator_variants, provider_variants
+from pytest_cppython.variants import generator_variants, provider_variants, scm_variants
 
 
 class BaseTests(Generic[PluginT], metaclass=ABCMeta):
@@ -50,11 +50,44 @@ class BaseTests(Generic[PluginT], metaclass=ABCMeta):
 
         raise NotImplementedError("Override this fixture")
 
-    @pytest.fixture(name="something", scope="session")
-    def fixture_something(self) -> Any:
-        """A required testing hook for something"""
+    @pytest.fixture(
+        name="cppython_plugin_data",
+        scope="session",
+    )
+    def fixture_cppython_plugin_data(
+        self, cppython_data: CPPythonData, plugin_type: type[DataPluginT]
+    ) -> CPPythonPluginData:
+        """Fixture for created the plugin CPPython table
 
-        return None
+        Args:
+            cppython_data: The CPPython table to help the resolve
+            plugin_type: The data plugin type
+
+        Returns:
+            The plugin specific CPPython table information
+        """
+
+        return resolve_cppython_plugin(cppython_data, plugin_type)
+
+    @pytest.fixture(
+        name="core_plugin_data",
+        scope="session",
+    )
+    def fixture_core_plugin_data(
+        self, cppython_plugin_data: CPPythonPluginData, project_data: ProjectData, pep621_data: PEP621Data
+    ) -> CorePluginData:
+        """Fixture for creating the wrapper CoreData type
+
+        Args:
+            cppython_plugin_data: CPPython data
+            project_data: The project data
+            pep621_data: Project table data
+
+        Returns:
+            Wrapper Core Type
+        """
+
+        return CorePluginData(cppython_data=cppython_plugin_data, project_data=project_data, pep621_data=pep621_data)
 
 
 class BaseIntegrationTests(Generic[PluginT], metaclass=ABCMeta):
@@ -157,45 +190,6 @@ class DataPluginTests(BaseTests[DataPluginT], Generic[DataPluginT], metaclass=AB
     Not inheriting PluginTests to reduce ancestor count
     """
 
-    @pytest.fixture(
-        name="cppython_plugin_data",
-        scope="session",
-    )
-    def fixture_cppython_plugin_data(
-        self, cppython_data: CPPythonData, plugin_type: type[DataPluginT]
-    ) -> CPPythonPluginData:
-        """Fixture for created the plugin CPPython table
-
-        Args:
-            cppython_data: The CPPython table to help the resolve
-            plugin_type: The data plugin type
-
-        Returns:
-            The plugin specific CPPython table information
-        """
-
-        return resolve_cppython_plugin(cppython_data, plugin_type)
-
-    @pytest.fixture(
-        name="core_plugin_data",
-        scope="session",
-    )
-    def fixture_core_plugin_data(
-        self, cppython_plugin_data: CPPythonPluginData, project_data: ProjectData, pep621_data: PEP621Data
-    ) -> CorePluginData:
-        """Fixture for creating the wrapper CoreData type
-
-        Args:
-            cppython_plugin_data: CPPython data
-            project_data: The project data
-            pep621_data: Project table data
-
-        Returns:
-            Wrapper Core Type
-        """
-
-        return CorePluginData(cppython_data=cppython_plugin_data, project_data=project_data, pep621_data=pep621_data)
-
     @staticmethod
     @pytest.fixture(
         name="plugin",
@@ -258,17 +252,17 @@ class ProviderTests(DataPluginTests[ProviderT], Generic[ProviderT], metaclass=AB
         return ProviderPluginGroupData
 
     @pytest.fixture(name="plugin_group_data", scope="session")
-    def fixture_plugin_group_data(self, project_data: ProjectData) -> ProviderPluginGroupData:
+    def fixture_plugin_group_data(self, core_plugin_data: CorePluginData) -> ProviderPluginGroupData:
         """Generates plugin configuration data generation from environment configuration
 
         Args:
-            project_data: The workspace configuration
+            core_plugin_data: The workspace configuration
 
         Returns:
             The plugin configuration
         """
 
-        return resolve_provider(project_data)
+        return resolve_provider(core_plugin_data)
 
     @pytest.fixture(
         name="provider_type",
@@ -304,6 +298,24 @@ class ProviderTests(DataPluginTests[ProviderT], Generic[ProviderT], metaclass=AB
 
         return generator_type
 
+    @pytest.fixture(
+        name="scm_type",
+        scope="session",
+        params=scm_variants,
+    )
+    def fixture_scm_type(self, request: pytest.FixtureRequest) -> type[SCM]:
+        """Fixture defining all testable variations mock Generator
+
+        Args:
+            request: Parameterization list
+
+        Returns:
+            Variation of a Generator
+        """
+        scm_type = cast(type[SCM], request.param)
+
+        return scm_type
+
 
 class GeneratorTests(DataPluginTests[GeneratorT], Generic[GeneratorT], metaclass=ABCMeta):
     """Shared functionality between the different Generator testing categories"""
@@ -319,17 +331,17 @@ class GeneratorTests(DataPluginTests[GeneratorT], Generic[GeneratorT], metaclass
         return GeneratorPluginGroupData
 
     @pytest.fixture(name="plugin_group_data", scope="session")
-    def fixture_plugin_group_data(self, project_data: ProjectData) -> GeneratorPluginGroupData:
+    def fixture_plugin_group_data(self, core_plugin_data: CorePluginData) -> GeneratorPluginGroupData:
         """Generates plugin configuration data generation from environment configuration
 
         Args:
-            project_data: The workspace configuration
+            core_plugin_data: The workspace configuration
 
         Returns:
             The plugin configuration
         """
 
-        return resolve_generator(project_data)
+        return resolve_generator(core_plugin_data)
 
     @pytest.fixture(
         name="provider_type",
@@ -365,6 +377,24 @@ class GeneratorTests(DataPluginTests[GeneratorT], Generic[GeneratorT], metaclass
 
         return plugin_type
 
+    @pytest.fixture(
+        name="scm_type",
+        scope="session",
+        params=scm_variants,
+    )
+    def fixture_scm_type(self, request: pytest.FixtureRequest) -> type[SCM]:
+        """Fixture defining all testable variations mock Generator
+
+        Args:
+            request: Parameterization list
+
+        Returns:
+            Variation of a Generator
+        """
+        scm_type = cast(type[SCM], request.param)
+
+        return scm_type
+
 
 class SCMTests(PluginTests[SCMT], Generic[SCMT], metaclass=ABCMeta):
     """Shared functionality between the different SCM testing categories"""
@@ -380,14 +410,67 @@ class SCMTests(PluginTests[SCMT], Generic[SCMT], metaclass=ABCMeta):
         return SCMPluginGroupData
 
     @pytest.fixture(name="plugin_group_data", scope="session")
-    def fixture_plugin_group_data(self, project_data: ProjectData) -> SCMPluginGroupData:
+    def fixture_plugin_group_data(self, core_plugin_data: CorePluginData) -> SCMPluginGroupData:
         """Generates plugin configuration data generation from environment configuration
 
         Args:
-            project_data: The workspace configuration
+            core_plugin_data: The workspace configuration
 
         Returns:
             The plugin configuration
         """
 
-        return resolve_scm(project_data)
+        return resolve_scm(core_plugin_data)
+
+    @pytest.fixture(
+        name="provider_type",
+        scope="session",
+        params=provider_variants,
+    )
+    def fixture_provider_type(self, request: pytest.FixtureRequest) -> type[Provider]:
+        """Fixture defining all testable variations mock Providers
+
+        Args:
+            request: Parameterization list
+
+        Returns:
+            Variation of a Provider
+        """
+        provider_type = cast(type[Provider], request.param)
+
+        return provider_type
+
+    @pytest.fixture(
+        name="generator_type",
+        scope="session",
+        params=generator_variants,
+    )
+    def fixture_generator_type(self, request: pytest.FixtureRequest) -> type[Generator]:
+        """Fixture defining all testable variations mock Generator
+
+        Args:
+            request: Parameterization list
+
+        Returns:
+            Variation of a Generator
+        """
+        generator_type = cast(type[Generator], request.param)
+
+        return generator_type
+
+    @pytest.fixture(
+        name="scm_type",
+        scope="session",
+        params=scm_variants,
+    )
+    def fixture_scm_type(self, plugin_type: type[SCMT]) -> type[SCM]:
+        """Fixture defining all testable variations mock Generator
+
+        Args:
+            plugin_type: Parameterization list
+
+        Returns:
+            Variation of a Generator
+        """
+
+        return plugin_type
