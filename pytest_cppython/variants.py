@@ -5,6 +5,7 @@ from pathlib import Path
 
 from cppython_core.plugin_schema.generator import Generator
 from cppython_core.plugin_schema.provider import Provider
+from cppython_core.plugin_schema.scm import SCM
 from cppython_core.schema import (
     CPPythonGlobalConfiguration,
     CPPythonLocalConfiguration,
@@ -14,6 +15,7 @@ from cppython_core.schema import (
 
 from pytest_cppython.mock.generator import MockGenerator
 from pytest_cppython.mock.provider import MockProvider
+from pytest_cppython.mock.scm import MockSCM
 
 
 def _pep621_configuration_list() -> list[PEP621Configuration]:
@@ -107,9 +109,24 @@ def _mock_generator_list() -> Sequence[type[Generator]]:
     return variants
 
 
+def _mock_scm_list() -> Sequence[type[SCM]]:
+    """Mocked list of SCMs
+
+    Returns:
+        List of mock SCMs
+    """
+    variants = []
+
+    # Default
+    variants.append(MockSCM)
+
+    return variants
+
+
 pep621_variants = _pep621_configuration_list()
 cppython_local_variants = _cppython_local_configuration_list()
 cppython_global_variants = _cppython_global_configuration_list()
 project_variants = _project_configuration_list()
 provider_variants = _mock_provider_list()
 generator_variants = _mock_generator_list()
+scm_variants = _mock_scm_list()
