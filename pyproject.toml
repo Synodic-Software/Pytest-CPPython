@@ -2,7 +2,7 @@
 description = "A pytest plugin that imports CPPython testing types"
 name = "pytest-cppython"
 
-license = "MIT"
+license = {text = "MIT"}
 
 authors = [
   {name = "Synodic Software", email = "contact@synodic.software"},
@@ -16,7 +16,7 @@ requires-python = ">=3.11"
 
 dependencies = [
   "cppython-core>=0.4.1.dev13",
-  "pydantic>=2.0a4",
+  "pydantic>=2.3",
 ]
 
 [project.license-files]
@@ -39,19 +39,22 @@ mock = "pytest_cppython.mock.provider:MockProvider"
 [project.entry-points.pytest11]
 pytest_cppython = "pytest_cppython.plugin"
 
-[tool.pdm]
-version = {use_scm = true}
+[tool.pdm.options]
+update = ["--update-all"]
+
+[tool.pdm.version]
+source = "scm"
 
 [tool.pdm.dev-dependencies]
 lint = [
-  "black>=23.1.0",
-  "pylint>=2.16.1",
+  "black>= 23.7.0 ",
   "isort>=5.12.0",
-  "mypy>=1.0.0",
+  "mypy>=1.5.1 ",
+  "pylint>=2.17.5",
 ]
 test = [
   "pytest >=7.2.0",
-  "pytest-cov>=3.0.0",
+  "pytest-cov>=4.1.0",
   "pytest-mock>=3.8.2",
 ]
 
@@ -107,5 +110,5 @@ default-docstring-type = "google"
 skip_empty = true
 
 [build-system]
-build-backend = "pdm.pep517.api"
-requires = ["pdm-pep517"]
+build-backend = "pdm.backend"
+requires = ["pdm.backend"]
