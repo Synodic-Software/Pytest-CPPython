@@ -20,7 +20,6 @@ from cppython_core.plugin_schema.scm import SCM, SCMT, SCMPluginGroupData
 from cppython_core.resolution import (
     resolve_cppython_plugin,
     resolve_generator,
-    resolve_group,
     resolve_provider,
     resolve_scm,
 )
@@ -36,7 +35,7 @@ from cppython_core.schema import (
     ProjectConfiguration,
     ProjectData,
 )
-from cppython_core.utility import canonicalize_name
+from synodic_utilities.utility import canonicalize_type
 
 from pytest_cppython.variants import generator_variants, provider_variants, scm_variants
 
@@ -99,7 +98,7 @@ class BaseIntegrationTests(Generic[PluginT], metaclass=ABCMeta):
         Args:
             plugin_type: The type to register
         """
-        group = resolve_group(plugin_type)
+        group = canonicalize_type(plugin_type).group
 
         types = []
         for entry in list(entry_points(group=f"cppython.{group}")):
@@ -113,7 +112,7 @@ class BaseIntegrationTests(Generic[PluginT], metaclass=ABCMeta):
         Args:
             plugin_type: The type to register
         """
-        normalized = canonicalize_name(plugin_type.__name__)
+        normalized = canonicalize_type(plugin_type)
 
         assert normalized.group != ""
         assert normalized.name != ""

@@ -9,9 +9,9 @@ from cppython_core.plugin_schema.provider import (
     ProviderPluginGroupData,
     SupportedProviderFeatures,
 )
-from cppython_core.resolution import resolve_name
 from cppython_core.schema import CorePluginData, CPPythonModel, Information, SyncData
 from pydantic import DirectoryPath
+from synodic_utilities.utility import canonicalize_type
 
 from pytest_cppython.mock.generator import MockSyncData
 
@@ -81,7 +81,7 @@ class MockProvider(Provider):
         for sync_type in consumer.sync_types():
             match sync_type:
                 case MockSyncData(sync_type):
-                    return MockSyncData(provider_name=resolve_name(type(self)))
+                    return MockSyncData(provider_name=canonicalize_type(type(self)).name)
 
         return None
 

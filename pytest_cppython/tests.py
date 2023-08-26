@@ -9,7 +9,7 @@ import pytest
 from cppython_core.plugin_schema.generator import GeneratorT
 from cppython_core.plugin_schema.provider import ProviderT
 from cppython_core.plugin_schema.scm import SCMT
-from cppython_core.resolution import resolve_group, resolve_name
+from synodic_utilities.utility import canonicalize_type
 
 from pytest_cppython.shared import (
     DataPluginIntegrationTests,
@@ -31,7 +31,7 @@ class ProviderIntegrationTests(
     def _fixture_install_dependency(self, plugin: ProviderT, install_path: Path) -> None:
         """Forces the download to only happen once per test session"""
 
-        path = install_path / resolve_name(type(plugin))
+        path = install_path / canonicalize_type(type(plugin)).name
         path.mkdir(parents=True, exist_ok=True)
 
         asyncio.run(plugin.download_tooling(path))
@@ -58,7 +58,7 @@ class ProviderIntegrationTests(
         Args:
             plugin_type: The type to register
         """
-        assert resolve_group(plugin_type) == "provider"
+        assert canonicalize_type(plugin_type).group == "provider"
 
 
 class ProviderUnitTests(
@@ -80,7 +80,7 @@ class GeneratorIntegrationTests(
         Args:
             plugin_type: The type to register
         """
-        assert resolve_group(plugin_type) == "generator"
+        assert canonicalize_type(plugin_type).group == "generator"
 
 
 class GeneratorUnitTests(
@@ -99,7 +99,7 @@ class SCMIntegrationTests(PluginIntegrationTests[SCMT], SCMTests[SCMT], Generic[
         Args:
             plugin_type: The type to register
         """
-        assert resolve_group(plugin_type) == "scm"
+        assert canonicalize_type(plugin_type).group == "scm"
 
 
 class SCMUnitTests(PluginUnitTests[SCMT], SCMTests[SCMT], Generic[SCMT], metaclass=ABCMeta):
