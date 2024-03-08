@@ -1,9 +1,8 @@
 """Composable test types"""
 
 from abc import ABCMeta
-from importlib.metadata import entry_points
 from pathlib import Path
-from typing import Any, Generic, cast
+from typing import Any, Generic, LiteralString, cast
 
 import pytest
 from cppython_core.plugin_schema.generator import (
@@ -35,12 +34,14 @@ from cppython_core.schema import (
     ProjectConfiguration,
     ProjectData,
 )
-from synodic_utilities.utility import canonicalize_type
+from pytest_synodic.plugin import BaseTests as SynodicBaseTests
+from pytest_synodic.plugin import IntegrationTests as SynodicBaseIntegrationTests
+from pytest_synodic.plugin import UnitTests as SynodicBaseUnitTests
 
 from pytest_cppython.variants import generator_variants, provider_variants, scm_variants
 
 
-class BaseTests(Generic[PluginT], metaclass=ABCMeta):
+class BaseTests[PluginT: PluginT](SynodicBaseTests[PluginT], metaclass=ABCMeta):  # type: ignore
     """Shared testing information for all plugin test classes."""
 
     @pytest.fixture(name="plugin_type", scope="session")
@@ -88,37 +89,22 @@ class BaseTests(Generic[PluginT], metaclass=ABCMeta):
 
         return CorePluginData(cppython_data=cppython_plugin_data, project_data=project_data, pep621_data=pep621_data)
 
+    @pytest.fixture(name="plugin_group_name", scope="session")
+    def fixture_plugin_group_name(self) -> LiteralString:
+        """A required testing hook that allows plugin group name generation
 
-class BaseIntegrationTests(Generic[PluginT], metaclass=ABCMeta):
+        Returns:
+            The plugin group name
+        """
+
+        return "cppython"
+
+
+class BaseIntegrationTests[PluginT: PluginT](SynodicBaseIntegrationTests[PluginT], metaclass=ABCMeta):  # type: ignore
     """Integration testing information for all plugin test classes"""
 
-    def test_entry_point(self, plugin_type: type[PluginT]) -> None:
-        """Verify that the plugin was registered
 
-        Args:
-            plugin_type: The type to register
-        """
-        group = canonicalize_type(plugin_type).group
-
-        types = []
-        for entry in list(entry_points(group=f"cppython.{group}")):
-            types.append(entry.load())
-
-        assert plugin_type in types
-
-    def test_name(self, plugin_type: type[PluginT]) -> None:
-        """Verifies the the class name allows name extraction
-
-        Args:
-            plugin_type: The type to register
-        """
-        normalized = canonicalize_type(plugin_type)
-
-        assert normalized.group != ""
-        assert normalized.name != ""
-
-
-class BaseUnitTests(Generic[PluginT], metaclass=ABCMeta):
+class BaseUnitTests[PluginT: PluginT](SynodicBaseUnitTests[PluginT], metaclass=ABCMeta):  # type: ignore
     """Unit testing information for all plugin test classes"""
 
     def test_feature_extraction(self, plugin_type: type[PluginT], project_configuration: ProjectConfiguration) -> None:
@@ -139,14 +125,6 @@ class BaseUnitTests(Generic[PluginT], metaclass=ABCMeta):
         """
 
         assert plugin_type.information()
-
-    def test_plugin_construction(self, plugin: PluginT) -> None:
-        """Verifies that the plugin being tested can be constructed
-
-        Args:
-            plugin: The data plugin fixture
-        """
-        assert plugin
 
 
 class PluginTests(BaseTests[PluginT], Generic[PluginT], metaclass=ABCMeta):

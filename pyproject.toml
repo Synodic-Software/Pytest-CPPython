@@ -16,7 +16,10 @@ requires-python = ">=3.12"
 
 dependencies = [
   "cppython-core>=0.4.1.dev13",
-  "pydantic>=2.5.3",
+  "pytest-synodic>=0.0.0",
+  "pydantic>=2.6.3",
+  "pytest>=8.0.0",
+  "pytest-mock>=3.12.0",
 ]
 
 [project.license-files]
@@ -47,15 +50,13 @@ source = "scm"
 
 [tool.pdm.dev-dependencies]
 lint = [
-  "black>= 23.12.1",
+  "black>= 24.1.1",
   "isort>=5.13.2",
-  "mypy>=1.8.0",
-  "pylint>=3.0.3",
+  "mypy>=1.9.0 ",
+  "pylint>=2.17.5",
 ]
 test = [
-  "pytest >=7.4.4",
   "pytest-cov>=4.1.0",
-  "pytest-mock>=3.12.0",
 ]
 
 [tool.pdm.scripts]
