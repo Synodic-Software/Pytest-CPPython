@@ -10,6 +10,7 @@ from cppython_core.plugin_schema.provider import Provider
 from cppython_core.plugin_schema.scm import SCM
 from cppython_core.resolution import (
     PluginBuildData,
+    PluginCPPythonData,
     resolve_cppython,
     resolve_pep621,
     resolve_project_configuration,
@@ -159,7 +160,30 @@ def fixture_plugin_build_data(
         The plugin build data
     """
 
-    return PluginBuildData(
+    return PluginBuildData(generator_type=generator_type, provider_type=provider_type, scm_type=scm_type)
+
+
+@pytest.fixture(
+    name="plugin_cppython_data",
+    scope="session",
+)
+def fixture_plugin_cppython_data(
+    provider_type: type[Provider],
+    generator_type: type[Generator],
+    scm_type: type[SCM],
+) -> PluginCPPythonData:
+    """Fixture for constructing resolved CPPython table data
+
+    Args:
+        provider_type: The provider type
+        generator_type: The generator type
+        scm_type: The scm type
+
+    Returns:
+        The plugin data for CPPython resolution
+    """
+
+    return PluginCPPythonData(
         generator_name=generator_type.name(), provider_name=provider_type.name(), scm_name=scm_type.name()
     )
 
@@ -172,7 +196,7 @@ def fixture_cppython_data(
     cppython_local_configuration: CPPythonLocalConfiguration,
     cppython_global_configuration: CPPythonGlobalConfiguration,
     project_data: ProjectData,
-    plugin_build_data: PluginBuildData,
+    plugin_cppython_data: PluginCPPythonData,
 ) -> CPPythonData:
     """Fixture for constructing resolved CPPython table data
 
@@ -180,14 +204,14 @@ def fixture_cppython_data(
         cppython_local_configuration: The local configuration to resolve
         cppython_global_configuration: The global configuration to resolve
         project_data: The project data to help with the resolve
-        plugin_build_data: Plugin build data
+        plugin_cppython_data: Plugin data for CPPython resolution
 
     Returns:
         The resolved CPPython table
     """
 
     return resolve_cppython(
-        cppython_local_configuration, cppython_global_configuration, project_data, plugin_build_data
+        cppython_local_configuration, cppython_global_configuration, project_data, plugin_cppython_data
     )
 
 
