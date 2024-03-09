@@ -2,20 +2,12 @@
 
 from abc import ABCMeta
 from pathlib import Path
-from typing import Any, Generic, LiteralString, cast
+from typing import Any, LiteralString, cast
 
 import pytest
-from cppython_core.plugin_schema.generator import (
-    Generator,
-    GeneratorPluginGroupData,
-    GeneratorT,
-)
-from cppython_core.plugin_schema.provider import (
-    Provider,
-    ProviderPluginGroupData,
-    ProviderT,
-)
-from cppython_core.plugin_schema.scm import SCM, SCMT, SCMPluginGroupData
+from cppython_core.plugin_schema.generator import Generator, GeneratorPluginGroupData
+from cppython_core.plugin_schema.provider import Provider, ProviderPluginGroupData
+from cppython_core.plugin_schema.scm import SCM, SCMPluginGroupData
 from cppython_core.resolution import (
     resolve_cppython_plugin,
     resolve_generator,
@@ -26,11 +18,11 @@ from cppython_core.schema import (
     CorePluginData,
     CPPythonData,
     CPPythonPluginData,
+    DataPlugin,
     DataPluginGroupData,
-    DataPluginT,
     PEP621Data,
+    Plugin,
     PluginGroupData,
-    PluginT,
     ProjectConfiguration,
     ProjectData,
 )
@@ -41,11 +33,11 @@ from pytest_synodic.plugin import UnitTests as SynodicBaseUnitTests
 from pytest_cppython.variants import generator_variants, provider_variants, scm_variants
 
 
-class BaseTests[PluginT: PluginT](SynodicBaseTests[PluginT], metaclass=ABCMeta):  # type: ignore
+class BaseTests[T: Plugin](SynodicBaseTests[T], metaclass=ABCMeta):  # type: ignore
     """Shared testing information for all plugin test classes."""
 
     @pytest.fixture(name="plugin_type", scope="session")
-    def fixture_plugin_type(self) -> type[PluginT]:
+    def fixture_plugin_type(self) -> type[T]:
         """A required testing hook that allows type generation"""
 
         raise NotImplementedError("Override this fixture")
@@ -54,9 +46,7 @@ class BaseTests[PluginT: PluginT](SynodicBaseTests[PluginT], metaclass=ABCMeta):
         name="cppython_plugin_data",
         scope="session",
     )
-    def fixture_cppython_plugin_data(
-        self, cppython_data: CPPythonData, plugin_type: type[DataPluginT]
-    ) -> CPPythonPluginData:
+    def fixture_cppython_plugin_data(self, cppython_data: CPPythonData, plugin_type: type[T]) -> CPPythonPluginData:
         """Fixture for created the plugin CPPython table
 
         Args:
@@ -100,34 +90,37 @@ class BaseTests[PluginT: PluginT](SynodicBaseTests[PluginT], metaclass=ABCMeta):
         return "cppython"
 
 
-class BaseIntegrationTests[PluginT: PluginT](SynodicBaseIntegrationTests[PluginT], metaclass=ABCMeta):  # type: ignore
+class BaseIntegrationTests[T: Plugin](SynodicBaseIntegrationTests[T], metaclass=ABCMeta):  # type: ignore
     """Integration testing information for all plugin test classes"""
 
 
-class BaseUnitTests[PluginT: PluginT](SynodicBaseUnitTests[PluginT], metaclass=ABCMeta):  # type: ignore
+class BaseUnitTests[T: Plugin](SynodicBaseUnitTests[T], metaclass=ABCMeta):  # type: ignore
     """Unit testing information for all plugin test classes"""
 
-    def test_feature_extraction(self, plugin_type: type[PluginT], project_configuration: ProjectConfiguration) -> None:
-        """_summary_
+    def test_feature_extraction(self, plugin_type: type[T], project_configuration: ProjectConfiguration) -> None:
+        """Test the feature extraction of a plugin.
+
+        This method tests the feature extraction functionality of a plugin by asserting that the features
+        returned by the plugin are correct for the given project configuration.
 
         Args:
-            plugin_type: _description_
-            project_configuration: _description_
+            plugin_type: The type of plugin to test.
+            project_configuration: The project configuration to use for testing.
         """
-
         assert plugin_type.features(project_configuration.pyproject_file.parent)
 
-    def test_information(self, plugin_type: type[PluginT]) -> None:
-        """_summary_
+    def test_information(self, plugin_type: type[T]) -> None:
+        """Test the information method of a plugin.
+
+        This method asserts that the `information` method of the given plugin type returns a value.
 
         Args:
-            plugin_type: _description_
+            plugin_type: The type of the plugin to test.
         """
-
         assert plugin_type.information()
 
 
-class PluginTests(BaseTests[PluginT], Generic[PluginT], metaclass=ABCMeta):
+class PluginTests[T: Plugin](BaseTests[T], metaclass=ABCMeta):
     """Testing information for basic plugin test classes."""
 
     @staticmethod
@@ -136,9 +129,9 @@ class PluginTests(BaseTests[PluginT], Generic[PluginT], metaclass=ABCMeta):
         scope="session",
     )
     def fixture_plugin(
-        plugin_type: type[PluginT],
+        plugin_type: type[T],
         plugin_group_data: PluginGroupData,
-    ) -> PluginT:
+    ) -> T:
         """Overridden plugin generator for creating a populated data plugin type
 
         Args:
@@ -154,15 +147,15 @@ class PluginTests(BaseTests[PluginT], Generic[PluginT], metaclass=ABCMeta):
         return plugin
 
 
-class PluginIntegrationTests(BaseIntegrationTests[PluginT], Generic[PluginT], metaclass=ABCMeta):
+class PluginIntegrationTests[T: Plugin](BaseIntegrationTests[T], metaclass=ABCMeta):
     """Integration testing information for basic plugin test classes"""
 
 
-class PluginUnitTests(BaseUnitTests[PluginT], Generic[PluginT], metaclass=ABCMeta):
+class PluginUnitTests[T: Plugin](BaseUnitTests[T], metaclass=ABCMeta):
     """Unit testing information for basic plugin test classes"""
 
 
-class DataPluginTests(BaseTests[DataPluginT], Generic[DataPluginT], metaclass=ABCMeta):
+class DataPluginTests[T: DataPlugin](BaseTests[T], metaclass=ABCMeta):
     """Shared testing information for all data plugin test classes.
     Not inheriting PluginTests to reduce ancestor count
     """
@@ -173,11 +166,11 @@ class DataPluginTests(BaseTests[DataPluginT], Generic[DataPluginT], metaclass=AB
         scope="session",
     )
     def fixture_plugin(
-        plugin_type: type[DataPluginT],
+        plugin_type: type[T],
         plugin_group_data: DataPluginGroupData,
         core_plugin_data: CorePluginData,
         plugin_data: dict[str, Any],
-    ) -> DataPluginT:
+    ) -> T:
         """Overridden plugin generator for creating a populated data plugin type
 
         Args:
@@ -195,11 +188,11 @@ class DataPluginTests(BaseTests[DataPluginT], Generic[DataPluginT], metaclass=AB
         return plugin
 
 
-class DataPluginIntegrationTests(BaseIntegrationTests[DataPluginT], Generic[DataPluginT], metaclass=ABCMeta):
+class DataPluginIntegrationTests[T: DataPlugin](BaseIntegrationTests[T], metaclass=ABCMeta):
     """Integration testing information for all data plugin test classes"""
 
 
-class DataPluginUnitTests(BaseUnitTests[DataPluginT], Generic[DataPluginT], metaclass=ABCMeta):
+class DataPluginUnitTests[T: DataPlugin](BaseUnitTests[T], metaclass=ABCMeta):
     """Unit testing information for all data plugin test classes"""
 
     def test_pyproject_undefined(self, plugin_data_path: Path | None) -> None:
@@ -215,7 +208,7 @@ class DataPluginUnitTests(BaseUnitTests[DataPluginT], Generic[DataPluginT], meta
             assert not paths
 
 
-class ProviderTests(DataPluginTests[ProviderT], Generic[ProviderT], metaclass=ABCMeta):
+class ProviderTests[T: Provider](DataPluginTests[T], metaclass=ABCMeta):
     """Shared functionality between the different Provider testing categories"""
 
     @pytest.fixture(name="plugin_configuration_type", scope="session")
@@ -246,7 +239,7 @@ class ProviderTests(DataPluginTests[ProviderT], Generic[ProviderT], metaclass=AB
         scope="session",
         params=provider_variants,
     )
-    def fixture_provider_type(self, plugin_type: type[ProviderT]) -> type[ProviderT]:
+    def fixture_provider_type(self, plugin_type: type[T]) -> type[T]:
         """Fixture defining all testable variations mock Providers
 
         Args:
@@ -294,7 +287,7 @@ class ProviderTests(DataPluginTests[ProviderT], Generic[ProviderT], metaclass=AB
         return scm_type
 
 
-class GeneratorTests(DataPluginTests[GeneratorT], Generic[GeneratorT], metaclass=ABCMeta):
+class GeneratorTests[T: Generator](DataPluginTests[T], metaclass=ABCMeta):
     """Shared functionality between the different Generator testing categories"""
 
     @pytest.fixture(name="plugin_configuration_type", scope="session")
@@ -342,7 +335,7 @@ class GeneratorTests(DataPluginTests[GeneratorT], Generic[GeneratorT], metaclass
         name="generator_type",
         scope="session",
     )
-    def fixture_generator_type(self, plugin_type: type[GeneratorT]) -> type[GeneratorT]:
+    def fixture_generator_type(self, plugin_type: type[T]) -> type[T]:
         """Override
 
         Args:
@@ -373,7 +366,7 @@ class GeneratorTests(DataPluginTests[GeneratorT], Generic[GeneratorT], metaclass
         return scm_type
 
 
-class SCMTests(PluginTests[SCMT], Generic[SCMT], metaclass=ABCMeta):
+class SCMTests[T: SCM](PluginTests[T], metaclass=ABCMeta):
     """Shared functionality between the different SCM testing categories"""
 
     @pytest.fixture(name="plugin_configuration_type", scope="session")
@@ -440,7 +433,7 @@ class SCMTests(PluginTests[SCMT], Generic[SCMT], metaclass=ABCMeta):
         scope="session",
         params=scm_variants,
     )
-    def fixture_scm_type(self, plugin_type: type[SCMT]) -> type[SCM]:
+    def fixture_scm_type(self, plugin_type: type[T]) -> type[SCM]:
         """Fixture defining all testable variations mock Generator
 
         Args:

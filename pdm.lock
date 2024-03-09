@@ -5,7 +5,7 @@
 groups = ["default", "lint", "test"]
 strategy = ["cross_platform"]
 lock_version = "4.4.1"
-content_hash = "sha256:a75b0047003ba83b1f1ce9c628d0cffca157bb4faf86ae6caf7738138af59ca1"
+content_hash = "sha256:f366c78765d7fbd74d024768789f4e1e4c75e3891130b805bb13fa5ae6810807"
 
 [[package]]
 name = "annotated-types"
@@ -117,7 +117,7 @@ files = [
 
 [[package]]
 name = "cppython-core"
-version = "0.7.1.dev3"
+version = "0.7.1.dev7"
 requires_python = ">=3.12"
 summary = "Data definitions for CPPython"
 dependencies = [
@@ -125,8 +125,8 @@ dependencies = [
     "synodic-utilities>=0.1.1.dev3",
 ]
 files = [
-    {file = "cppython_core-0.7.1.dev3-py3-none-any.whl", hash = "sha256:bbf39390611064c0a495f62bddbb9f52edca14d0c21968971ee4110fdf560e29"},
-    {file = "cppython_core-0.7.1.dev3.tar.gz", hash = "sha256:9ec11ef282694a2e6c93678a54a51a4248c0c54f1eaa6bdabcb2e56fb4d0ed56"},
+    {file = "cppython_core-0.7.1.dev7-py3-none-any.whl", hash = "sha256:20cb42be6f2f31f0b66a4fd2add6aae2cc890fe0e46bc1d41e41143a62e7f687"},
+    {file = "cppython_core-0.7.1.dev7.tar.gz", hash = "sha256:bb8eb862b90834827ff8c6b5360489ae90ddd6aac816dc549c74aa899c7ee236"},
 ]
 
 [[package]]
@@ -359,26 +359,26 @@ files = [
 
 [[package]]
 name = "pytest-synodic"
-version = "0.1.1.dev4"
+version = "0.1.1.dev6"
 requires_python = ">=3.12"
 summary = "Synodic Pytest utilities"
 dependencies = [
-    "pytest>=7.4.4",
+    "pytest>=8.0.2",
     "synodic-utilities>=0.1.1.dev5",
 ]
 files = [
-    {file = "pytest_synodic-0.1.1.dev4-py3-none-any.whl", hash = "sha256:481671487a4c7cecb9e1d5b0d85b791363d3969dac5467ad477095b747accb8d"},
-    {file = "pytest_synodic-0.1.1.dev4.tar.gz", hash = "sha256:4d425b939ded48f7dbf3902537c2e563ecf71521c1df47295697825ca9ca3cee"},
+    {file = "pytest_synodic-0.1.1.dev6-py3-none-any.whl", hash = "sha256:9c4e0a450379c54bcb4d2f3875fe8db1ffe3c58ea90ce5a41df5e79fe3a01d46"},
+    {file = "pytest_synodic-0.1.1.dev6.tar.gz", hash = "sha256:16739c0021a778dc69ea5d57b264118e68ef7cc5429312a1a389bd5c1a784239"},
 ]
 
 [[package]]
 name = "synodic-utilities"
-version = "0.1.1.dev6"
-requires_python = ">=3.11"
+version = "0.1.1.dev8"
+requires_python = ">=3.12"
 summary = "Synodic python utility library"
 files = [
-    {file = "synodic_utilities-0.1.1.dev6-py3-none-any.whl", hash = "sha256:3811c1b808bb6c9953f15b62f171fcc8d62fe4eba91a09718cfd4c081f9033f2"},
-    {file = "synodic_utilities-0.1.1.dev6.tar.gz", hash = "sha256:d5f246c1a064054a2de05a427cc1ba935ff56134aac6c7d3f7d947eb2ed21f5e"},
+    {file = "synodic_utilities-0.1.1.dev8-py3-none-any.whl", hash = "sha256:3034f10f780629ef5eea2078fcf82875f7aedee3b0e3fe2c04759bac4a55662a"},
+    {file = "synodic_utilities-0.1.1.dev8.tar.gz", hash = "sha256:e25a9dbd0cdd77bd555705ef3d13489591d43cd8bd93ac211cf9bead4e476c68"},
 ]
 
 [[package]]
