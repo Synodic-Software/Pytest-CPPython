@@ -1,5 +1,4 @@
-"""Test the integrations related to the internal provider implementation and the 'Provider' interface itself
-"""
+"""Test the integrations related to the internal provider implementation and the 'Provider' interface itself"""
 
 from typing import Any
 

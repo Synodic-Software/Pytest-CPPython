@@ -1,6 +1,5 @@
 """Mock provider definitions"""
 
-
 from typing import Any
 
 from cppython_core.plugin_schema.generator import SyncConsumer

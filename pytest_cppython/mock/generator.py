@@ -1,5 +1,4 @@
-"""Shared definitions for testing.
-"""
+"""Shared definitions for testing."""
 
 from typing import Any
 

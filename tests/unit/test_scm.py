@@ -1,5 +1,4 @@
-"""Tests the unit test plugin
-"""
+"""Tests the unit test plugin"""
 
 from typing import Any
 
