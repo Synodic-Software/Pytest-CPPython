@@ -222,17 +222,20 @@ class ProviderTests[T: Provider](DataPluginTests[T], metaclass=ABCMeta):
         return ProviderPluginGroupData
 
     @pytest.fixture(name="plugin_group_data", scope="session")
-    def fixture_plugin_group_data(self, core_plugin_data: CorePluginData) -> ProviderPluginGroupData:
+    def fixture_plugin_group_data(
+        self, project_data: ProjectData, cppython_plugin_data: CPPythonPluginData
+    ) -> ProviderPluginGroupData:
         """Generates plugin configuration data generation from environment configuration
 
         Args:
-            core_plugin_data: The workspace configuration
+            project_data: The project data fixture
+            cppython_plugin_data:The plugin configuration fixture
 
         Returns:
             The plugin configuration
         """
 
-        return resolve_provider(core_plugin_data)
+        return resolve_provider(project_data=project_data, cppython_data=cppython_plugin_data)
 
     @pytest.fixture(
         name="provider_type",
@@ -301,17 +304,20 @@ class GeneratorTests[T: Generator](DataPluginTests[T], metaclass=ABCMeta):
         return GeneratorPluginGroupData
 
     @pytest.fixture(name="plugin_group_data", scope="session")
-    def fixture_plugin_group_data(self, core_plugin_data: CorePluginData) -> GeneratorPluginGroupData:
+    def fixture_plugin_group_data(
+        self, project_data: ProjectData, cppython_plugin_data: CPPythonPluginData
+    ) -> GeneratorPluginGroupData:
         """Generates plugin configuration data generation from environment configuration
 
         Args:
-            core_plugin_data: The workspace configuration
+            project_data: The project data fixture
+            cppython_plugin_data:The plugin configuration fixture
 
         Returns:
             The plugin configuration
         """
 
-        return resolve_generator(core_plugin_data)
+        return resolve_generator(project_data=project_data, cppython_data=cppython_plugin_data)
 
     @pytest.fixture(
         name="provider_type",
@@ -380,17 +386,20 @@ class SCMTests[T: SCM](PluginTests[T], metaclass=ABCMeta):
         return SCMPluginGroupData
 
     @pytest.fixture(name="plugin_group_data", scope="session")
-    def fixture_plugin_group_data(self, core_plugin_data: CorePluginData) -> SCMPluginGroupData:
+    def fixture_plugin_group_data(
+        self, project_data: ProjectData, cppython_plugin_data: CPPythonPluginData
+    ) -> SCMPluginGroupData:
         """Generates plugin configuration data generation from environment configuration
 
         Args:
-            core_plugin_data: The workspace configuration
+            project_data: The project data fixture
+            cppython_plugin_data:The plugin configuration fixture
 
         Returns:
             The plugin configuration
         """
 
-        return resolve_scm(core_plugin_data)
+        return resolve_scm(project_data=project_data, cppython_data=cppython_plugin_data)
 
     @pytest.fixture(
         name="provider_type",
