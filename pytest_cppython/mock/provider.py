@@ -10,7 +10,6 @@ from cppython_core.plugin_schema.provider import (
 )
 from cppython_core.schema import CorePluginData, CPPythonModel, Information, SyncData
 from pydantic import DirectoryPath
-from synodic_utilities.utility import canonicalize_type
 
 from pytest_cppython.mock.generator import MockSyncData
 
@@ -79,8 +78,8 @@ class MockProvider(Provider):
         # This is a mock class, so any generator sync type is OK
         for sync_type in consumer.sync_types():
             match sync_type:
-                case MockSyncData(sync_type):
-                    return MockSyncData(provider_name=canonicalize_type(type(self)).name)
+                case underlying_type if underlying_type is MockSyncData:
+                    return MockSyncData(provider_name=self.name())
 
         return None
 
