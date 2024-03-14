@@ -33,7 +33,7 @@ from pytest_synodic.plugin import UnitTests as SynodicBaseUnitTests
 from pytest_cppython.variants import generator_variants, provider_variants, scm_variants
 
 
-class BaseTests[T: Plugin](SynodicBaseTests[T], metaclass=ABCMeta):  # type: ignore
+class BaseTests[T: Plugin](SynodicBaseTests[T], metaclass=ABCMeta):
     """Shared testing information for all plugin test classes."""
 
     @pytest.fixture(name="plugin_type", scope="session")
@@ -90,11 +90,11 @@ class BaseTests[T: Plugin](SynodicBaseTests[T], metaclass=ABCMeta):  # type: ign
         return "cppython"
 
 
-class BaseIntegrationTests[T: Plugin](SynodicBaseIntegrationTests[T], metaclass=ABCMeta):  # type: ignore
+class BaseIntegrationTests[T: Plugin](SynodicBaseIntegrationTests[T], metaclass=ABCMeta):
     """Integration testing information for all plugin test classes"""
 
 
-class BaseUnitTests[T: Plugin](SynodicBaseUnitTests[T], metaclass=ABCMeta):  # type: ignore
+class BaseUnitTests[T: Plugin](SynodicBaseUnitTests[T], metaclass=ABCMeta):
     """Unit testing information for all plugin test classes"""
 
     def test_feature_extraction(self, plugin_type: type[T], project_configuration: ProjectConfiguration) -> None:
