@@ -65,7 +65,7 @@ class MockProvider(Provider):
 
         return sync_type == MockSyncData
 
-    def sync_data(self, consumer: type[SyncConsumer]) -> SyncData | None:
+    def sync_data(self, consumer: SyncConsumer) -> SyncData | None:
         """Gathers synchronization data
 
         Args:
